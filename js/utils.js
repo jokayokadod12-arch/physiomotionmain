@@ -239,12 +239,21 @@ async function asyncGetAllUsers() {
 }
 
 // ── Auth ──────────────────────────────────────────────────
+function dashboardUrlForRole(role) {
+  if (role === 'doctor') return 'choose-year.html';
+  if (role === 'student') return 'student-dashboard.html';
+  return 'choose-role.html';
+}
+
 function requireAuth(requiredRole = null) {
   const user = getCurrentUser();
   if (!user) { window.location.href = 'login.html'; return null; }
-  if (requiredRole && user.role !== requiredRole) {
-    window.location.href = user.role === 'doctor' ? 'choose-year.html' : 'choose-role.html';
-    return null;
+  if (requiredRole) {
+    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    if (!allowedRoles.includes(user.role)) {
+      window.location.href = dashboardUrlForRole(user.role);
+      return null;
+    }
   }
   // Silently refresh user data from Firestore in background
   if (window.FIREBASE_ENABLED) {
@@ -286,7 +295,7 @@ async function logout() {
 function goHome() {
   const user = getCurrentUser();
   if (!user) { window.location.href = 'login.html'; return; }
-  window.location.href = user.role === 'doctor' ? 'choose-year.html' : 'choose-role.html';
+  window.location.href = dashboardUrlForRole(user.role);
 }
 function goProfile() { window.location.href = 'profile.html'; }
 function formatDate(d) { return d || '—'; }

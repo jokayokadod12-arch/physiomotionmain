@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!currentUser) return;
 
   const role = currentUser.role;
-  document.getElementById('displayRole').textContent  = role.charAt(0).toUpperCase() + role.slice(1);
+  const roleLabels = { doctor: 'Doctor', patient: 'Patient', student: 'College Student' };
+  document.getElementById('displayRole').textContent  = roleLabels[role] || (role.charAt(0).toUpperCase() + role.slice(1));
   document.getElementById('displayEmail').textContent = currentUser.email;
 
   const initials = (currentUser.name || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Student Dashboard — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ── WELCOME HERO ── */
+.dash-hero {
+  position:relative; z-index:1;
+  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, var(--sage) 100%);
+  padding: 36px 24px 52px; overflow: hidden;
+}
+.dash-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 50%, rgba(90,122,98,.3) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 90% 20%, rgba(184,148,63,.15) 0%, transparent 55%);
+}
+.dash-hero::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, transparent, var(--sage-pale), var(--gold-light), var(--sage-pale), transparent);
+}
+.hero-inner {
+  max-width:900px; margin:0 auto; position:relative; z-index:1;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+}
+.hw-left { flex:1; }
+.hw-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 14px; border-radius:100px;
+  background:rgba(250,247,242,.1); border:1px solid rgba(250,247,242,.2);
+  font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:rgba(250,247,242,.7); margin-bottom:14px;
+}
+.hw-pulse {
+  width:6px; height:6px; border-radius:50%; background:var(--sage-pale);
+  animation: hwblink 2s ease-in-out infinite;
+}
+@keyframes hwblink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+.hw-name {
+  font-family:'Playfair Display', serif;
+  font-size: clamp(20px, 3.5vw, 32px); font-weight:700;
+  color:#FAF7F2; letter-spacing:-.5px; margin-bottom:6px; line-height:1.2;
+}
+.hw-sub { font-size:13px; color:rgba(250,247,242,.45); }
+.hw-right { display:flex; gap:16px; flex-wrap:wrap; }
+.hw-stat {
+  text-align:center; padding:14px 20px;
+  background:rgba(250,247,242,.08); border:1px solid rgba(250,247,242,.12); border-radius:14px;
+}
+.hw-stat-n {
+  font-family:'Playfair Display', serif;
+  font-size:24px; font-weight:700; color:#FAF7F2; display:block; letter-spacing:-.5px;
+}
+.hw-stat-l {
+  font-size:10px; font-weight:600; text-transform:uppercase;
+  letter-spacing:1px; color:rgba(250,247,242,.75); display:block; margin-top:3px;
+}
+
+/* ── MAIN ── */
+.dash-main {
+  flex:1; max-width:900px; margin:0 auto; width:100%;
+  padding:36px 24px 80px; position:relative; z-index:1;
+}
+
+/* ── SECTION LABEL ── */
+.sec-lbl {
+  font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--sage); margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-lbl::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
+
+/* ── DASHBOARD CARDS ── */
+.cards-row {
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:32px;
+}
+@media(max-width:680px) { .cards-row { grid-template-columns: 1fr 1fr; } }
+@media(max-width:380px) { .cards-row { grid-template-columns: 1fr 1fr; gap:10px; } }
+
+.dash-card {
+  background: white; border:1px solid var(--border); border-radius:20px;
+  display:flex; flex-direction:column; align-items:center;
+  padding:28px 18px 22px; gap:12px; cursor:pointer;
+  transition:all .28s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden; text-align:center;
+  box-shadow: var(--shadow-sm);
+}
+.dash-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background: var(--dc, var(--sage)); opacity:0; transition:opacity .28s;
+  border-radius:20px 20px 0 0;
+}
+.dash-card::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(90,122,98,.04), transparent);
+  opacity:0; transition:opacity .28s;
+}
+.dash-card:hover::before, .dash-card:hover::after { opacity:1; }
+.dash-card:hover {
+  transform:translateY(-6px);
+  border-color: rgba(90,122,98,.25);
+  box-shadow: 0 16px 50px rgba(44,44,44,.11);
+}
+.dc-icon {
+  width:64px; height:64px; border-radius:18px;
+  background:var(--bg-warm, #F5EFE4); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; transition:all .28s; position:relative; z-index:1;
+}
+.dash-card:hover .dc-icon { transform:scale(1.08); box-shadow:0 4px 16px rgba(44,44,44,.1); }
+.dc-title {
+  font-family:'Playfair Display', serif;
+  font-size:14px; font-weight:700; color:var(--forest);
+  position:relative; z-index:1; letter-spacing:-.1px;
+}
+.dc-desc { font-size:11px; color:var(--muted); line-height:1.55; position:relative; z-index:1; }
+.dc-arrow { font-size:16px; color:rgba(90,122,98,.2); transition:.28s; position:relative; z-index:1; }
+.dash-card:hover .dc-arrow { color:var(--dc, var(--sage)); transform:translateX(3px); }
+
+/* ── LOCKED / COMING SOON CARDS ── */
+.dash-card.is-locked { cursor:pointer; opacity:.82; filter:grayscale(.15); }
+.dash-card.is-locked:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(44,44,44,.08); }
+.dash-card.is-locked .dc-icon { background:var(--cream-warm, #F5EFE4); }
+.soon-badge {
+  position:absolute; top:12px; right:12px; z-index:2;
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 9px; border-radius:100px;
+  background:rgba(44,44,44,.06); border:1px solid rgba(44,44,44,.1);
+  font-size:9px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+  color:var(--muted, #8A8A8A);
+}
+
+/* ── TIP CARD ── */
+.tip-card {
+  background:linear-gradient(135deg, var(--forest-deep), var(--forest));
+  border-radius:20px; padding:24px 28px;
+  display:flex; align-items:center; gap:18px;
+  box-shadow: var(--shadow);
+}
+.tip-icon { font-size:36px; flex-shrink:0; }
+.tip-text h4 {
+  font-family:'Playfair Display', serif;
+  font-size:16px; font-weight:700; color:#FAF7F2; margin-bottom:5px;
+}
+.tip-text p { font-size:13px; color:rgba(250,247,242,.55); line-height:1.65; }
+
+/* ── TOAST ── */
+.stu-toast {
+  position:fixed; left:50%; bottom:28px; transform:translate(-50%, 20px);
+  background:var(--forest-deep, #1A3020); color:#FAF7F2;
+  padding:13px 22px; border-radius:100px; font-size:13px; font-weight:600;
+  box-shadow:0 12px 40px rgba(0,0,0,.28); z-index:9999;
+  display:flex; align-items:center; gap:8px;
+  opacity:0; pointer-events:none; transition: all .3s cubic-bezier(.22,1,.36,1);
+}
+.stu-toast.show { opacity:1; transform:translate(-50%, 0); }
+
+@media(max-width:420px) {
+  .dash-card { padding:18px 12px 15px; border-radius:16px; gap:8px; }
+  .dc-icon { width:50px; height:50px; font-size:22px; }
+  .dc-title { font-size:12px; }
+  .dc-desc { display:none; }
+  .dash-main { padding:22px 14px 70px; }
+  .dash-hero { padding:28px 16px 44px; }
+  .tip-card { flex-direction:column; gap:12px; text-align:center; }
+  .soon-badge { font-size:8px; padding:2px 7px; top:9px; right:9px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="doLogout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="dash-hero">
+  <div class="hero-inner">
+    <div class="hw-left">
+      <div class="hw-badge"><span class="hw-pulse"></span>Student Dashboard</div>
+      <h2 class="hw-name">Welcome, <span id="studentName">—</span> 🎓</h2>
+      <p class="hw-sub">Your physiotherapy learning space</p>
+    </div>
+    <div class="hw-right">
+      <div class="hw-stat">
+        <span class="hw-stat-n" id="statYear">—</span>
+        <span class="hw-stat-l">Year of Study</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="dash-main">
+  <div class="sec-lbl">Your Study Modules</div>
+
+  <div class="cards-row">
+
+    <div class="dash-card" style="--dc:#9B59B6" onclick="window.location.href='guidelines.html'">
+      <div class="dc-icon">📚</div>
+      <div class="dc-title">Clinical Guidelines</div>
+      <div class="dc-desc">Evidence-based research &amp; AI search across clinical databases</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:#e91e63" onclick="window.location.href='muscle-test.html'">
+      <div class="dc-icon">💪</div>
+      <div class="dc-title">Muscle Testing</div>
+      <div class="dc-desc">Full MMT guide — grading, nerve supply &amp; technique videos</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card is-locked" onclick="comingSoon('Physio Communication Center')">
+      <span class="soon-badge">🔒 Coming Soon</span>
+      <div class="dc-icon">🗣️</div>
+      <div class="dc-title">Physio Communication Center</div>
+      <div class="dc-desc">Connect &amp; discuss with fellow students and mentors</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card is-locked" onclick="comingSoon('Physio Lessons')">
+      <span class="soon-badge">🔒 Coming Soon</span>
+      <div class="dc-icon">🎥</div>
+      <div class="dc-title">Physio Lessons</div>
+      <div class="dc-desc">Structured lessons &amp; courses for physiotherapy students</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card is-locked" onclick="comingSoon('Anatomy')">
+      <span class="soon-badge">🔒 Coming Soon</span>
+      <div class="dc-icon">🦴</div>
+      <div class="dc-title">Anatomy</div>
+      <div class="dc-desc">Interactive anatomy reference for every body system</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+  </div>
+
+  <div class="tip-card" id="tipCard">
+    <div class="tip-icon" id="tipIcon">💡</div>
+    <div class="tip-text">
+      <h4 id="tipTitle">Study Tip</h4>
+      <p id="tipBody">Loading tip...</p>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const TIPS = [
+      {icon:'📚', title:'Master the Basics First', text:'A strong grasp of anatomy and kinesiology makes every clinical concept click faster later. Never skip the fundamentals.'},
+      {icon:'💪', title:'Practice MMT on Real People', text:'Manual muscle testing is a hands-on skill. Practice grading on classmates or family whenever you can — it builds muscle memory, literally.'},
+      {icon:'📖', title:'Read Primary Research', text:'Don\'t just rely on textbooks. Reading original studies in the Clinical Guidelines section builds real evidence-based thinking.'},
+      {icon:'🧠', title:'Understand, Don\'t Memorise', text:'Ask "why" for every technique. Understanding the mechanism behind a test or treatment beats rote memorisation every time.'},
+      {icon:'🎯', title:'Learn Landmarks by Touch', text:'Palpation skills separate good therapists from great ones. Spend extra time locating bony landmarks and muscle bellies by feel.'},
+      {icon:'📝', title:'Keep a Case Log', text:'Write short notes on every patient case or clinical scenario you observe. Reviewing them later reveals patterns you\'d otherwise miss.'},
+      {icon:'🤝', title:'Learn From Every Doctor', text:'Every clinician has a different technique. Watch, ask questions, and build your own style from the best of what you see.'},
+      {icon:'⏱️', title:'Consistency Beats Cramming', text:'Short daily review sessions of muscle grading and clinical guidelines beat one long cram session before exams.'},
+      {icon:'🧩', title:'Connect Systems Together', text:'Physiotherapy is rarely one system in isolation. Practice thinking about how nerve, muscle, and joint findings relate to each other.'},
+      {icon:'🌟', title:'Stay Curious', text:'The best clinicians never stop learning. Treat every guideline you read and every muscle test you practice as one more tool in your toolkit.'}
+    ];
+    let idx = Math.floor(Math.random() * TIPS.length);
+    function showTip(t, animate) {
+      const card = document.getElementById('tipCard');
+      const icon = document.getElementById('tipIcon');
+      const title = document.getElementById('tipTitle');
+      const body = document.getElementById('tipBody');
+      if (animate) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(8px)';
+        setTimeout(() => {
+          icon.textContent = t.icon;
+          title.textContent = t.title;
+          body.textContent = t.text;
+          card.style.transition = 'opacity .5s ease, transform .5s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 300);
+      } else {
+        icon.textContent = t.icon;
+        title.textContent = t.title;
+        body.textContent = t.text;
+        card.style.transition = 'opacity .5s ease, transform .5s ease';
+      }
+    }
+    showTip(TIPS[idx], false);
+    setInterval(() => {
+      idx = (idx + 1) % TIPS.length;
+      showTip(TIPS[idx], true);
+    }, 10000);
+  })();
+  </script>
+</main>
+
+<div class="stu-toast" id="stuToast"><span>🔒</span><span id="stuToastMsg"></span></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  if (!firebase.apps.length) firebase.initializeApp({
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  });
+  window._fbDb = firebase.firestore();
+  window._fbStorage = firebase.storage();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+  const user = requireAuth('student');
+  if (user) {
+    document.getElementById('studentName').textContent = user.name || user.email;
+    const ys = user.profile && user.profile.yearStudy;
+    const yearLabels = { '1':'Year 1', '2':'Year 2', '3':'Year 3', '4':'Year 4', '5':'Year 5', 'intern':'Internship' };
+    document.getElementById('statYear').textContent = ys ? (yearLabels[ys] || ys) : '—';
+  }
+  function goProfile() { window.location.href = 'profile.html'; }
+  async function doLogout() {
+    const ok = await customConfirm('Are you sure you want to log out?', {
+      title: 'Logout', icon: '🚪', confirmLabel: 'Logout', cancelLabel: 'Cancel', danger: true
+    });
+    if (!ok) return;
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+  }
+
+  let _toastTimer = null;
+  function comingSoon(name) {
+    const t = document.getElementById('stuToast');
+    document.getElementById('stuToastMsg').textContent = name + ' is coming soon — stay tuned!';
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+</script>
+</body>
+</html>

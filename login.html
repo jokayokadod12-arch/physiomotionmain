@@ -214,7 +214,8 @@ body::before {
 }
 
 /* ROLE SELECT */
-.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+@media(max-width:420px) { .role-grid { grid-template-columns: 1fr; } }
 .role-opt {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 14px 10px; border-radius: 14px;
@@ -361,11 +362,17 @@ body::before {
               <span class="role-name">Doctor</span>
               <span class="role-desc">Physiotherapy professional</span>
             </label>
+            <label class="role-opt" id="ropt-student" onclick="pickRole('student')">
+              <span class="role-ico">🎓</span>
+              <span class="role-name">College Student</span>
+              <span class="role-desc">Physiotherapy student</span>
+            </label>
           </div>
           <!-- ORIGINAL ID — login.js reads this -->
           <select id="signupRole" name="role" style="display:none;">
             <option value="patient">Patient</option>
             <option value="doctor">Doctor</option>
+            <option value="student">College Student</option>
           </select>
         </div>
 
@@ -478,6 +485,7 @@ function pickRole(role) {
   document.getElementById('signupRole').value = role;
   document.getElementById('ropt-patient').classList.toggle('selected', role === 'patient');
   document.getElementById('ropt-doctor').classList.toggle('selected', role === 'doctor');
+  document.getElementById('ropt-student').classList.toggle('selected', role === 'student');
 }
 
 // ── Password eye toggle ──
@@ -515,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try {
     const u = JSON.parse(localStorage.getItem('currentUser'));
     if (u && u.email) {
-      window.location.href = u.role === 'doctor' ? 'choose-year.html' : 'choose-role.html';
+      window.location.href = u.role === 'doctor' ? 'choose-year.html' : (u.role === 'student' ? 'student-dashboard.html' : 'choose-role.html');
     }
   } catch(e) {}
 });

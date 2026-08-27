@@ -1,6 +1,6 @@
-const CACHE_NAME = 'physio-v4';
+const CACHE_NAME = 'physio-v5';
 const STATIC_FILES = [
-  '/login.html', '/choose-role.html', '/choose-year.html', '/index.html',
+  '/login.html', '/choose-role.html', '/choose-year.html', '/student-dashboard.html', '/index.html',
   '/plans.html', '/my-exercises.html', '/progress.html', '/pain-helper.html',
   '/patient-helper.html', '/patient-files.html',
   '/exercises-library.html', '/exercises-videos.html', '/guidelines.html',

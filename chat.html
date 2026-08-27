@@ -835,7 +835,7 @@ function closeSidebar() { document.getElementById('sidebar').classList.remove('o
 function initials(name) { return (name || '?').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2); }
 function e(s)  { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function e2(s) { return e(s).replace(/\n/g, '<br>'); }
-function goHome() { window.location.href = ME?.role === 'doctor' ? 'choose-year.html' : 'choose-role.html'; }
+function goHome() { window.location.href = (typeof dashboardUrlForRole === 'function') ? dashboardUrlForRole(ME?.role) : (ME?.role === 'doctor' ? 'choose-year.html' : 'choose-role.html'); }
 
 // ─── Load all data from Firestore into caches ────────────
 async function loadAllFromFirestore() {

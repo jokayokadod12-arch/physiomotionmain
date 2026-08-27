@@ -26,7 +26,7 @@ async function doLogin() {
     if (window.FIREBASE_ENABLED) {
       fbSaveUser(user).catch(() => {});
     }
-    window.location.href = user.role === 'doctor' ? 'choose-year.html' : 'choose-role.html';
+    window.location.href = user.role === 'doctor' ? 'choose-year.html' : (user.role === 'student' ? 'student-dashboard.html' : 'choose-role.html');
   } catch(e) {
     showMsg('loginMsg','Something went wrong. Try again.');
   } finally {

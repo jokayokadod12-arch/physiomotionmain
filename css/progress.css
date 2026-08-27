@@ -1,0 +1,15 @@
+.page-container{width:100%;max-width:900px;margin:0 auto;padding:24px 18px 80px;position:relative;z-index:1;}
+@media(max-width:600px){.page-container{padding:18px 14px 70px;}}
+
+.progress-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow),var(--shadow-sage);position:relative;}
+.progress-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(90,122,98,.16),transparent);}
+.progress-card h2{font-family:'Playfair Display',monospace;font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:16px;letter-spacing:.5px;}
+.assign-prog{background:rgba(90,122,98,.02);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;transition:.18s;}
+.assign-prog:hover{border-color:rgba(90,122,98,.2);}
+.assign-prog h3{font-family:'Playfair Display',monospace;font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:3px;}
+.assign-prog .meta{font-size:12px;color:var(--text-muted);margin-bottom:9px;}
+.prog-numbers{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-top:7px;}
+.breakdown{display:flex;gap:12px;margin-top:7px;flex-wrap:wrap;}
+.breakdown .item{font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.breakdown .done{color:var(--success);}.breakdown .pending{color:var(--warning);}
+@media(max-width:600px){.progress-card{padding:14px;}.assign-prog{padding:11px 13px;}}

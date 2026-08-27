@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Find a Doctor — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+:root{--cyan:#7A9E82;--blue:#5A7A62;--dark:#FAF7F2;--text:#2C2C2C;--border:rgba(90,122,98,.14);}
+@keyframes pulse { 0%,100%{opacity:.4;transform:scale(1);} 50%{opacity:1;transform:scale(1.15);} }
+body{display:flex;flex-direction:column;min-height:100vh;}
+.pw{max-width:680px;margin:0 auto;padding:22px 16px 100px;width:100%;position:relative;z-index:1;}
+#drList{width:100%;}
+
+/* ── Search ── */
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-row{display:flex;gap:10px;}
+.search-input{flex:1;background:rgba(245,239,228,.88);border:1px solid rgba(90,122,98,.22);border-radius:10px;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:15px;padding:11px 15px;outline:none;transition:border-color .18s;}
+.search-input::placeholder{color:var(--muted);}
+.search-input:focus{border-color:rgba(90,122,98,.45);}
+.search-btn{padding:11px 20px;background:rgba(90,122,98,.12);border:1px solid rgba(90,122,98,.3);color:var(--cyan);font-family:'Playfair Display',monospace;font-size:11px;letter-spacing:.5px;border-radius:10px;cursor:pointer;transition:.18s;white-space:nowrap;}
+.search-btn:hover{background:rgba(90,122,98,.22);}
+
+/* ── Autocomplete ── */
+.autocomplete{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#FFFFFF;border:1px solid rgba(90,122,98,.25);border-radius:10px;z-index:100;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.6);display:none;}
+.autocomplete.open{display:block;}
+.ac-item{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(90,122,98,.07);transition:.14s;}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover{background:rgba(90,122,98,.09);}
+.ac-av{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.2);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:11px;font-weight:700;color:var(--cyan);flex-shrink:0;}
+.ac-info{flex:1;min-width:0;}
+.ac-name{font-size:13px;font-weight:700;color:var(--forest);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ac-spec{font-size:11px;color:rgba(90,122,98,.6);}
+.ac-empty{padding:14px;font-size:12px;color:var(--muted);text-align:center;}
+
+/* ── Specialty chips ── */
+.spec-label{font-family:'Playfair Display',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(90,122,98,.4);margin-bottom:7px;margin-top:4px;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{padding:5px 12px;border-radius:18px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(245,239,228,.7);color:rgba(90,122,98,.6);transition:.18s;font-family:'DM Sans',sans-serif;}
+.chip:hover,.chip.on{background:rgba(90,122,98,.14);border-color:var(--cyan);color:var(--cyan);}
+
+/* ── Doctor cards ── */
+.dr-card{background:rgba(245,239,228,.82);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;transition:.2s;position:relative;overflow:hidden;max-width:650px;margin-left:auto;margin-right:auto;}
+.dr-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:.2s;}
+.dr-card:hover{border-color:rgba(90,122,98,.28);transform:translateY(-1px);}
+.dr-card:hover::before{opacity:1;}
+.dr-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+.dr-avatar{width:42px;height:42px;border-radius:9px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.22);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:14px;font-weight:700;color:var(--cyan);flex-shrink:0;}
+.dr-info{flex:1;}
+.dr-name{font-family:'Playfair Display',monospace;font-size:12px;font-weight:700;color:var(--forest);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dr-spec{font-size:11px;color:rgba(90,122,98,.8);margin-bottom:2px;}
+.dr-meta{font-size:11px;color:var(--charcoal-mid);display:flex;flex-wrap:wrap;gap:6px;}
+.avail{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:9px;font-size:10px;font-weight:600;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.22);color:#4caf50;}
+.avail-dot{width:5px;height:5px;border-radius:50%;background:#4caf50;animation:blink 1.4s infinite;}
+.dr-details{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px;align-items:center;}
+.dr-detail-tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--charcoal-mid);background:rgba(90,122,98,.05);border:1px solid rgba(90,122,98,.1);border-radius:6px;padding:2px 7px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+.dr-bio{font-size:11px;color:var(--charcoal-mid);margin-bottom:7px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.dr-hint{font-size:11px;color:rgba(90,122,98,.55);margin-bottom:7px;}
+.dr-acts{display:flex;gap:6px;}
+.act-btn{flex:1;padding:7px 8px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.3px;transition:.18s;text-align:center;}
+.act-book{background:linear-gradient(135deg,var(--sage),#2D4A35);border:1px solid rgba(90,122,98,.3);color:#fff;box-shadow:0 4px 14px rgba(45,74,53,.2);}
+.act-book:hover{box-shadow:0 6px 20px rgba(90,122,98,.3);transform:translateY(-1px);}
+.act-chat{background:rgba(90,122,98,.08);border:1px solid var(--border);color:var(--cyan);}
+.act-chat:hover{background:rgba(90,122,98,.18);}
+.act-profile{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--charcoal-mid);}
+.act-profile:hover{background:rgba(255,255,255,.09);}
+
+/* ── States ── */
+.search-prompt{text-align:center;padding:60px 20px 40px;}
+.sp-icon{font-size:54px;display:block;margin-bottom:14px;opacity:.55;}
+.sp-title{font-family:'Playfair Display',monospace;font-size:14px;color:rgba(90,122,98,.65);margin-bottom:8px;letter-spacing:1px;}
+.sp-sub{font-size:13px;color:var(--muted);line-height:1.8;}
+.loading{text-align:center;padding:50px;font-family:'Playfair Display',monospace;font-size:11px;color:rgba(90,122,98,.4);letter-spacing:2px;}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty span{font-size:48px;display:block;margin-bottom:12px;}
+
+/* ── Booking modal ── */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:#FFFFFF;border:1px solid var(--border);border-radius:18px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;padding:26px 22px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6);}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--charcoal-mid);font-size:20px;cursor:pointer;}
+.modal-close:hover{color:#fff;}
+.m-title{font-family:'Playfair Display',monospace;font-size:14px;color:var(--cyan);margin-bottom:3px;}
+.m-sub{font-size:12px;color:var(--charcoal-mid);margin-bottom:18px;}
+.m-lbl{font-family:'Playfair Display',monospace;font-size:10px;letter-spacing:1.5px;color:rgba(90,122,98,.55);margin-bottom:8px;}
+.stype-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.stype-opt{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:9px;cursor:pointer;border:1px solid var(--border);background:rgba(245,239,228,.6);transition:.18s;}
+.stype-opt:hover,.stype-opt.on{border-color:var(--cyan);background:rgba(90,122,98,.07);}
+.stype-opt input{accent-color:var(--cyan);}
+.stype-name{font-size:14px;font-weight:600;color:var(--text-primary);}
+.stype-dur{font-size:11px;color:rgba(90,122,98,.55);}
+.date-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;}
+.date-row::-webkit-scrollbar{height:3px;}
+.date-row::-webkit-scrollbar-thumb{background:rgba(90,122,98,.2);}
+.d-btn{padding:7px 11px;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:rgba(245,239,228,.7);transition:.18s;text-align:center;flex-shrink:0;min-width:62px;}
+.d-btn:hover,.d-btn.on{border-color:var(--cyan);background:rgba(90,122,98,.1);}
+.d-btn.full{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.d-num{font-family:'Playfair Display',monospace;font-size:15px;font-weight:700;color:var(--forest);}
+.d-name{font-size:10px;color:rgba(90,122,98,.55);text-transform:uppercase;}
+.d-free{font-size:10px;margin-top:2px;}
+.d-free.ok{color:#4caf50;}.d-free.no{color:rgba(255,100,100,.45);}
+.slots-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;min-height:38px;}
+.s-btn{padding:8px 11px;border-radius:7px;cursor:pointer;border:1px solid var(--border);background:rgba(245,239,228,.7);font-family:'Playfair Display',monospace;font-size:12px;color:var(--text-primary);transition:.18s;}
+.s-btn:hover,.s-btn.on{border-color:var(--cyan);background:rgba(90,122,98,.12);color:var(--cyan);}
+.s-btn.taken{opacity:.28;cursor:not-allowed;text-decoration:line-through;pointer-events:none;}
+.hint-bar{background:rgba(90,122,98,.05);border:1px solid rgba(90,122,98,.1);border-radius:7px;padding:8px 12px;font-size:12px;color:rgba(90,122,98,.65);margin-bottom:14px;display:none;}
+.no-slots-box{background:rgba(255,152,0,.06);border:1px solid rgba(255,152,0,.18);border-radius:12px;padding:18px 16px;text-align:center;margin-bottom:14px;}
+.ns-icon{font-size:30px;margin-bottom:8px;}
+.ns-title{font-family:'Playfair Display',monospace;font-size:12px;color:#ff9800;margin-bottom:6px;}
+.ns-sub{font-size:13px;color:var(--charcoal-mid);margin-bottom:14px;line-height:1.6;}
+.btn-req{width:100%;padding:10px;background:rgba(255,152,0,.07);border:1px solid rgba(255,152,0,.22);color:#ff9800;font-family:'Playfair Display',monospace;font-size:11px;letter-spacing:.5px;border-radius:8px;cursor:pointer;transition:.18s;margin-bottom:8px;}
+.btn-req:hover{background:rgba(255,152,0,.16);}
+.btn-confirm{width:100%;padding:12px;background:linear-gradient(135deg,var(--sage),rgba(90,122,98,.13));border:1px solid rgba(90,122,98,.38);color:#fff;font-family:'Playfair Display',monospace;font-size:12px;letter-spacing:1px;border-radius:9px;cursor:pointer;transition:.18s;}
+.btn-confirm:hover:not(:disabled){background:rgba(90,122,98,.15);}
+.btn-confirm:disabled{opacity:.3;cursor:not-allowed;}
+.success-box{display:none;text-align:center;padding:14px 0;}
+.success-box.open{display:block;}
+.suc-icon{font-size:52px;margin-bottom:12px;}
+.suc-title{font-family:'Playfair Display',monospace;font-size:14px;color:#4caf50;margin-bottom:8px;}
+.suc-sub{font-size:13px;color:var(--charcoal-mid);line-height:1.7;}
+
+/* ── Profile modal ── */
+.prof-overlay{display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:20px;}
+.prof-overlay.open{display:flex;}
+.prof-box{background:#FFFFFF;border:1px solid var(--border);border-radius:18px;width:100%;max-width:420px;padding:26px 22px;position:relative;}
+.p-avatar{width:66px;height:66px;border-radius:14px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.22);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:20px;font-weight:700;color:var(--cyan);margin:0 auto 12px;}
+.p-name{font-family:'Playfair Display',monospace;font-size:15px;color:var(--forest);text-align:center;margin-bottom:4px;}
+.p-spec{font-size:13px;color:rgba(90,122,98,.7);text-align:center;margin-bottom:14px;}
+.p-row{font-size:13px;color:var(--charcoal-mid);margin-bottom:7px;display:flex;gap:8px;}
+.p-row strong{color:#2C2C2C;min-width:80px;}
+.p-acts{display:flex;gap:10px;margin-top:16px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🔍</span> Find a Doctor</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-role.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="pw">
+  <button class="btn-back" onclick="window.location.href='choose-role.html'">← Dashboard</button>
+  <div class="page-title">🔍 Find a Physiotherapist</div>
+  <div class="page-subtitle" id="pageSubtitle">Finding doctors in your department…</div>
+
+  <!-- Search with live autocomplete -->
+  <div class="search-wrap">
+    <div class="search-row">
+      <input class="search-input" id="searchQ" type="text"
+             placeholder="Type a doctor name to search…"
+             autocomplete="off"
+             oninput="onInput()"
+             onkeydown="onKey(event)">
+      <button class="search-btn" onclick="commitSearch()">🔍 Search</button>
+    </div>
+    <div class="autocomplete" id="acDrop"></div>
+  </div>
+
+  <!-- Specialty filter chips — shown after a search returns results -->
+  <div id="specSection" style="display:none;">
+    <div class="spec-label">Filter by Specialty</div>
+    <div class="chips" id="chips">
+      <!-- specialty chips are built dynamically from registered doctors -->
+    </div>
+  </div>
+
+  <!-- Doctor results list -->
+  <div id="drList">
+    <div class="search-prompt">
+      <span class="sp-icon">👨‍⚕️</span>
+      <div class="sp-title">Search for a Doctor</div>
+      <div class="sp-sub">
+        Type a doctor's name above and press Search.<br>
+        You can then book an appointment, send a request,<br>
+        or open a direct chat with the doctor.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ BOOKING MODAL ══════════════ -->
+<div class="overlay" id="bookOverlay" onclick="if(event.target===this)closeBook()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBook()">✕</button>
+
+    <div id="bookForm">
+      <div class="m-title" id="bkTitle">Book Appointment</div>
+      <div class="m-sub"   id="bkSub">Physiotherapist</div>
+
+      <div class="m-lbl">Session Type</div>
+      <div class="stype-opts">
+        <label class="stype-opt on">
+          <input type="radio" name="stype" value="first_visit" checked onchange="selType(this.closest('.stype-opt'))">
+          <div><div class="stype-name">First Visit — Assessment</div><div class="stype-dur">60 minutes</div></div>
+        </label>
+        <label class="stype-opt">
+          <input type="radio" name="stype" value="follow_up" onchange="selType(this.closest('.stype-opt'))">
+          <div><div class="stype-name">Follow-up Session</div><div class="stype-dur">30 minutes</div></div>
+        </label>
+        <label class="stype-opt">
+          <input type="radio" name="stype" value="rom_check" onchange="selType(this.closest('.stype-opt'))">
+          <div><div class="stype-name">ROM Check</div><div class="stype-dur">45 minutes</div></div>
+        </label>
+      </div>
+
+      <!-- No open slots -->
+      <div id="noSlotsMsg" class="no-slots-box" style="display:none;">
+        <div class="ns-icon">📅</div>
+        <div class="ns-title">No Open Slots Yet</div>
+        <div class="ns-sub">This doctor hasn't opened their schedule yet.<br>Send a request and they'll reach out to arrange a time.</div>
+        <button class="btn-req" onclick="sendRequest()">📩 Send Appointment Request</button>
+        <button class="btn-confirm" onclick="openChatFromBook()">💬 Message Doctor</button>
+      </div>
+
+      <!-- Available slots -->
+      <div id="slotsSection" style="display:none;">
+        <div class="m-lbl">Select Day</div>
+        <div class="date-row" id="dateRow"></div>
+
+        <div class="m-lbl">Available Time Slots</div>
+        <div class="slots-wrap" id="slotsWrap">
+          <span style="font-size:12px;color:var(--muted);">← Pick a day first</span>
+        </div>
+        <div class="hint-bar" id="slotHint"></div>
+
+        <button class="btn-req" onclick="sendRequest()">📩 No suitable time? Send a Request</button>
+        <button class="btn-confirm" id="confirmBtn" onclick="doBook()" disabled>✅ Confirm Booking</button>
+      </div>
+    </div>
+
+    <div class="success-box" id="successBox">
+      <div class="suc-icon">✅</div>
+      <div class="suc-title">Booking Confirmed!</div>
+      <div class="suc-sub" id="sucDetails"></div>
+      <button class="btn-confirm" style="margin-top:18px;" onclick="window.location.href='my-appointments.html'">View My Appointments →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROFILE MODAL ══════════════ -->
+<div class="prof-overlay" id="profOverlay" onclick="if(event.target===this)closeProf()">
+  <div class="prof-box">
+    <button class="modal-close" onclick="closeProf()">✕</button>
+    <div class="p-avatar" id="pAvatar">?</div>
+    <div class="p-name"   id="pName">—</div>
+    <div class="p-spec"   id="pSpec">—</div>
+    <div id="pDetails"></div>
+    <div class="p-acts">
+      <button class="act-btn act-book"  style="flex:1;" onclick="bookFromProf()">📅 Book</button>
+      <button class="act-btn act-chat"  style="flex:1;" onclick="chatFromProf()">💬 Chat</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  const cfg={apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"};
+  if(!firebase.apps.length)firebase.initializeApp(cfg);
+  window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;
+}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let ME           = null;
+let allDoctors   = [];   // every doctor account fetched from DB
+let searchPool   = [];   // result of the last text search
+let filteredDocs = [];   // searchPool narrowed by specialty chip
+let specFilter   = 'all';
+let selDr=null, selDate=null, selSlot=null, profDr=null;
+let _loaded      = false;
+
+// ── Slot / booking caches ──
+let _drSettingsCache = {};
+let _drSlotsCache    = {};
+let _bookingsCache   = [];
+
+// ═══════════════════════════════════════════════════════════
+//  DATA — load all doctor accounts once (silently, for AC)
+// ═══════════════════════════════════════════════════════════
+async function ensureLoaded() {
+  if (_loaded) return;
+  let users = [];
+
+  if (window.FIREBASE_ENABLED && window._fbDb) {
+    try {
+      const snap = await Promise.race([
+        window._fbDb.collection('users').where('role', '==', 'doctor').get(),
+        new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+      ]);
+      users = snap.docs.map(d => d.data());
+    } catch(e) {
+      console.warn('Firestore doctor query failed:', e.message);
+      try {
+        const snap2 = await Promise.race([
+          window._fbDb.collection('users').get(),
+          new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+        ]);
+        users = snap2.docs.map(d => d.data()).filter(u => u.role === 'doctor');
+      } catch(e2) {
+        console.warn('Fallback also failed:', e2.message);
+      }
+    }
+  }
+
+  // Load doctors first
+  const doctors = users.filter(u => u.role === 'doctor');
+  // Read schedule_settings.online as a durable source of truth.
+  // Keep user.acceptOnline as backward-compatible fallback.
+  await Promise.all(doctors.map(async d => {
+    if (!_drSettingsCache[d.email]) {
+      _drSettingsCache[d.email] = await dbGetScheduleSettings(d.email).catch(() => ({}));
+    }
+  }));
+  allDoctors = doctors.filter(d => (_drSettingsCache[d.email]?.online === true) || (d.acceptOnline === true));
+  _loaded = true;
+  buildSpecialtyChips();
+}
+
+function buildSpecialtyChips() {
+  const seen = new Map();
+  allDoctors.forEach(d => {
+    if (d.profile?.specialty) {
+      seen.set(d.profile.specialty, d.profile.specialtyLabel || d.profile.specialty);
+    }
+  });
+
+  const patientSpec = ME ? (ME.profile?.specialty || '') : '';
+  const container = document.getElementById('chips');
+  container.innerHTML = '';
+
+  // All chip
+  const allChip = document.createElement('div');
+  allChip.className = 'chip' + (patientSpec ? '' : ' on');
+  allChip.dataset.v = 'all';
+  allChip.textContent = '🏥 All Specialties';
+  allChip.onclick = function() { setFilter('all', this); };
+  container.appendChild(allChip);
+
+  seen.forEach((label, value) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (value === patientSpec ? ' on' : '');
+    chip.dataset.v = value;
+    chip.onclick = function() { setFilter(value, this); };
+    chip.textContent = label;
+    container.appendChild(chip);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTOCOMPLETE — shows as user types
+// ═══════════════════════════════════════════════════════════
+let _acTimer = null;
+
+function onInput() {
+  clearTimeout(_acTimer);
+  const q = document.getElementById('searchQ').value.trim();
+  if (!q) { closeAc(); return; }
+  _acTimer = setTimeout(()=>showAc(q), 180);
+}
+
+async function showAc(q) {
+  await ensureLoaded();
+  const ql = q.toLowerCase();
+  const hits = allDoctors.filter(d =>
+    (d.name||'').toLowerCase().includes(ql) ||
+    (d.email||'').toLowerCase().includes(ql)
+  ).slice(0,6);
+
+  const drop = document.getElementById('acDrop');
+  if (!hits.length) {
+    drop.innerHTML = '<div class="ac-empty">No doctor found — try a different name</div>';
+    drop.classList.add('open');
+    return;
+  }
+  drop.innerHTML = hits.map(d => {
+    const spec = d.profile?.specialtyLabel || d.profile?.specialty || '';
+    return `<div class="ac-item" onclick="pickFromAc('${esc(d.email)}')">
+      <div class="ac-av">${initials(d.name)}</div>
+      <div class="ac-info">
+        <div class="ac-name">${esc(d.name||d.email)}</div>
+        <div class="ac-spec">🏥 ${esc(spec)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  drop.classList.add('open');
+}
+
+function closeAc() {
+  document.getElementById('acDrop').classList.remove('open');
+}
+
+function onKey(e) {
+  if (e.key==='Enter')  { closeAc(); commitSearch(); }
+  if (e.key==='Escape') closeAc();
+}
+
+// User clicked a suggestion — immediately show that doctor's card
+async function pickFromAc(email) {
+  closeAc();
+  await ensureLoaded();
+  const dr = allDoctors.find(d=>d.email===email);
+  if (!dr) return;
+  document.getElementById('searchQ').value = dr.name || dr.email;
+  searchPool = [dr];
+  specFilter = 'all';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v==='all'));
+  document.getElementById('specSection').style.display = 'block';
+  applyFilter();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SEARCH (button / Enter)
+// ═══════════════════════════════════════════════════════════
+async function commitSearch() {
+  const q = document.getElementById('searchQ').value.trim();
+  closeAc();
+  if (!q) {
+    // No query — show all doctors
+    searchPool = [...allDoctors];
+    specFilter = 'all';
+    document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v==='all'));
+    document.getElementById('specSection').style.display = searchPool.length ? 'block' : 'none';
+    applyFilter();
+    return;
+  }
+
+  document.getElementById('drList').innerHTML = '<div class="loading">SEARCHING…</div>';
+  document.getElementById('specSection').style.display = 'none';
+
+  await ensureLoaded();
+  const ql = q.toLowerCase();
+  searchPool = allDoctors.filter(d =>
+    (d.name||'').toLowerCase().includes(ql) ||
+    (d.email||'').toLowerCase().includes(ql)
+  );
+
+  specFilter = 'all';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v==='all'));
+  if (searchPool.length) document.getElementById('specSection').style.display = 'block';
+  applyFilter();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SPECIALTY FILTER
+// ═══════════════════════════════════════════════════════════
+function setFilter(v, el) {
+  specFilter = v;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  applyFilter();
+}
+
+function applyFilter() {
+  filteredDocs = specFilter === 'all'
+    ? [...searchPool]
+    : searchPool.filter(d => (d.profile?.specialty || '') === specFilter);
+  // Sort: doctors with full profiles first
+  filteredDocs.sort((a, b) => {
+    const aScore = (a.profile?.specialty ? 2 : 0) + (a.profile?.clinic ? 1 : 0) + (a.name ? 1 : 0);
+    const bScore = (b.profile?.specialty ? 2 : 0) + (b.profile?.clinic ? 1 : 0) + (b.name ? 1 : 0);
+    return bScore - aScore;
+  });
+  renderResults();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER DOCTOR CARDS
+// ═══════════════════════════════════════════════════════════
+function showPrompt() {
+  document.getElementById('specSection').style.display = 'none';
+  document.getElementById('drList').innerHTML = `
+    <div class="search-prompt">
+      <span class="sp-icon">👨‍⚕️</span>
+      <div class="sp-title">Search for a Doctor</div>
+      <div class="sp-sub">Type a doctor's name above and press Search.<br>
+        You can then book an appointment, send a request,<br>or open a direct chat with the doctor.</div>
+    </div>`;
+}
+
+function renderResults() {
+  const el = document.getElementById('drList');
+  if (!filteredDocs.length) {
+    el.innerHTML = searchPool.length
+      ? `<div class="empty"><span>🏥</span><p>No doctors match this specialty filter.<br><small>Try "All Specialties".</small></p></div>`
+      : `<div class="empty"><span>🔍</span><p>No doctor found with that name.<br><small>Check the spelling and try again.</small></p></div>`;
+    return;
+  }
+
+  el.innerHTML = filteredDocs.map(d => {
+    const init    = initials(d.name);
+    const spec    = d.profile?.specialtyLabel || d.profile?.specialty || 'Physiotherapist';
+    const specCode= d.profile?.specialtyCode ? ' (' + d.profile.specialtyCode + ')' : '';
+    const clinic  = d.profile?.clinic  || '';
+    const address = d.profile?.address || '';
+    const years   = d.profile?.years   ? d.profile.years + ' yrs exp' : '';
+    const phone   = d.profile?.phone   || '';
+    const bio     = d.profile?.bio     || '';
+    const next    = nextFreeSlot(d);
+
+    return `<div class="dr-card">
+      <div class="dr-top">
+        <div class="dr-avatar">${init}</div>
+        <div class="dr-info">
+          <div class="dr-name">${esc(d.name||d.email)}</div>
+          <div class="dr-spec">🏥 ${esc(spec+specCode)}</div>
+        </div>
+        <div class="avail"><span class="avail-dot"></span> Active</div>
+      </div>
+      <div class="dr-details">
+        ${years   ? `<span class="dr-detail-tag">⭐ ${esc(years)}</span>` : ''}
+        ${clinic  ? `<span class="dr-detail-tag">🏢 ${esc(clinic)}</span>` : ''}
+        ${address ? `<span class="dr-detail-tag">📍 ${esc(address)}</span>` : ''}
+        ${phone   ? `<span class="dr-detail-tag">📞 ${esc(phone)}</span>` : ''}
+        ${next
+          ? `<span class="dr-detail-tag" style="color:rgba(76,175,80,.8);border-color:rgba(76,175,80,.2);">🗓 ${esc(next)}</span>`
+          : `<span class="dr-detail-tag" style="color:rgba(255,152,0,.7);border-color:rgba(255,152,0,.2);">⏳ No open slots</span>`}
+      </div>
+      ${bio ? `<div class="dr-bio">${esc(bio)}</div>` : ''}
+      <div class="dr-acts">
+        <button class="act-btn act-book"    onclick="openBook('${esc(d.email)}')">📅 Book</button>
+        <button class="act-btn act-chat"    onclick="startChat('${esc(d.email)}','${esc(d.name||d.email)}')">💬 Chat</button>
+        <button class="act-btn act-profile" onclick="openProf('${esc(d.email)}')">👤 Profile</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SLOT HELPERS  (reads doctor's schedule from Firestore)
+// ═══════════════════════════════════════════════════════════
+function getDrSettings(dr) { return _drSettingsCache[dr.email] || {}; }
+function getDrOpenSlots(dr) { return _drSlotsCache[dr.email] || []; }
+function getBookings()      { return _bookingsCache; }
+
+function normalizeSlotKey(k) {
+  // Ensure format is always "YYYY-MM-DD:HH:MM"
+  // k might be "2025-5-1:9:0" or "2025-05-01:09:00"
+  const colonIdx = k.indexOf(':');
+  if (colonIdx === -1) return null;
+  const datePart = k.slice(0, colonIdx);
+  const timePart = k.slice(colonIdx + 1);
+  // Normalize date: YYYY-MM-DD
+  const dParts = datePart.split('-');
+  if (dParts.length !== 3) return null;
+  const normDate = dParts[0] + '-' + String(dParts[1]).padStart(2,'0') + '-' + String(dParts[2]).padStart(2,'0');
+  // Normalize time: HH:MM
+  const tParts = timePart.split(':');
+  if (tParts.length < 2) return null;
+  const normTime = String(tParts[0]).padStart(2,'0') + ':' + String(tParts[1]).padStart(2,'0');
+  return normDate + ':' + normTime;
+}
+
+function getDrSlots(dr, dateStr) {
+  const booked = new Set(
+    getBookings()
+      .filter(b => b.doctorEmail === dr.email && b.date === dateStr
+        && b.status !== 'cancelled' && b.status !== 'rejected'
+        && b.status !== 'noshow' && b.status !== 'deleted')
+      .map(b => b.time)
+  );
+
+  // Normalize all open slot keys then filter by this date
+  const openList = (getDrOpenSlots(dr) || [])
+    .map(normalizeSlotKey)
+    .filter(Boolean);
+
+  const openForDate = openList
+    .filter(k => k.startsWith(dateStr + ':'))
+    .map(k => k.slice(dateStr.length + 1)); // extract "HH:MM"
+
+  if (openForDate.length === 0) return [];
+
+  const slots = [...new Set(openForDate)].map(t => ({
+    time: t,
+    taken: booked.has(t)
+  }));
+
+  slots.sort((a, b) => a.time.localeCompare(b.time));
+  return slots;
+}
+
+function pad(n){return String(n).padStart(2,'0');}
+function localDateStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+
+function nextFreeSlot(dr) {
+  for(let i=0;i<60;i++){
+    const d=new Date(); d.setDate(d.getDate()+i);
+    const ds=localDateStr(d);
+    const free=getDrSlots(dr,ds).find(s=>!s.taken);
+    if(free) return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})+' at '+free.time;
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BOOKING MODAL
+// ═══════════════════════════════════════════════════════════
+async function openBook(email) {
+  selDr = filteredDocs.find(d=>d.email===email) || allDoctors.find(d=>d.email===email);
+  if(!selDr) return;
+  selDate=null; selSlot=null;
+
+  document.getElementById('bkTitle').textContent = 'Book with '+(selDr.name||selDr.email);
+  document.getElementById('bkSub').textContent   = selDr.profile?.specialtyLabel||'Physiotherapist';
+  document.getElementById('bookForm').style.display='block';
+  document.getElementById('successBox').classList.remove('open');
+  document.getElementById('confirmBtn').disabled=true;
+
+  // Show modal with loading state immediately
+  document.getElementById('noSlotsMsg').style.display   = 'none';
+  document.getElementById('slotsSection').style.display = 'block';
+  document.getElementById('slotsWrap').innerHTML = '<span style="font-size:12px;color:rgba(90,122,98,.6);">⏳ Loading available slots…</span>';
+  document.getElementById('dateRow').innerHTML = '';
+  document.getElementById('slotHint').style.display = 'none';
+  document.getElementById('bookOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // Always load fresh from Firebase — never use stale cache for booking modal
+  try {
+    const [settings, openSlots, allSnap] = await Promise.all([
+      dbGetScheduleSettings(selDr.email).catch(() => ({})),
+      dbGetOpenSlots(selDr.email).catch(() => []),
+      window._fbDb.collection('bookings').get().catch(() => null),
+    ]);
+    _drSettingsCache[selDr.email] = settings;
+    _drSlotsCache[selDr.email]    = openSlots;
+    if (allSnap) _bookingsCache = allSnap.docs.map(d => d.data());
+  } catch(e) { console.warn('Failed to load slots:', e); }
+
+  // Reset session type to first
+  document.querySelectorAll('.stype-opt').forEach((o,i)=>o.classList.toggle('on',i===0));
+  document.querySelectorAll('input[name="stype"]')[0].checked=true;
+
+  // Check for future open slots using normalized keys
+  const rawSlots = _drSlotsCache[selDr.email] || [];
+  const today = localDateStr(new Date());
+  const hasFutureSlots = rawSlots.some(k => {
+    const norm = normalizeSlotKey(k);
+    if (!norm) return false;
+    return norm.slice(0, 10) >= today;
+  });
+
+  document.getElementById('noSlotsMsg').style.display   = hasFutureSlots ? 'none' : 'block';
+  document.getElementById('slotsSection').style.display = hasFutureSlots ? 'block' : 'none';
+  if(hasFutureSlots){ buildDates(); resetSlots(); }
+}
+
+function closeBook(){
+  document.getElementById('bookOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function selType(el){
+  document.querySelectorAll('.stype-opt').forEach(o=>o.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function buildDates(){
+  const row=document.getElementById('dateRow');
+  row.innerHTML='';
+  for(let i=0;i<60;i++){
+    const d=new Date(); d.setDate(d.getDate()+i);
+    const ds=localDateStr(d);
+    const free=getDrSlots(selDr,ds).filter(s=>!s.taken).length;
+    const btn=document.createElement('div');
+    btn.className='d-btn'+(free===0?' full':'');
+    btn.dataset.date=ds;
+    btn.innerHTML=`<div class="d-num">${d.getDate()}</div>
+      <div class="d-name">${d.toLocaleDateString('en-US',{weekday:'short'})}</div>
+      <div class="d-free ${free?'ok':'no'}">${free?free+' free':'Full'}</div>`;
+    if(free>0) btn.onclick=()=>selDay(ds,btn);
+    else btn.title='No open slots on this day';
+    row.appendChild(btn);
+  }
+}
+
+function selDay(ds,el){
+  selDate=ds; selSlot=null;
+  document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  buildSlots();
+  document.getElementById('confirmBtn').disabled=true;
+}
+
+function buildSlots(){
+  const wrap=document.getElementById('slotsWrap');
+  const hint=document.getElementById('slotHint');
+  if(!selDate){
+    wrap.innerHTML='<span style="font-size:12px;color:var(--muted);">← Pick a day first</span>';
+    hint.style.display='none'; return;
+  }
+  const slots=getDrSlots(selDr,selDate);
+  if(!slots.length){
+    wrap.innerHTML='<span style="font-size:12px;color:var(--muted);">No slots on this day.</span>';
+    hint.style.display='none'; return;
+  }
+  wrap.innerHTML=slots.map(s=>
+    `<button class="s-btn ${s.taken?'taken':''}" onclick="pickSlot('${s.time}',this)">${s.time}</button>`
+  ).join('');
+  const first=slots.find(s=>!s.taken);
+  if(first){hint.textContent='💡 Earliest available: '+first.time; hint.style.display='block';}
+  else hint.style.display='none';
+}
+
+function pickSlot(t,el){
+  selSlot=t;
+  document.querySelectorAll('.s-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('confirmBtn').disabled=false;
+}
+
+function resetSlots(){
+  document.getElementById('slotsWrap').innerHTML='<span style="font-size:12px;color:var(--muted);">← Pick a day first</span>';
+  document.getElementById('slotHint').style.display='none';
+}
+
+// Send appointment request (no slot chosen / no slots available)
+async function sendRequest(){
+  if(!selDr) return;
+  const req={
+    id:'req_'+Date.now(),
+    patientEmail:ME.email,
+    patientName: ME.name||ME.email,
+    doctorEmail: selDr.email,
+    doctorName:  selDr.name||selDr.email,
+    message:'Patient requesting an appointment. No suitable slot was available on the schedule.',
+    status:'pending',
+    createdAt:new Date().toISOString()
+  };
+  await dbSaveRequest(req);
+  await pushNotif(selDr.email,'request','Appointment Request',
+    (ME.name||ME.email)+' sent an appointment request.');
+  closeBook();
+  startChat(selDr.email,selDr.name||selDr.email,
+    'Hello, I would like to book an appointment with you. I checked your schedule but could not find a suitable slot. Could you please suggest an available time?');
+}
+
+function openChatFromBook(){
+  if(!selDr) return;
+  closeBook();
+  startChat(selDr.email,selDr.name||selDr.email);
+}
+
+// Confirm a slot booking
+async function doBook(){
+  if(!selDate||!selSlot||!selDr) return;
+  const stype=document.querySelector('input[name="stype"]:checked')?.value||'first_visit';
+  const dur  =stype==='first_visit'?60:stype==='rom_check'?45:30;
+  const label=stype==='first_visit'?'First Visit':stype==='rom_check'?'ROM Check':'Follow-up';
+
+  // Check doctor's auto-accept setting
+  let drSettings = {};
+  try { drSettings = await dbGetScheduleSettings(selDr.email); } catch(e){}
+  const autoAccept = drSettings.auto !== false; // default true
+
+  // Write booking record to Firestore (visible on all devices)
+  const bk={
+    id:'bk_'+Date.now(),
+    patientEmail:ME.email,
+    patientName: ME.name||ME.email,
+    doctorEmail: selDr.email,
+    doctorName:  selDr.name||selDr.email,
+    doctorSpec:  selDr.profile?.specialtyLabel||'',
+    type:stype, typeLabel:label,
+    date:selDate, time:selSlot, duration:dur,
+    status: autoAccept ? 'confirmed' : 'pending_approval',
+    createdAt:new Date().toISOString()
+  };
+  _bookingsCache.push(bk);
+  await dbSaveBooking(bk);
+
+  // Seed conversation in both users' Firestore chat lists
+  const chatId = [ME.email, selDr.email].sort().join('||');
+  await dbSaveConv(ME.email, { id:chatId, otherEmail:selDr.email, otherName:selDr.name||selDr.email, lastMsg:'', lastTime:Date.now() });
+  await dbSaveConv(selDr.email, { id:chatId, otherEmail:ME.email, otherName:ME.name||ME.email, lastMsg:'', lastTime:Date.now() });
+
+  // Notify doctor
+  await pushNotif(selDr.email,'booking','New Booking',
+    (ME.name||ME.email)+' booked '+label+' on '+selDate+' at '+selSlot);
+
+  const dl=new Date(selDate).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const statusMsg = autoAccept
+    ? `✅ Booking Confirmed`
+    : `⏳ Awaiting Doctor Approval`;
+  document.getElementById('sucDetails').innerHTML=
+    `<strong style="color:var(--forest);">${esc(selDr.name)}</strong><br>📅 ${dl} at ${selSlot}<br>🗂 ${label} · ${dur} min<br><span style="font-size:12px;color:${autoAccept?'#3D8B5B':'#B8943F'}">${statusMsg}</span>`;
+  document.getElementById('bookForm').style.display='none';
+  document.getElementById('successBox').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROFILE MODAL
+// ═══════════════════════════════════════════════════════════
+function openProf(email){
+  profDr=filteredDocs.find(d=>d.email===email)||allDoctors.find(d=>d.email===email);
+  if(!profDr) return;
+  document.getElementById('pAvatar').textContent=initials(profDr.name);
+  document.getElementById('pName').textContent  =profDr.name||profDr.email;
+  document.getElementById('pSpec').textContent  =profDr.profile?.specialtyLabel||'Physiotherapist';
+  const p=profDr.profile||{};
+  let det='';
+  if(p.years)   det+=`<div class="p-row"><strong>Experience</strong><span>${esc(p.years)} years</span></div>`;
+  if(p.clinic)  det+=`<div class="p-row"><strong>Clinic</strong><span>${esc(p.clinic)}</span></div>`;
+  if(p.address) det+=`<div class="p-row"><strong>Location</strong><span>${esc(p.address)}</span></div>`;
+  if(p.bio)     det+=`<div class="p-row"><strong>About</strong><span>${esc(p.bio.slice(0,150))}</span></div>`;
+  det+=`<div class="p-row"><strong>Email</strong><span>${esc(profDr.email)}</span></div>`;
+  document.getElementById('pDetails').innerHTML=det;
+  document.getElementById('profOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeProf(){document.getElementById('profOverlay').classList.remove('open');document.body.style.overflow='';}
+function bookFromProf(){closeProf();if(profDr)openBook(profDr.email);}
+function chatFromProf(){closeProf();if(profDr)startChat(profDr.email,profDr.name||profDr.email);}
+
+// ═══════════════════════════════════════════════════════════
+//  CHAT
+// ═══════════════════════════════════════════════════════════
+async function startChat(email, name, premsg) {
+  // Pre-seed conversation in both users' Firestore lists
+  const chatId = [ME.email, email].sort().join('||');
+  await dbSaveConv(ME.email, { id:chatId, otherEmail:email, otherName:name||email, lastMsg:'', lastTime:Date.now() });
+  await dbSaveConv(email, { id:chatId, otherEmail:ME.email, otherName:ME.name||ME.email, lastMsg:'', lastTime:Date.now() });
+  let url = 'chat.html?with=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name||email);
+  if (premsg) url += '&premsg=' + encodeURIComponent(premsg);
+  window.location.href = url;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════
+async function pushNotif(toEmail,type,title,body){
+  const notif={id:'n'+Date.now(),type,title,body,ts:Date.now(),read:false};
+  await dbPushNotif(toEmail, notif);
+}
+function initials(name){return(name||'?').split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+// Close autocomplete when clicking outside the search wrap
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search-wrap')) closeAc();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async ()=>{
+  ME=requireAuth('patient');
+  if(!ME) return;
+  if(window.Notification&&Notification.permission==='default') Notification.requestPermission();
+
+  const patientSpec      = ME.profile?.specialty || '';
+  const patientSpecLabel = ME.profile?.specialtyLabel || ME.profile?.specialty || '';
+
+  // Update subtitle
+  document.getElementById('pageSubtitle').textContent = patientSpec
+    ? 'Showing doctors in your department: ' + patientSpecLabel
+    : 'All registered physiotherapists — search by name or filter by specialty';
+
+  // Skeleton loading cards
+  document.getElementById('drList').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${[1,2,3].map(()=>`
+        <div style="max-width:650px;margin:0 auto;width:100%;background:rgba(245,239,228,.5);border:1px solid rgba(90,122,98,.1);border-radius:12px;padding:12px 14px;animation:pulse 1.4s ease-in-out infinite;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div style="width:42px;height:42px;border-radius:9px;background:rgba(90,122,98,.08);flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="height:12px;background:rgba(90,122,98,.1);border-radius:4px;margin-bottom:7px;width:55%;"></div>
+              <div style="height:10px;background:rgba(90,122,98,.07);border-radius:4px;width:38%;"></div>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  await ensureLoaded();
+
+  // Load ALL bookings (so doctor's booked slots show as taken for any patient)
+  try {
+    const [myBks, allBks] = await Promise.all([
+      dbGetPatientBookings(ME.email).catch(() => []),
+      dbGetDoctorBookings ? Promise.resolve([]) : Promise.resolve([]) // placeholder
+    ]);
+    // Fetch all bookings to check doctor slot occupancy
+    const allSnap = await window._fbDb.collection('bookings').get().catch(() => null);
+    _bookingsCache = allSnap ? allSnap.docs.map(d => d.data()) : myBks;
+  } catch(e) { _bookingsCache = []; }
+
+  searchPool = [...allDoctors];
+
+  if (searchPool.length) {
+    document.getElementById('specSection').style.display = 'block';
+    // Auto-select patient's specialty chip
+    if (patientSpec) {
+      specFilter = patientSpec;
+      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c.dataset.v === patientSpec));
+      const matched = document.querySelector(`.chip[data-v="${patientSpec}"]`);
+      if (!matched) {
+        specFilter = 'all';
+        document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.v==='all'));
+      }
+    }
+    applyFilter();
+    // Load slots for all doctors in background, then re-render to update availability tags
+    (async () => {
+      try {
+        await Promise.all(allDoctors.map(async dr => {
+          if (!_drSlotsCache[dr.email]) {
+            [_drSettingsCache[dr.email], _drSlotsCache[dr.email]] = await Promise.all([
+              dbGetScheduleSettings(dr.email).catch(() => ({})),
+              dbGetOpenSlots(dr.email).catch(() => []),
+            ]);
+          }
+        }));
+        renderResults(); // re-render now that slots are loaded
+      } catch(e) { console.warn('Background slots load failed:', e); }
+    })();
+  } else {
+    document.getElementById('drList').innerHTML = `
+      <div style="text-align:center;padding:48px 20px;">
+        <div style="font-size:40px;margin-bottom:12px;">👨‍⚕️</div>
+        <div style="font-family:'Playfair Display',monospace;font-size:13px;color:var(--charcoal-mid);margin-bottom:8px;">No doctors registered yet</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+          Doctors need to register and set up their profiles.<br>
+          Once they do, they'll appear here automatically.
+        </div>
+      </div>`;
+    document.getElementById('specSection').style.display = 'none';
+  }
+});
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Exercises Library — Physio Motion Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .library-main {
+      flex:1; max-width:980px; margin:0 auto;
+      padding:30px 20px 60px; position:relative; z-index:1;
+      width:100%;
+    }
+    .dept-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:20px; margin-top:28px;
+    }
+    .dept-card {
+      background:rgba(245,239,228,.8);
+      border:1px solid rgba(90,122,98,.13);
+      border-radius:16px; overflow:hidden; cursor:pointer;
+      transition:all .25s ease;
+      box-shadow:0 8px 28px rgba(0,0,0,.4);
+      position:relative;
+    }
+    .dept-card:hover {
+      transform:translateY(-6px);
+      border-color:rgba(90,122,98,.4);
+      box-shadow:0 16px 48px rgba(0,0,0,.5),0 0 24px rgba(90,122,98,.12);
+    }
+    .dept-banner {
+      height:110px; display:flex;
+      align-items:center; justify-content:center;
+      font-size:54px; position:relative;
+    }
+    .banner-women  { background:linear-gradient(135deg,#1a0d26,#2d1040); }
+    .banner-ortho  { background:linear-gradient(135deg,#021a2e,#EDE3D4); }
+    .banner-muscle { background:linear-gradient(135deg,#0d1a10,#1a2e18); }
+    .banner-neuro  { background:linear-gradient(135deg,#0d0d26,#1a1a40); }
+    .dept-banner::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(to bottom,transparent 60%,rgba(0,0,0,.4));
+    }
+    .dept-body { padding:18px 20px; }
+    .dept-body h3 {
+      font-family:'Playfair Display',monospace;
+      font-size:13px; font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase;
+      color:#7A9E82; margin-bottom:8px;
+    }
+    .dept-body p {
+      font-size:12px; color:var(--charcoal-mid);
+      line-height:1.6; margin-bottom:12px;
+    }
+    .vid-badge {
+      display:inline-block;
+      padding:3px 10px; border-radius:20px;
+      font-size:11px; font-weight:700;
+      letter-spacing:.5px; text-transform:uppercase;
+      background:rgba(90,122,98,.08);
+      color:rgba(90,122,98,.7);
+      border:1px solid rgba(90,122,98,.2);
+    }
+    .back-wrap { margin-top:36px; }
+  </style>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Exercises Library</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="library-main">
+  <button class="btn-back" onclick="goHome()">← Dashboard</button>
+  <div class="page-title">Exercise Departments</div>
+  <div class="page-subtitle">Select a department to browse and assign exercises</div>
+
+  <div class="dept-grid">
+    <div class="dept-card" onclick="openDept('women')" tabindex="0">
+      <div class="dept-banner banner-women">🌸</div>
+      <div class="dept-body">
+        <h3>Women's Health</h3>
+        <p>Pregnancy, postpartum recovery, pelvic floor strengthening, and women's wellness exercises.</p>
+        <span class="vid-badge">4 Videos</span>
+      </div>
+    </div>
+    <div class="dept-card" onclick="openDept('orthopedic')" tabindex="0">
+      <div class="dept-banner banner-ortho">🦴</div>
+      <div class="dept-body">
+        <h3>Orthopedic</h3>
+        <p>Post-surgical rehabilitation, fracture recovery, joint replacement and bone health exercises.</p>
+        <span class="vid-badge">6 Videos</span>
+      </div>
+    </div>
+    <div class="dept-card" onclick="openDept('musculoskeletal')" tabindex="0">
+      <div class="dept-banner banner-muscle">💪</div>
+      <div class="dept-body">
+        <h3>Musculoskeletal</h3>
+        <p>Back pain relief, neck exercises, posture correction, muscle strengthening and flexibility.</p>
+        <span class="vid-badge">5 Videos</span>
+      </div>
+    </div>
+    <div class="dept-card" onclick="openDept('neuromuscular')" tabindex="0">
+      <div class="dept-banner banner-neuro">🧠</div>
+      <div class="dept-body">
+        <h3>Neuromuscular</h3>
+        <p>Stroke recovery, balance training, coordination exercises, and nervous system rehabilitation.</p>
+        <span class="vid-badge">5 Videos</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    try {
+      var _FBCFG = {
+        apiKey:            "AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+        authDomain:        "physiowork-8976f.firebaseapp.com",
+        projectId:         "physiowork-8976f",
+        storageBucket:     "physiowork-8976f.firebasestorage.app",
+        messagingSenderId: "789519816056",
+        appId:             "1:789519816056:web:c2c8d82c83f8149fd1a48d"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+      window._fbDb      = firebase.firestore();
+      window._fbStorage = firebase.storage();
+      window.FIREBASE_ENABLED = true;
+    } catch(e) {
+      console.warn('Firebase init failed:', e);
+      window.FIREBASE_ENABLED = false;
+    }
+  </script>
+<script src="js/utils.js"></script>
+<script>
+  requireAuth();
+  function openDept(dept) { window.location.href = `exercises-videos.html?dept=${dept}`; }
+  document.querySelectorAll('.dept-card').forEach(c => {
+    c.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') c.click(); });
+  });
+</script>
+
+<script src="js/pwa.js"></script>
+</body>
+</html>

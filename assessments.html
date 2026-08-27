@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Assessments — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body{display:flex;flex-direction:column;min-height:100vh;}
+    .assess-main{flex:1;max-width:900px;margin:0 auto;padding:28px 20px 60px;position:relative;z-index:1;width:100%;}
+    .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:10px;}
+    @media(max-width:520px){.hub-grid{grid-template-columns:1fr;}}
+    .hub-card{
+      background:rgba(245,239,228,.78);border:1px solid rgba(90,122,98,.16);
+      border-radius:20px;padding:32px 26px;cursor:pointer;
+      transition:all .25s;position:relative;overflow:hidden;
+      text-align:center;
+    }
+    .hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--hc,#7A9E82);opacity:0;transition:.25s;border-radius:20px 20px 0 0;}
+    .hub-card:hover::before{opacity:1;}
+    .hub-card:hover{transform:translateY(-6px);border-color:var(--hc,rgba(90,122,98,.4));box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 24px rgba(90,122,98,.1);}
+    .hc-icon{font-size:52px;margin-bottom:14px;display:block;filter:drop-shadow(0 0 10px rgba(90,122,98,.3));}
+    .hc-badge-wrap{display:inline-block;padding:4px 14px;border-radius:20px;font-family:'Playfair Display',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(90,122,98,.1);color:#7A9E82;border:1px solid rgba(90,122,98,.2);margin-bottom:14px;}
+    .hub-card h3{font-family:'Playfair Display',monospace;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--forest);margin-bottom:10px;}
+    .hub-card p{font-size:13px;color:var(--charcoal-mid);line-height:1.7;}
+    /* ROM card — desktop only notice */
+    .desktop-notice{display:none;margin-top:10px;font-size:11px;color:rgba(255,165,0,.7);font-style:italic;}
+    @media(max-width:768px){.desktop-notice{display:block;}}
+  </style>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🔬</span> Assessments</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="window.location.href='chat.html'">💬 Chat</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+<div class="assess-main">
+  <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
+  <div class="page-title">🔬 Assessments</div>
+  <div class="page-subtitle">Clinical assessment tools for physiotherapists</div>
+  <div class="hub-grid">
+
+    <div class="hub-card" style="--hc:#00bcd4" id="romCard" onclick="window.location.href='analyz.html'">
+      <span class="hc-icon">📊</span>
+      <div class="hc-badge-wrap">DESKTOP ONLY</div>
+      <h3>ROM Analyzer</h3>
+      <p>Real-time range of motion analysis using AI pose detection. Measure 12+ joint angles with camera.</p>
+      <div class="desktop-notice">⚠️ Requires desktop browser with camera access</div>
+    </div>
+
+    <div class="hub-card" style="--hc:#e91e63" onclick="window.location.href='muscle-test.html'">
+      <span class="hc-icon">💪</span>
+      <div class="hc-badge-wrap">MANUAL TESTING</div>
+      <h3>Muscle Testing</h3>
+      <p>Full manual muscle testing guide — grading scales, nerve supply, patient positioning and video demonstrations for all body regions.</p>
+    </div>
+
+  </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>try{if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"});window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;}catch(e){window.FIREBASE_ENABLED=false;}</script>
+<script src="js/utils.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+  requireAuth('doctor');
+  // Hide ROM on mobile
+  if(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+    const r=document.getElementById('romCard');
+    if(r){r.style.opacity='.4';r.onclick=()=>alert('ROM Analyzer requires a desktop browser with camera access.');}
+  }
+  function logout(){if(confirm('Logout?')){localStorage.removeItem('currentUser');window.location.href='login.html';}}
+</script>
+</body>
+</html>

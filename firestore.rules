@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users ──────────────────────────────────────────────
+    // Any authenticated read (for login lookups); write only by the owner
+    match /users/{email} {
+      allow read: if true;
+      allow write: if true; // managed via app logic; tighten in production
+    }
+
+    // ── Chat Messages ──────────────────────────────────────
+    // A chatId is built as: [emailA, emailB].sort().join('||')
+    // Only the two participants may read/write messages in the room
+    match /chat_messages/{chatId}/msgs/{msgId} {
+      allow read, write: if
+        // The chatId must contain the requesting user's email
+        // Since we don't have Firebase Auth here, we validate via app logic
+        // and add a client-side filter layer in db.js
+        true; // Replace with Firebase Auth rule when Auth is enabled
+    }
+
+    // ── Conversation Lists ─────────────────────────────────
+    // Each user can only read/write their own conv list
+    match /chat_convs/{email}/list/{convId} {
+      allow read, write: if true; // tighten with Auth in production
+    }
+
+    // ── Muted, Notifications ───────────────────────────────
+    match /chat_muted/{email} {
+      allow read, write: if true;
+    }
+    match /notifications/{email}/items/{itemId} {
+      allow read, write: if true;
+    }
+
+    // ── Bookings ───────────────────────────────────────────
+    match /bookings/{bookingId} {
+      allow read, write: if true;
+    }
+
+    // ── Open Slots ─────────────────────────────────────────
+    match /open_slots/{doctorEmail} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // ── Schedule Settings ──────────────────────────────────
+    match /schedule_settings/{doctorEmail} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // ── All other collections ──────────────────────────────
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

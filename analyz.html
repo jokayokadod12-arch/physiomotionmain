@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ROM Analysis - Physio Motion Analyzer</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+/* ── analyz.html — dark theme layout ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  min-height:100vh;
+  font-family:'DM Sans','Segoe UI',sans-serif;
+  color:#2C2C2C;
+  overflow-x:hidden;
+}
+
+/* ── Header ── */
+header{
+  position:sticky;top:0;z-index:200;
+  height:62px;
+  background:rgba(250,247,242,.92);
+  border-bottom:1px solid rgba(90,122,98,.14);
+  backdrop-filter:blur(14px);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 28px;
+  box-shadow:0 2px 20px rgba(0,0,0,.4);
+}
+header h1{
+  font-family:'Playfair Display',monospace;
+  font-size:15px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:#1a1a1a;
+  display:flex;align-items:center;gap:10px;
+}
+header .hbtns{display:flex;gap:8px;}
+header button{
+  padding:8px 16px;
+  border:1px solid rgba(90,122,98,.25);
+  border-radius:20px;
+  background:rgba(90,122,98,.08);
+  color:#1a1a1a;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  transition:.2s;
+}
+header button:hover{
+  background:rgba(90,122,98,.2);
+  box-shadow:0 0 14px rgba(90,122,98,.2);
+  transform:translateY(-1px);
+}
+
+/* ── Main layout ── */
+.container{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  padding:22px;gap:22px;max-width:1600px;margin:0 auto;
+  position:relative;z-index:1;
+}
+
+/* ── Video Section ── */
+.video-section{
+  background:rgba(245,239,228,.8);
+  border:1px solid rgba(90,122,98,.14);
+  border-radius:18px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  backdrop-filter:blur(10px);
+  padding:20px;
+  flex:1;min-width:660px;max-width:900px;
+}
+.video-wrapper{
+  position:relative;width:100%;height:500px;
+  background:#010d14;border-radius:12px;overflow:hidden;
+  border:1px solid rgba(90,122,98,.1);
+}
+video,canvas{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+video{z-index:1;}canvas{z-index:2;pointer-events:none;}
+
+/* Controls card */
+.controls-card{
+  margin-top:14px;padding:16px;
+  background:rgba(250,247,242,.92);
+  border-radius:12px;border:1px solid rgba(90,122,98,.2);
+  box-shadow:0 4px 16px rgba(44,44,44,.05);
+}
+.ctrl-label{
+  display:block;font-weight:700;color:#1a1a1a;
+  margin-bottom:6px;font-size:11px;
+  text-transform:uppercase;letter-spacing:1px;
+}
+select{
+  width:100%;padding:10px 13px;
+  border:1px solid rgba(90,122,98,.22);
+  border-radius:8px;font-size:14px;
+  background:rgba(250,247,242,.85);
+  color:#2C2C2C;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+}
+select:focus{outline:none;border-color:#7A9E82;box-shadow:0 0 0 3px rgba(90,122,98,.1);}
+select option{background:#F5EFE4;color:#2C2C2C;}
+
+#resolutionInfo{font-size:11px;color:rgba(26,26,26,.5);margin-top:5px;letter-spacing:.5px;}
+
+.btn-row{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+
+.action-btn{
+  padding:9px 16px;border-radius:8px;border:none;
+  background:linear-gradient(135deg,#5A7A62,#2D4A35);
+  color:#fff;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:12px;letter-spacing:.8px;
+  text-transform:uppercase;cursor:pointer;
+  transition:.2s;
+  box-shadow:0 3px 12px rgba(45,74,53,.35);
+}
+.action-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(90,122,98,.25);
+}
+.action-btn:disabled{
+  background:rgba(45,74,53,.2);color:rgba(26,26,26,.3);
+  cursor:not-allowed;box-shadow:none;transform:none;
+}
+.action-btn.red{background:linear-gradient(135deg,#c62828,#b71c1c);}
+.action-btn.gray{background:rgba(80,100,110,.5);color:var(--charcoal-mid);}
+
+#statusMsg{
+  padding:6px 14px;border-radius:16px;
+  font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:11px;letter-spacing:.8px;
+  text-transform:uppercase;margin-left:4px;
+}
+.status-active  {background:rgba(0,230,118,.1);color:#00e676;border:1px solid rgba(0,230,118,.3);}
+.status-inactive{background:rgba(255,82,82,.1); color:#ff5252;border:1px solid rgba(255,82,82,.3);}
+.status-loading {background:rgba(255,214,0,.08);color:#ffd600;border:1px solid rgba(255,214,0,.25);}
+
+.timer-display{
+  font-family:'Playfair Display',monospace;
+  font-size:28px;font-weight:800;color:#1a1a1a;
+  margin-left:8px;
+}
+
+/* Joint legend */
+.joint-legend{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
+  padding:10px 14px;
+  background:rgba(250,247,242,.5);
+  border-radius:8px;font-size:11px;
+  border:1px solid rgba(90,122,98,.08);
+}
+.joint-item{display:flex;align-items:center;gap:6px;color:var(--charcoal-mid);}
+.jdot{
+  width:10px;height:10px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.3);
+  box-shadow:0 0 4px currentColor;
+}
+
+/* Photos section */
+.photos-section{margin-top:20px;}
+.photos-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.photos-header h3{
+  font-family:'Playfair Display',monospace;
+  font-size:12px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:#1a1a1a;
+}
+.photo-counter{
+  background:rgba(90,122,98,.1);
+  color:#1a1a1a;border:1px solid rgba(90,122,98,.25);
+  padding:3px 12px;border-radius:20px;
+  font-weight:700;font-size:12px;letter-spacing:.5px;
+}
+#photoDisplay{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:12px;
+}
+.photo-card{
+  background:rgba(250,247,242,.92);
+  border-radius:10px;overflow:hidden;
+  border:1px solid rgba(90,122,98,.2);
+  transition:.25s;cursor:pointer;position:relative;
+  box-shadow:0 4px 16px rgba(44,44,44,.05);
+}
+.photo-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(90,122,98,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.photo-card img{width:100%;height:135px;object-fit:cover;}
+.photo-info{
+  padding:7px 10px;
+  background:rgba(45,74,53,.3);
+  color:#2C2C2C;font-size:10px;
+  border-top:1px solid rgba(90,122,98,.1);
+}
+.photo-angles-preview{
+  padding:6px 10px;font-size:10px;
+  color:rgba(26,26,26,.6);
+  background:rgba(250,247,242,.5);line-height:1.7;
+}
+.delete-btn{
+  position:absolute;top:5px;right:5px;
+  background:rgba(255,82,82,.8);color:#fff;
+  border:none;width:22px;height:22px;border-radius:50%;
+  cursor:pointer;font-size:13px;font-weight:bold;
+  display:none;line-height:22px;text-align:center;
+  transition:.2s;
+}
+.photo-card:hover .delete-btn{display:block;}
+
+/* ── Data Panel ── */
+.data-panel{
+  background:rgba(245,239,228,.8);
+  border:1px solid rgba(90,122,98,.14);
+  border-radius:18px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+  backdrop-filter:blur(10px);
+  padding:0;
+  flex:0 0 430px;max-width:460px;
+  overflow:hidden;
+}
+.panel-header{
+  background:linear-gradient(135deg,rgba(45,74,53,.5),rgba(45,74,53,.3));
+  border-bottom:1px solid rgba(90,122,98,.15);
+  padding:18px 22px;
+}
+.panel-header h2{
+  font-family:'Playfair Display',monospace;
+  font-size:13px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:#1a1a1a;
+}
+.panel-body{padding:20px 22px;}
+
+.input-group{margin-bottom:14px;}
+.input-group label{
+  display:block;font-weight:700;color:#1a1a1a;
+  margin-bottom:5px;font-size:10px;
+  text-transform:uppercase;letter-spacing:1px;
+}
+input[type=text],input[type=number],textarea,.form-sel{
+  width:100%;padding:10px 13px;
+  border:1px solid rgba(90,122,98,.2);
+  border-radius:8px;font-size:13px;
+  background:rgba(250,247,242,.85);
+  color:#2C2C2C;
+  font-family:'DM Sans',sans-serif;
+  transition:.2s;
+}
+input[type=text]:focus,input[type=number]:focus,
+textarea:focus,.form-sel:focus{
+  outline:none;border-color:#7A9E82;
+  box-shadow:0 0 0 3px rgba(90,122,98,.1);
+  background:rgba(250,247,242,.95);
+}
+input::placeholder,textarea::placeholder{
+  color:rgba(26,26,26,.3);
+}
+.form-sel option{background:#F5EFE4;color:#2C2C2C;}
+textarea{min-height:68px;resize:vertical;}
+
+.row2{display:flex;gap:10px;}
+.row2 .input-group{flex:1;}
+
+/* Joint Selector */
+.joint-selector{
+  background:rgba(250,247,242,.92);
+  border:1px solid rgba(90,122,98,.2);
+  border-radius:12px;padding:16px;margin-bottom:16px;
+  box-shadow:0 4px 16px rgba(44,44,44,.05);
+}
+.joint-selector h3{
+  font-family:'Playfair Display',monospace;
+  font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:#1a1a1a;margin-bottom:12px;text-align:center;
+}
+.select-row{display:flex;gap:8px;margin-bottom:10px;}
+.select-row select{flex:1;padding:9px;border-radius:8px;font-size:12px;}
+
+/* Angle display box */
+.angle-display-box{
+  background:rgba(250,247,242,.7);
+  border:1px solid rgba(90,122,98,.2);
+  border-radius:10px;text-align:center;
+  padding:14px;margin-top:10px;
+  display:none;
+  animation:slideIn .3s ease;
+}
+.angle-display-box.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.angle-value-large{
+  font-family:'Playfair Display',monospace;
+  font-size:48px;font-weight:800;color:#1a1a1a;
+  }
+.angle-label-text{
+  font-size:11px;color:rgba(26,26,26,.65);
+  margin-top:4px;text-transform:uppercase;
+  letter-spacing:1px;font-weight:600;
+}
+.normal-range{font-size:10px;color:var(--muted);margin-top:3px;}
+.quality-badge{
+  display:inline-block;padding:4px 16px;border-radius:20px;
+  font-size:10px;font-weight:700;margin-top:8px;text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.q-good{background:rgba(0,230,118,.1);color:#00e676;border:1px solid rgba(0,230,118,.3);}
+.q-mod {background:rgba(255,214,0,.08);color:#ffd600;border:1px solid rgba(255,214,0,.25);}
+.q-poor{background:rgba(255,82,82,.1); color:#ff5252;border:1px solid rgba(255,82,82,.3);}
+
+/* Bottom buttons */
+.bottom-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.big-btn{
+  width:100%;padding:14px;
+  font-family:'Playfair Display',monospace;
+  font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  border:none;border-radius:10px;cursor:pointer;
+  transition:.25s;position:relative;overflow:hidden;
+}
+.btn-db{
+  background:linear-gradient(180deg,#1e88e5 0%,#5A7A62 40%,#2D4A35 100%);
+  color:#fff;
+  box-shadow:0 4px 0 #004d5a,0 6px 20px rgba(90,122,98,.3);
+}
+.btn-db::before{
+  content:'';position:absolute;inset:0;border-radius:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.18) 0%,transparent 55%);
+  pointer-events:none;
+}
+.btn-db:hover{transform:translateY(-2px);box-shadow:0 4px 0 #004d5a,0 12px 28px rgba(90,122,98,.4);}
+.btn-db:active{transform:translateY(3px);box-shadow:0 1px 0 #004d5a,0 4px 12px rgba(90,122,98,.15);}
+.btn-db:disabled{background:rgba(45,74,53,.2);color:rgba(26,26,26,.3);box-shadow:none;transform:none;cursor:not-allowed;}
+
+.btn-pdf{
+  background:linear-gradient(135deg,rgba(198,40,40,.8),rgba(183,28,28,.9));
+  color:#fff;
+  border:1px solid rgba(255,82,82,.3);
+  box-shadow:0 4px 16px rgba(255,82,82,.2);
+}
+.btn-pdf:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,82,82,.3);}
+.btn-pdf:disabled{background:rgba(198,40,40,.2);color:rgba(255,82,82,.4);box-shadow:none;transform:none;cursor:not-allowed;}
+
+/* Feedback */
+.feedback{
+  padding:11px 14px;border-radius:8px;
+  margin-top:10px;font-weight:700;
+  text-align:center;display:none;font-size:13px;
+  letter-spacing:.3px;
+}
+.fb-success{background:rgba(0,230,118,.1);color:#00e676;border:1px solid rgba(0,230,118,.3);}
+.fb-error  {background:rgba(255,82,82,.1); color:#ff5252;border:1px solid rgba(255,82,82,.3);}
+
+/* ── DATABASE MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.75);z-index:9000;
+  justify-content:center;align-items:center;padding:20px;
+  backdrop-filter:blur(6px);
+}
+.modal-overlay.open{display:flex;}
+.modal-box{
+  background:rgba(250,247,242,.98);
+  border:1px solid rgba(90,122,98,.18);
+  border-radius:18px;
+  width:100%;max-width:920px;max-height:88vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 60px rgba(90,122,98,.06);
+}
+.modal-head{
+  background:linear-gradient(135deg,rgba(45,74,53,.5),rgba(45,74,53,.3));
+  border-bottom:1px solid rgba(90,122,98,.15);
+  padding:16px 22px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.modal-head h2{
+  font-family:'Playfair Display',monospace;
+  font-size:13px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:#1a1a1a;
+}
+.modal-close{
+  background:rgba(90,122,98,.1);border:1px solid rgba(90,122,98,.2);
+  color:#1a1a1a;width:32px;height:32px;border-radius:50%;
+  cursor:pointer;font-size:18px;line-height:32px;
+  text-align:center;transition:.2s;
+}
+.modal-close:hover{background:rgba(255,82,82,.2);color:#ff5252;border-color:rgba(255,82,82,.3);}
+.modal-body{padding:18px;overflow-y:auto;flex:1;}
+
+/* DB toolbar */
+.db-toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.db-toolbar input{
+  flex:1;min-width:180px;
+  padding:9px 13px;
+  background:rgba(250,247,242,.8);
+  border:1px solid rgba(90,122,98,.2);
+  border-radius:8px;font-size:13px;
+  color:#2C2C2C;
+  font-family:'DM Sans',sans-serif;
+}
+.db-toolbar input::placeholder{color:rgba(26,26,26,.3);}
+.db-toolbar input:focus{outline:none;border-color:#7A9E82;}
+
+/* DB Stats */
+.db-stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;margin-bottom:16px;
+}
+.db-stat{
+  background:linear-gradient(135deg,rgba(45,74,53,.4),rgba(45,74,53,.2));
+  border:1px solid rgba(90,122,98,.15);
+  color:#2C2C2C;padding:12px;border-radius:10px;text-align:center;
+}
+.db-stat .dsn{
+  font-family:'Playfair Display',monospace;
+  font-size:24px;font-weight:800;color:#1a1a1a;
+}
+.db-stat .dsl{font-size:10px;opacity:.6;margin-top:2px;text-transform:uppercase;letter-spacing:.8px;}
+
+/* Session card */
+.session-card{
+  border:1px solid rgba(90,122,98,.12);
+  border-radius:12px;margin-bottom:12px;overflow:hidden;
+  background:rgba(245,239,228,.6);
+  transition:.2s;
+}
+.session-card:hover{border-color:rgba(90,122,98,.28);}
+.session-card-head{
+  background:rgba(90,122,98,.05);
+  padding:12px 16px;display:flex;
+  justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:8px;
+  border-bottom:1px solid rgba(90,122,98,.08);
+}
+.session-card-head h3{
+  font-family:'Playfair Display',monospace;
+  font-size:12px;font-weight:700;letter-spacing:1px;color:#1a1a1a;
+}
+.session-date{font-size:11px;color:var(--charcoal-mid);}
+.session-card-body{padding:12px 16px;}
+
+/* Angles grid in DB */
+.angles-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:7px;margin-bottom:10px;
+}
+.ag-item{
+  background:rgba(250,247,242,.5);
+  border:1px solid rgba(90,122,98,.1);
+  border-radius:7px;padding:8px 10px;
+}
+.ag-item .ag-name{font-size:10px;color:rgba(26,26,26,.5);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.ag-item .ag-val{
+  font-family:'Playfair Display',monospace;
+  font-size:16px;font-weight:800;color:#1a1a1a;margin-top:2px;
+}
+.ag-item .ag-val.na{color:var(--muted);font-size:12px;}
+.ag-item .ag-normal{font-size:9px;color:var(--muted);margin-top:1px;}
+
+.session-photos{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+.session-photo-thumb{
+  width:75px;height:56px;object-fit:cover;
+  border-radius:6px;border:1px solid rgba(90,122,98,.15);
+  cursor:pointer;transition:.2s;
+}
+.session-photo-thumb:hover{border-color:#7A9E82;transform:scale(1.07);}
+
+.session-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.sa-btn{
+  padding:6px 14px;border:none;border-radius:7px;
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;cursor:pointer;transition:.2s;
+}
+.sa-print{
+  background:linear-gradient(135deg,rgba(45,74,53,.6),rgba(45,74,53,.4));
+  color:#1a1a1a;border:1px solid rgba(90,122,98,.2);
+}
+.sa-print:hover{background:rgba(90,122,98,.2);}
+.sa-del{
+  background:rgba(255,82,82,.08);
+  color:#ff5252;border:1px solid rgba(255,82,82,.25);
+}
+.sa-del:hover{background:rgba(255,82,82,.2);}
+
+/* DB empty */
+.db-empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.db-empty-icon{font-size:52px;margin-bottom:12px;opacity:.5;}
+
+/* Image preview modal */
+.img-modal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.93);z-index:9999;
+  justify-content:center;align-items:center;cursor:zoom-out;
+}
+.img-modal.open{display:flex;}
+.img-modal img{max-width:90vw;max-height:90vh;border-radius:10px;border:1px solid rgba(90,122,98,.2);}
+.img-close{
+  position:absolute;top:16px;right:22px;
+  color:var(--charcoal-mid);font-size:40px;
+  background:none;border:none;cursor:pointer;line-height:1;
+  transition:.2s;
+}
+.img-close:hover{color:#1a1a1a;}
+</style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    try {
+      var _FBCFG = {
+        apiKey:            "AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+        authDomain:        "physiowork-8976f.firebaseapp.com",
+        projectId:         "physiowork-8976f",
+        storageBucket:     "physiowork-8976f.firebasestorage.app",
+        messagingSenderId: "789519816056",
+        appId:             "1:789519816056:web:c2c8d82c83f8149fd1a48d"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+      window._fbDb      = firebase.firestore();
+      window._fbStorage = firebase.storage();
+      window.FIREBASE_ENABLED = true;
+    } catch(e) {
+      console.warn('Firebase init failed:', e);
+      window.FIREBASE_ENABLED = false;
+    }
+  </script>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🏥 ROM Analysis System</h1>
+  <div class="hbtns">
+    <button onclick="goDatabase()">🗄️ Database</button>
+    <button onclick="goProfile()">👤 Profile</button>
+    <button onclick="goBack()">← Back</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══ VIDEO SECTION ══ -->
+  <div class="video-section">
+    <div class="video-wrapper">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+
+    <div class="controls-card">
+      <label class="ctrl-label">Select Camera</label>
+      <select id="cameraSelect">
+        <option value="">-- Choose Camera --</option>
+      </select>
+      <div style="font-size:12px;color:#1a1a1a;margin-top:5px;" id="resolutionInfo"></div>
+
+      <div class="btn-row">
+        <button class="action-btn" id="startBtn" onclick="startCamera()">▶ Start</button>
+        <button class="action-btn" id="stopBtn"  onclick="stopCamera()"  disabled>⏹ Stop</button>
+        <button class="action-btn" id="captureBtn" onclick="startPhotoTimer()" disabled>📸 Capture (3s)</button>
+        <button class="action-btn gray" onclick="resetSession()">🔄 Reset</button>
+        <span id="timerDisplay" class="timer-display"></span>
+        <span id="statusMsg" class="status-inactive">Camera Stopped</span>
+      </div>
+
+      <div class="joint-legend">
+        <div class="joint-item"><div class="jdot" style="background:#5A7A62"></div>Shoulder</div>
+        <div class="joint-item"><div class="jdot" style="background:#5A7A62"></div>Elbow</div>
+        <div class="joint-item"><div class="jdot" style="background:#64b5f6"></div>Wrist</div>
+        <div class="joint-item"><div class="jdot" style="background:#26c6da"></div>Hip</div>
+        <div class="joint-item"><div class="jdot" style="background:#80deea"></div>Knee</div>
+        <div class="joint-item"><div class="jdot" style="background:#2C2C2C;box-shadow:0 0 0 1px #5A7A62"></div>Ankle</div>
+      </div>
+    </div>
+
+    <div class="photos-section">
+      <div class="photos-header">
+        <h3>📷 Captured Photos</h3>
+        <span id="photoCount" class="photo-counter">0 / 2</span>
+      </div>
+      <div id="photoDisplay"></div>
+    </div>
+  </div>
+
+  <!-- ══ DATA PANEL ══ -->
+  <div class="data-panel">
+    <div class="panel-header">
+      <h2>📋 Patient Data & Measurements</h2>
+    </div>
+    <div class="panel-body">
+    <div class="input-group">
+      <label>Patient Name *</label>
+      <input type="text" id="patientName" placeholder="Enter full name" required>
+    </div>
+
+    <div class="row2">
+      <div class="input-group">
+        <label>Age</label>
+        <input type="number" id="patientAge" placeholder="Years" min="0" max="120">
+      </div>
+      <div class="input-group">
+        <label>Gender</label>
+        <select id="patientGender" class="form-sel">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="input-group">
+        <label>Weight (kg)</label>
+        <input type="number" id="patientWeight" placeholder="kg">
+      </div>
+      <div class="input-group">
+        <label>Height (cm)</label>
+        <input type="number" id="patientHeight" placeholder="cm">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Medical History / Notes</label>
+      <textarea id="patientHistory" placeholder="Relevant medical history, current complaint…"></textarea>
+    </div>
+
+    <!-- Joint Selector -->
+    <div class="joint-selector">
+      <h3>🔍 Select Joint to Monitor</h3>
+      <div class="select-row">
+        <select id="jointType" onchange="updateJointDisplay()">
+          <option value="">-- Joint --</option>
+          <option value="elbow">Elbow Flexion</option>
+          <option value="shoulder-flexion">Shoulder Flexion</option>
+          <option value="shoulder-abduction">Shoulder Abduction</option>
+          <option value="shoulder-extension">Shoulder Extension</option>
+          <option value="knee">Knee Flexion</option>
+          <option value="hip-flexion">Hip Flexion</option>
+        </select>
+        <select id="jointSide" onchange="updateJointDisplay()">
+          <option value="">-- Side --</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
+
+      <div id="angleDisplayBox" class="angle-display-box">
+        <div class="angle-value-large" id="selectedAngle">--°</div>
+        <div class="angle-label-text" id="selectedJointLabel">Select a joint</div>
+        <div class="normal-range" id="normalRange"></div>
+        <div class="quality-badge q-good" id="qualityBadge" style="display:none">--</div>
+      </div>
+    </div>
+
+
+    <div class="bottom-btns">
+      <button class="big-btn btn-db" id="saveDbBtn" onclick="saveToDatabase()">
+        🗄️ Save to Database
+      </button>
+      <button class="big-btn btn-pdf" id="pdfBtn" onclick="generatePDF()">
+        📄 Generate PDF Report
+      </button>
+    </div>
+
+    <div id="feedbackMsg" class="feedback"></div>
+    </div><!-- .panel-body -->
+  </div>
+</div>
+
+<!-- ══════════  DATABASE MODAL  ══════════ -->
+<div class="modal-overlay" id="dbModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>🗄️ Patient Database</h2>
+      <button class="modal-close" onclick="closeDB()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="db-stats" id="dbStats"></div>
+      <div class="db-toolbar">
+        <input type="text" id="dbSearch" placeholder="🔍  Search patient name…" oninput="renderDB()">
+      </div>
+      <div id="dbList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Image preview -->
+<div class="img-modal" id="imgModal" onclick="closeImgModal()">
+  <button class="img-close" onclick="closeImgModal()">×</button>
+  <img id="imgPreview" src="" alt="">
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   GLOBALS
+════════════════════════════════════════════ */
+let video     = document.getElementById('video');
+let canvas    = document.getElementById('overlay');
+let ctx       = canvas.getContext('2d');
+let detector  = null;
+let currentStream = null;
+let isDetecting   = false;
+let capturedPhotos = [];
+const MAX_PHOTOS   = 2;
+let isCapturing    = false;
+let currentAngles  = {};
+let smoothedKp     = {};  // smoothed keypoint positions for fluid skeleton
+
+/* Normal ROM ranges (clinical reference) */
+const NORMAL_ROM = {
+  elbow:               { normal: 145, label: 'Elbow Flexion',       unit:'°', low:90, high:130 },
+  'shoulder-flexion':  { normal: 180, label: 'Shoulder Flexion',    unit:'°', low:90, high:150 },
+  'shoulder-abduction':{ normal: 180, label: 'Shoulder Abduction',  unit:'°', low:90, high:150 },
+  'shoulder-extension':{ normal: 60,  label: 'Shoulder Extension',  unit:'°', low:20, high:45  },
+  knee:                { normal: 140, label: 'Knee Flexion',         unit:'°', low:90, high:130 },
+  'hip-flexion':       { normal: 120, label: 'Hip Flexion',          unit:'°', low:70, high:100 },
+};
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('currentUser'));
+  if (!user) { window.location.href = 'login.html'; return; }
+  getCameras();
+});
+
+/* ════════════════════════════════════════════
+   CAMERAS
+════════════════════════════════════════════ */
+async function getCameras() {
+  const sel  = document.getElementById('cameraSelect');
+  const info = document.getElementById('resolutionInfo');
+  try {
+    // Must get permission first — otherwise labels are empty strings
+    const temp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    temp.getTracks().forEach(t => t.stop());
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams    = devices.filter(d => d.kind === 'videoinput');
+
+    sel.innerHTML = '<option value="">-- Choose Camera --</option>';
+    cams.forEach((c, i) => {
+      const opt   = document.createElement('option');
+      opt.value   = c.deviceId;
+      opt.text    = c.label || `Camera ${i + 1}`;
+      sel.appendChild(opt);
+    });
+
+    if (cams.length === 0) {
+      info.textContent = '⚠ No cameras found';
+      return;
+    }
+    if (cams.length === 1) {
+      sel.value        = cams[0].deviceId;
+      info.textContent = `📷 ${cams[0].label || 'Camera 1'} — ready to start`;
+    } else {
+      info.textContent = `${cams.length} cameras found — select one`;
+    }
+  } catch (e) {
+    updateStatus('⚠ Camera permission denied', 'inactive');
+    sel.innerHTML    = '<option value="">Permission denied</option>';
+    info.textContent = 'Allow camera access in browser settings';
+  }
+}
+
+async function startCamera() {
+  const deviceId = document.getElementById('cameraSelect').value;
+  if (!deviceId) { updateStatus('⚠ Select a camera first', 'inactive'); return; }
+
+  if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); currentStream = null; }
+
+  // Try exact deviceId first, fallback to any camera
+  const constraints = [
+    { video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+    { video: { deviceId: deviceId,            width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+    { video: { deviceId: { exact: deviceId }                                                  }, audio: false },
+    { video: true,                                                                               audio: false },
+  ];
+
+  let stream = null;
+  for (const c of constraints) {
+    try { stream = await navigator.mediaDevices.getUserMedia(c); break; }
+    catch (_) {}
+  }
+
+  if (!stream) {
+    updateStatus('❌ Cannot open camera', 'inactive');
+    document.getElementById('resolutionInfo').textContent = 'Try a different camera or check connections';
+    return;
+  }
+
+  currentStream   = stream;
+  video.srcObject = stream;
+
+  await new Promise(res => {
+    video.onloadedmetadata = () => {
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      document.getElementById('resolutionInfo').textContent =
+        `${video.videoWidth}×${video.videoHeight}  •  ${stream.getVideoTracks()[0]?.label || ''}`;
+      res();
+    };
+    // Safety timeout
+    setTimeout(res, 4000);
+  });
+
+  document.getElementById('startBtn').disabled   = true;
+  document.getElementById('stopBtn').disabled    = false;
+  document.getElementById('captureBtn').disabled = false;
+  updateStatus('Loading AI…', 'loading');
+  await initPoseDetector();
+}
+
+function stopCamera() {
+  if (currentStream) { currentStream.getTracks().forEach(t => t.stop()); currentStream = null; }
+  video.srcObject = null;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('startBtn').disabled   = false;
+  document.getElementById('stopBtn').disabled    = true;
+  document.getElementById('captureBtn').disabled = true;
+  isDetecting = false;
+  updateStatus('Camera Stopped', 'inactive');
+  currentAngles = {};
+}
+
+function updateStatus(msg, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className   = 'status-' + type;
+}
+
+/* ════════════════════════════════════════════
+   POSE DETECTION
+════════════════════════════════════════════ */
+async function initPoseDetector() {
+  try {
+    await tf.setBackend('webgl');
+    detector = await poseDetection.createDetector(
+      poseDetection.SupportedModels.MoveNet,
+      { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING, minPoseScore: 0.25 }
+    );
+    updateStatus('AI Active ✓', 'active');
+    isDetecting = true;
+    detectPose();
+  } catch(e) {
+    updateStatus('Error loading AI', 'inactive');
+  }
+}
+
+async function detectPose() {
+  if (!isDetecting || !detector) return;
+  try {
+    const poses = await detector.estimatePoses(video, { maxPoses:1, flipHorizontal:false });
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (poses.length > 0 && poses[0].keypoints) {
+      const kp = poses[0].keypoints.filter(p => p.score > 0.3);
+      if (kp.length >= 6) {
+        const sx   = canvas.width  / video.videoWidth;
+        const sy   = canvas.height / video.videoHeight;
+        const alpha = 0.35;  // smoothing factor (lower = smoother, higher = more responsive)
+
+        // Apply exponential moving average to each keypoint
+        const skp = kp.map(p => {
+          const x = p.x * sx, y = p.y * sy;
+          const prev = smoothedKp[p.name];
+          if (prev && p.score > 0.3) {
+            smoothedKp[p.name] = { x: prev.x + alpha*(x - prev.x), y: prev.y + alpha*(y - prev.y), name:p.name, score:p.score };
+          } else {
+            smoothedKp[p.name] = { x, y, name:p.name, score:p.score };
+          }
+          return smoothedKp[p.name];
+        });
+
+        drawSkeleton(skp);
+        calculateAllAngles(skp);
+        updateJointDisplay();
+      }
+    }
+  } catch(_) {}
+  requestAnimationFrame(detectPose);
+}
+
+/* ════════════════════════════════════════════
+   SKELETON DRAWING
+════════════════════════════════════════════ */
+const CONNECTIONS = [
+  ['left_shoulder','right_shoulder'],
+  ['left_shoulder','left_elbow'],['left_elbow','left_wrist'],
+  ['right_shoulder','right_elbow'],['right_elbow','right_wrist'],
+  ['left_shoulder','left_hip'],['right_shoulder','right_hip'],
+  ['left_hip','right_hip'],
+  ['left_hip','left_knee'],['left_knee','left_ankle'],
+  ['right_hip','right_knee'],['right_knee','right_ankle'],
+];
+
+const JOINT_COLORS = {
+  left_shoulder:'#5A7A62', right_shoulder:'#5A7A62',
+  left_elbow:'#5A7A62',    right_elbow:'#5A7A62',
+  left_wrist:'#64b5f6',    right_wrist:'#64b5f6',
+  left_hip:'#26c6da',      right_hip:'#26c6da',
+  left_knee:'#80deea',     right_knee:'#80deea',
+  left_ankle:'#2C2C2C',    right_ankle:'#2C2C2C',
+  nose:'#fff176',
+};
+
+function drawSkeleton(kp) {
+  ctx.save();
+  ctx.lineCap  = 'round';
+  ctx.lineJoin = 'round';
+
+  // ── Bone color by body segment ──
+  const SEG_COLORS = {
+    'left_shoulder-right_shoulder':  { h: 'rgba(90,122,98,0.55)', s: 3 },
+    'left_shoulder-left_elbow':      { h: 'rgba(90,122,98,0.80)', s: 4 },
+    'left_elbow-left_wrist':         { h: 'rgba(77,208,225,0.80)', s: 3 },
+    'right_shoulder-right_elbow':    { h: 'rgba(90,122,98,0.80)', s: 4 },
+    'right_elbow-right_wrist':       { h: 'rgba(77,208,225,0.80)', s: 3 },
+    'left_shoulder-left_hip':        { h: 'rgba(0,188,212,0.65)', s: 5 },
+    'right_shoulder-right_hip':      { h: 'rgba(0,188,212,0.65)', s: 5 },
+    'left_hip-right_hip':            { h: 'rgba(90,122,98,0.55)', s: 4 },
+    'left_hip-left_knee':            { h: 'rgba(38,198,218,0.80)', s: 4 },
+    'left_knee-left_ankle':          { h: 'rgba(128,222,234,0.75)', s: 3 },
+    'right_hip-right_knee':          { h: 'rgba(38,198,218,0.80)', s: 4 },
+    'right_knee-right_ankle':        { h: 'rgba(128,222,234,0.75)', s: 3 },
+  };
+
+  // Draw bones with glow effect
+  CONNECTIONS.forEach(([a,b]) => {
+    const p1 = kp.find(k=>k.name===a);
+    const p2 = kp.find(k=>k.name===b);
+    if (!p1||!p2) return;
+    const seg = SEG_COLORS[`${a}-${b}`] || { h:'rgba(90,122,98,0.6)', s:3 };
+
+    // Shadow/glow pass
+    ctx.shadowBlur  = 10;
+    ctx.shadowColor = 'rgba(90,122,98,0.4)';
+    ctx.strokeStyle = seg.h;
+    ctx.lineWidth   = seg.s + 2;
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+
+    // Crisp main line on top
+    ctx.shadowBlur  = 0;
+    ctx.strokeStyle = seg.h;
+    ctx.lineWidth   = seg.s;
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  });
+
+  // Draw joints
+  const JOINT_SIZE = {
+    left_shoulder:7, right_shoulder:7,
+    left_hip:7,      right_hip:7,
+    left_elbow:6,    right_elbow:6,
+    left_knee:6,     right_knee:6,
+    left_wrist:5,    right_wrist:5,
+    left_ankle:5,    right_ankle:5,
+    nose:5,
+  };
+
+  kp.forEach(p => {
+    const color = JOINT_COLORS[p.name] || '#7A9E82';
+    const r     = JOINT_SIZE[p.name] || 5;
+
+    // Outer glow ring
+    ctx.shadowBlur  = 14;
+    ctx.shadowColor = color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r + 3, 0, 2*Math.PI);
+    ctx.strokeStyle = color.replace(')', ',0.3)').replace('rgb(','rgba(') ;
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    // Filled circle
+    ctx.shadowBlur  = 8;
+    ctx.shadowColor = color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, 2*Math.PI);
+    ctx.fillStyle   = color;
+    ctx.fill();
+
+    // White center dot
+    ctx.shadowBlur  = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r * 0.35, 0, 2*Math.PI);
+    ctx.fillStyle   = 'rgba(255,255,255,0.9)';
+    ctx.fill();
+  });
+
+  ctx.shadowBlur = 0;
+
+  // Draw angle arc on selected joint
+  drawAngleArc(kp);
+  ctx.restore();
+}
+
+function drawAngleArc(kp) {
+  const jt   = document.getElementById('jointType').value;
+  const side = document.getElementById('jointSide').value;
+  if (!jt || !side) return;
+
+  const config = getJointPoints(jt, side);
+  if (!config) return;
+
+  const A = kp.find(k => k.name === config.A);
+  const B = kp.find(k => k.name === config.B);
+  const C = kp.find(k => k.name === config.C);
+  if (!A || !B || !C) return;
+
+  // Use the already-computed clinical angle from currentAngles (same values shown in UI)
+  const key = angleKeyFor(jt, side);
+  const displayAng = (key && currentAngles[key] != null) ? currentAngles[key] : null;
+  if (displayAng === null) return;
+
+  // Draw the arc between the two bone vectors at joint B
+  const angle1 = Math.atan2(A.y - B.y, A.x - B.x);
+  const angle2 = Math.atan2(C.y - B.y, C.x - B.x);
+  const arcR   = 40;
+
+  // Arc fill
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(B.x, B.y);
+  ctx.arc(B.x, B.y, arcR, angle1, angle2);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,235,59,0.10)';
+  ctx.fill();
+
+  // Arc stroke
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = 'rgba(255,235,59,0.7)';
+  ctx.strokeStyle = 'rgba(255,235,59,0.95)';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.arc(B.x, B.y, arcR, angle1, angle2);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Bone lines highlight
+  ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(255,235,59,0.5)';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(B.x, B.y);
+  ctx.lineTo(A.x, A.y);
+  ctx.moveTo(B.x, B.y);
+  ctx.lineTo(C.x, C.y);
+  ctx.stroke();
+
+  // Label position: midpoint of the arc
+  let midAngle = (angle1 + angle2) / 2;
+  // Ensure the label goes toward the "opening" of the arc
+  const diffAng = angle2 - angle1;
+  if (Math.abs(diffAng) > Math.PI) midAngle += Math.PI;
+  const lx = B.x + (arcR + 24) * Math.cos(midAngle);
+  const ly = B.y + (arcR + 24) * Math.sin(midAngle);
+  const label = displayAng + '°';
+
+  ctx.font      = 'bold 15px Orbitron, monospace';
+  const tw = ctx.measureText(label).width;
+
+  // Pill background
+  ctx.fillStyle = 'rgba(10,10,10,0.82)';
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(lx - tw/2 - 8, ly - 12, tw + 16, 24, 6);
+  } else {
+    ctx.rect(lx - tw/2 - 8, ly - 12, tw + 16, 24);
+  }
+  ctx.fill();
+
+  // Text
+  ctx.fillStyle    = '#ffeb3b';
+  ctx.shadowBlur   = 8;
+  ctx.shadowColor  = 'rgba(255,235,59,0.9)';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, lx, ly);
+  ctx.shadowBlur   = 0;
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.restore();
+}
+
+/* ════════════════════════════════════════════
+   ANGLE CALCULATIONS  — clinically accurate
+   All angles reported in standard clinical ROM conventions:
+   • Elbow Flexion:      0° = full extension, 145° = full flexion
+   • Knee Flexion:       0° = full extension, 140° = full flexion
+   • Shoulder Flexion:   0° = arm at side,    180° = arm overhead (forward)
+   • Shoulder Abduction: 0° = arm at side,    180° = arm overhead (lateral)
+   • Shoulder Extension: 0° = neutral,         60° = full extension
+   • Hip Flexion:        0° = standing,        120° = thigh to chest
+════════════════════════════════════════════ */
+function getKp(kp, name) { return kp.find(k => k.name === name) || null; }
+
+/**
+ * Core: true 3-point angle at vertex B using dot-product (0–180°)
+ * Returns the interior angle — i.e. angle BETWEEN the two bones.
+ * At full extension (straight limb) this returns ~180°.
+ */
+function calcAngle3(A, B, C) {
+  if (!A || !B || !C) return null;
+  const BAx = A.x - B.x, BAy = A.y - B.y;
+  const BCx = C.x - B.x, BCy = C.y - B.y;
+  const dot   = BAx * BCx + BAy * BCy;
+  const magBA = Math.hypot(BAx, BAy);
+  const magBC = Math.hypot(BCx, BCy);
+  if (magBA < 1e-6 || magBC < 1e-6) return null;
+  const cos = Math.max(-1, Math.min(1, dot / (magBA * magBC)));
+  return Math.round(Math.acos(cos) * 180 / Math.PI);
+}
+
+/**
+ * Signed 2D angle from vector u to vector v (counter-clockwise positive).
+ * Returns degrees in -180 … +180.
+ */
+function signedAngle2D(ux, uy, vx, vy) {
+  const cross = ux * vy - uy * vx;   // z-component of cross product
+  const dot   = ux * vx + uy * vy;
+  return Math.atan2(cross, dot) * 180 / Math.PI;
+}
+
+function calculateAllAngles(kp) {
+  const ls = getKp(kp,'left_shoulder'),  le = getKp(kp,'left_elbow'),   lw = getKp(kp,'left_wrist');
+  const rs = getKp(kp,'right_shoulder'), re = getKp(kp,'right_elbow'),  rw = getKp(kp,'right_wrist');
+  const lh = getKp(kp,'left_hip'),       rh = getKp(kp,'right_hip');
+  const lk = getKp(kp,'left_knee'),      rk = getKp(kp,'right_knee');
+  const la = getKp(kp,'left_ankle'),     ra = getKp(kp,'right_ankle');
+
+  /* ── Elbow Flexion ──
+     interior angle at elbow = 180° when straight.
+     Clinical flexion = 180° − interior → 0° when straight, ~145° fully bent. */
+  const rawElbowL = ls && le && lw ? calcAngle3(ls, le, lw) : null;
+  const rawElbowR = rs && re && rw ? calcAngle3(rs, re, rw) : null;
+  currentAngles.elbowL = rawElbowL !== null ? Math.max(0, Math.min(150, 180 - rawElbowL)) : null;
+  currentAngles.elbowR = rawElbowR !== null ? Math.max(0, Math.min(150, 180 - rawElbowR)) : null;
+
+  /* ── Shoulder Flexion ──
+     Measure the angle between the trunk segment (hip→shoulder, pointing UP)
+     and the arm segment (shoulder→elbow).
+     In image coords: Y increases downward.
+     trunk UP vector = (shoulder - hip).
+     arm vector      = (elbow - shoulder).
+     We use the raw angle between them, then:
+       0°  → arm hanging straight down alongside trunk  (clinical 0°)
+       90° → arm horizontal forward
+       180°→ arm straight up overhead (clinical 180°)
+  */
+  currentAngles.shoulderFlexL = (ls && le && lh) ? calcShoulderFlex(ls, le, lh, 'left')  : null;
+  currentAngles.shoulderFlexR = (rs && re && rh) ? calcShoulderFlex(rs, re, rh, 'right') : null;
+
+  /* ── Shoulder Abduction ──
+     Arm raised to the side (frontal plane).
+     0° = arm at side, 90° = horizontal, 180° = full overhead.
+     We measure the angle of the arm segment (shoulder→elbow) from
+     the straight-down direction (0,+1 in image coords). */
+  currentAngles.shoulderAbdL = (ls && le && lh) ? calcShoulderAbd(ls, le, lh, 'left')  : null;
+  currentAngles.shoulderAbdR = (rs && re && rh) ? calcShoulderAbd(rs, re, rh, 'right') : null;
+
+  /* ── Shoulder Extension ──
+     Arm behind body: 0°→60°.
+     Positive only when elbow is posterior to the trunk line. */
+  currentAngles.shoulderExtL = (ls && le && lh) ? calcShoulderExt(ls, le, lh, 'left')  : null;
+  currentAngles.shoulderExtR = (rs && re && rh) ? calcShoulderExt(rs, re, rh, 'right') : null;
+
+  /* ── Knee Flexion ──
+     interior angle at knee = 180° when straight.
+     Clinical flexion = 180° − interior → 0° straight, ~140° fully bent. */
+  const rawKneeL = lh && lk && la ? calcAngle3(lh, lk, la) : null;
+  const rawKneeR = rh && rk && ra ? calcAngle3(rh, rk, ra) : null;
+  currentAngles.kneeL = rawKneeL !== null ? Math.max(0, Math.min(150, 180 - rawKneeL)) : null;
+  currentAngles.kneeR = rawKneeR !== null ? Math.max(0, Math.min(150, 180 - rawKneeR)) : null;
+
+  /* ── Hip Flexion ──
+     Angle between trunk (shoulder→hip, pointing DOWN) and thigh (hip→knee).
+     When standing straight: shoulder, hip, knee are nearly collinear → interior ≈ 180° → flexion ≈ 0°.
+     Lifting knee toward chest: angle shrinks → flexion increases.
+     Clinical: 0° standing, ~120° max flexion. */
+  currentAngles.hipFlexL = (ls && lh && lk) ? calcHipFlex(ls, lh, lk) : null;
+  currentAngles.hipFlexR = (rs && rh && rk) ? calcHipFlex(rs, rh, rk) : null;
+}
+
+/* ── Shoulder Flexion helper ──
+   Returns 0° when arm hangs down, 90° arm horizontal forward, 180° arm overhead.
+   Works whether camera is in front or to the side of the patient.
+*/
+function calcShoulderFlex(shoulder, elbow, hip, side) {
+  // Trunk UP vector: from hip to shoulder (opposite of gravity in image)
+  const tUx = shoulder.x - hip.x;
+  const tUy = shoulder.y - hip.y;   // negative in image = up
+
+  // Arm vector: from shoulder to elbow
+  const aVx = elbow.x - shoulder.x;
+  const aVy = elbow.y - shoulder.y;
+
+  // angle3 gives the interior angle between trunk-down and arm
+  // We want angle from trunk-UP to arm
+  // trunk-UP = (-tUx, -tUy) relative to shoulder
+  // Use dot-product between (tUx,tUy) flipped to UP and arm vector
+  const upX = -tUx, upY = -tUy; // trunk direction pointing UP from shoulder
+
+  const dot    = upX * aVx + upY * aVy;
+  const magUp  = Math.hypot(upX, upY);
+  const magArm = Math.hypot(aVx, aVy);
+  if (magUp < 1e-6 || magArm < 1e-6) return 0;
+
+  const cos = Math.max(-1, Math.min(1, dot / (magUp * magArm)));
+  const angle = Math.acos(cos) * 180 / Math.PI; // 0° = arm pointing up, 180° = arm pointing down
+
+  // Clinical: 0° when arm at side (arm pointing down = 180° from up = 180° from trunk-UP)
+  // Convert: flexion = 180° − angle  → 0 when hanging, 180 when overhead
+  const flex = Math.round(Math.max(0, Math.min(180, angle)));
+  return flex;
+}
+
+/* ── Shoulder Abduction helper ──
+   0° arm at side (pointing down), 90° horizontal, 180° overhead.
+   Uses angle of (shoulder→elbow) from the straight-down gravity vector (0,+1).
+   Corrected for trunk tilt using the actual trunk-down direction.
+*/
+function calcShoulderAbd(shoulder, elbow, hip, side) {
+  // Trunk DOWN vector (hip relative to shoulder direction, in image Y-down space)
+  const trunkDx = hip.x - shoulder.x;
+  const trunkDy = hip.y - shoulder.y;
+
+  // Arm vector from shoulder to elbow
+  const armDx = elbow.x - shoulder.x;
+  const armDy = elbow.y - shoulder.y;
+
+  const magT = Math.hypot(trunkDx, trunkDy);
+  const magA = Math.hypot(armDx, armDy);
+  if (magT < 1e-6 || magA < 1e-6) return 0;
+
+  // Angle between trunk-down and arm
+  const dot = trunkDx * armDx + trunkDy * armDy;
+  const cos = Math.max(-1, Math.min(1, dot / (magT * magA)));
+  // This angle is 0° when arm is alongside trunk (pointing same way = down)
+  // and 180° when arm is directly up
+  const ang = Math.acos(cos) * 180 / Math.PI;
+
+  // For abduction we clamp to 0–180°
+  return Math.round(Math.max(0, Math.min(180, ang)));
+}
+
+/* ── Shoulder Extension helper ──
+   Arm behind body: 0–60°.
+   Positive only when elbow is posterior to shoulder (behind trunk plane).
+*/
+function calcShoulderExt(shoulder, elbow, hip, side) {
+  // Trunk-forward direction: perpendicular to trunk (shoulder→hip rotated 90°)
+  const trunkDy = hip.y - shoulder.y;
+  const trunkDx = hip.x - shoulder.x;
+
+  // "Forward" perpendicular to trunk (depends on which side of body)
+  // For a front-facing camera: left shoulder → forward is to the right in image
+  // We detect posterior position by checking if elbow crossed behind shoulder
+  const armDx = elbow.x - shoulder.x;
+  const armDy = elbow.y - shoulder.y;
+
+  // Use the trunk as reference plane: project arm onto plane perpendicular to trunk
+  const magT = Math.hypot(trunkDx, trunkDy);
+  if (magT < 1e-6) return 0;
+
+  // Component of arm vector parallel to trunk (down)
+  const dotAT  = armDx * (trunkDx / magT) + armDy * (trunkDy / magT);
+  // Component perpendicular to trunk (lateral/anterior-posterior)
+  const perpX  = armDx - dotAT * (trunkDx / magT);
+  const perpY  = armDy - dotAT * (trunkDy / magT);
+  const perpMag = Math.hypot(perpX, perpY);
+
+  // Extension angle from trunk = angle of arm in the sagittal plane behind
+  const rawAngle = Math.atan2(perpMag, Math.max(0, dotAT)) * 180 / Math.PI;
+
+  // Only register as extension if elbow is behind shoulder
+  // In image (front-facing): left side → elbow.x > shoulder.x = behind
+  //                           right side → elbow.x < shoulder.x = behind
+  const isBehind = (side === 'left')
+    ? elbow.x > shoulder.x + 8
+    : elbow.x < shoulder.x - 8;
+
+  if (!isBehind) return 0;
+  return Math.round(Math.max(0, Math.min(60, rawAngle)));
+}
+
+/* ── Hip Flexion helper ──
+   0° = standing (trunk and thigh aligned), positive when thigh raises forward. */
+function calcHipFlex(shoulder, hip, knee) {
+  const raw = calcAngle3(shoulder, hip, knee);
+  if (raw === null) return null;
+  // raw = 180° when standing straight; decreases as thigh lifts
+  return Math.round(Math.max(0, Math.min(130, 180 - raw)));
+}
+
+/* ════════════════════════════════════════════
+   JOINT POINTS CONFIG  (for arc drawing)
+════════════════════════════════════════════ */
+function getJointPoints(jt, side) {
+  const s = side === 'left' ? 'left' : 'right';
+  const configs = {
+    elbow:                { A:`${s}_shoulder`, B:`${s}_elbow`,   C:`${s}_wrist` },
+    'shoulder-flexion':   { A:`${s}_hip`,      B:`${s}_shoulder`,C:`${s}_elbow` },
+    'shoulder-abduction': { A:`${s}_hip`,      B:`${s}_shoulder`,C:`${s}_elbow` },
+    'shoulder-extension': { A:`${s}_hip`,      B:`${s}_shoulder`,C:`${s}_elbow` },
+    knee:                 { A:`${s}_hip`,      B:`${s}_knee`,    C:`${s}_ankle` },
+    'hip-flexion':        { A:`${s}_shoulder`, B:`${s}_hip`,     C:`${s}_knee`  },
+  };
+  return configs[jt] || null;
+}
+
+/* ════════════════════════════════════════════
+   JOINT DISPLAY & TABLE
+════════════════════════════════════════════ */
+function updateJointDisplay() {
+  const jt   = document.getElementById('jointType').value;
+  const side = document.getElementById('jointSide').value;
+  const box  = document.getElementById('angleDisplayBox');
+
+  if (!jt || !side) { box.classList.remove('active'); return; }
+  box.classList.add('active');
+
+  const info = NORMAL_ROM[jt] || {};
+  document.getElementById('normalRange').textContent =
+    `Normal ROM: 0° – ${info.normal || '?'}°`;
+
+  let angleVal = null;
+  const key = angleKeyFor(jt, side);
+  if (key && currentAngles[key] !== undefined && currentAngles[key] !== null) {
+    angleVal = currentAngles[key];
+  }
+
+  const angleEl   = document.getElementById('selectedAngle');
+  const labelEl   = document.getElementById('selectedJointLabel');
+  const badgeEl   = document.getElementById('qualityBadge');
+
+  const sideLabel = side.charAt(0).toUpperCase() + side.slice(1);
+  labelEl.textContent = `${sideLabel} ${info.label || jt}`;
+
+  if (angleVal !== null && angleVal !== undefined && !isNaN(angleVal)) {
+    angleEl.textContent = angleVal + '°';
+  } else {
+    angleEl.textContent = '--°';
+  }
+  badgeEl.style.display = 'none';  // quality badge removed
+}
+
+function angleKeyFor(jt, side) {
+  const s = side === 'left' ? 'L' : 'R';
+  const map = {
+    elbow: `elbow${s}`,
+    'shoulder-flexion': `shoulderFlex${s}`,
+    'shoulder-abduction': `shoulderAbd${s}`,
+    'shoulder-extension': `shoulderExt${s}`,
+    knee: `knee${s}`,
+    'hip-flexion': `hipFlex${s}`,
+  };
+  return map[jt] || null;
+}
+
+
+
+/* TABLE_ROWS — used by Database display and PDF generation */
+const TABLE_ROWS = [
+  { key:'elbowL',        label:'Left Elbow Flex',      jt:'elbow' },
+  { key:'elbowR',        label:'Right Elbow Flex',     jt:'elbow' },
+  { key:'shoulderFlexL', label:'Left Shoulder Flex',   jt:'shoulder-flexion' },
+  { key:'shoulderFlexR', label:'Right Shoulder Flex',  jt:'shoulder-flexion' },
+  { key:'shoulderAbdL',  label:'Left Shoulder Abd',    jt:'shoulder-abduction' },
+  { key:'shoulderAbdR',  label:'Right Shoulder Abd',   jt:'shoulder-abduction' },
+  { key:'shoulderExtL',  label:'Left Shoulder Ext',    jt:'shoulder-extension' },
+  { key:'shoulderExtR',  label:'Right Shoulder Ext',   jt:'shoulder-extension' },
+  { key:'kneeL',         label:'Left Knee Flex',       jt:'knee' },
+  { key:'kneeR',         label:'Right Knee Flex',      jt:'knee' },
+  { key:'hipFlexL',      label:'Left Hip Flex',        jt:'hip-flexion' },
+  { key:'hipFlexR',      label:'Right Hip Flex',       jt:'hip-flexion' },
+];
+
+/* ════════════════════════════════════════════
+   PHOTO CAPTURE
+════════════════════════════════════════════ */
+function startPhotoTimer() {
+  if (isCapturing) return;
+  if (capturedPhotos.length >= MAX_PHOTOS) { alert('Maximum 2 photos allowed per session.'); return; }
+  isCapturing = true;
+  const timerEl = document.getElementById('timerDisplay');
+  document.getElementById('captureBtn').disabled = true;
+  let s = 3;
+  timerEl.textContent = s;
+  const iv = setInterval(() => {
+    s--;
+    timerEl.textContent = s > 0 ? s : '📸';
+    if (s <= 0) {
+      clearInterval(iv);
+      capturePhoto();
+      timerEl.textContent = '';
+      document.getElementById('captureBtn').disabled = false;
+      isCapturing = false;
+    }
+  }, 1000);
+}
+
+async function capturePhoto() {
+  if (!video.srcObject) return;
+  const cc  = document.createElement('canvas');
+  cc.width  = video.videoWidth;
+  cc.height = video.videoHeight;
+  const cctx = cc.getContext('2d');
+  cctx.drawImage(video, 0, 0);
+
+  // Overlay skeleton on photo — same quality as live view
+  try {
+    const poses = await detector.estimatePoses(video, { maxPoses: 1, flipHorizontal: false });
+    if (poses.length && poses[0].keypoints) {
+      const kp  = poses[0].keypoints.filter(p => p.score > 0.25);
+      const sx  = cc.width  / video.videoWidth;
+      const sy  = cc.height / video.videoHeight;
+      const skp = kp.map(p => ({ x: p.x * sx, y: p.y * sy, name: p.name, score: p.score }));
+
+      cctx.save();
+      cctx.lineCap  = 'round';
+      cctx.lineJoin = 'round';
+
+      // Bones with glow
+      const SEG = {
+        'left_shoulder-right_shoulder':  { c:'rgba(90,122,98,0.7)',  w:3 },
+        'left_shoulder-left_elbow':      { c:'rgba(90,122,98,0.9)',  w:4 },
+        'left_elbow-left_wrist':         { c:'rgba(77,208,225,0.9)', w:3 },
+        'right_shoulder-right_elbow':    { c:'rgba(90,122,98,0.9)',  w:4 },
+        'right_elbow-right_wrist':       { c:'rgba(77,208,225,0.9)', w:3 },
+        'left_shoulder-left_hip':        { c:'rgba(0,188,212,0.8)',  w:5 },
+        'right_shoulder-right_hip':      { c:'rgba(0,188,212,0.8)',  w:5 },
+        'left_hip-right_hip':            { c:'rgba(90,122,98,0.7)',  w:4 },
+        'left_hip-left_knee':            { c:'rgba(38,198,218,0.9)', w:4 },
+        'left_knee-left_ankle':          { c:'rgba(128,222,234,0.85)',w:3},
+        'right_hip-right_knee':          { c:'rgba(38,198,218,0.9)', w:4 },
+        'right_knee-right_ankle':        { c:'rgba(128,222,234,0.85)',w:3},
+      };
+      CONNECTIONS.forEach(([a, b]) => {
+        const p1 = skp.find(k => k.name === a);
+        const p2 = skp.find(k => k.name === b);
+        if (!p1 || !p2) return;
+        const s = SEG[`${a}-${b}`] || { c:'rgba(90,122,98,0.7)', w:3 };
+        cctx.shadowBlur  = 8;
+        cctx.shadowColor = 'rgba(90,122,98,0.5)';
+        cctx.strokeStyle = s.c;
+        cctx.lineWidth   = s.w + 2;
+        cctx.beginPath(); cctx.moveTo(p1.x, p1.y); cctx.lineTo(p2.x, p2.y); cctx.stroke();
+        cctx.shadowBlur  = 0;
+        cctx.lineWidth   = s.w;
+        cctx.beginPath(); cctx.moveTo(p1.x, p1.y); cctx.lineTo(p2.x, p2.y); cctx.stroke();
+      });
+
+      // Joints
+      const JSZ = { left_shoulder:7,right_shoulder:7,left_hip:7,right_hip:7,
+                    left_elbow:6,right_elbow:6,left_knee:6,right_knee:6,
+                    left_wrist:5,right_wrist:5,left_ankle:5,right_ankle:5,nose:5 };
+      skp.forEach(p => {
+        const color = JOINT_COLORS[p.name] || '#7A9E82';
+        const r     = JSZ[p.name] || 5;
+        // Glow ring
+        cctx.shadowBlur  = 12; cctx.shadowColor = color;
+        cctx.beginPath(); cctx.arc(p.x, p.y, r + 3, 0, 2*Math.PI);
+        cctx.strokeStyle = color; cctx.lineWidth = 1.5; cctx.stroke();
+        // Fill
+        cctx.shadowBlur = 6;
+        cctx.beginPath(); cctx.arc(p.x, p.y, r, 0, 2*Math.PI);
+        cctx.fillStyle = color; cctx.fill();
+        // White center
+        cctx.shadowBlur = 0;
+        cctx.beginPath(); cctx.arc(p.x, p.y, r * 0.35, 0, 2*Math.PI);
+        cctx.fillStyle = 'rgba(255,255,255,0.9)'; cctx.fill();
+      });
+
+      cctx.restore();
+    }
+  } catch(_) {}
+
+  // Save the currently selected joint angle at capture time
+  const selJt   = document.getElementById('jointType').value;
+  const selSide = document.getElementById('jointSide').value;
+  const selKey  = selJt && selSide ? angleKeyFor(selJt, selSide) : null;
+  const selVal  = selKey ? (currentAngles[selKey] ?? null) : null;
+  const selLabel = selJt && selSide
+    ? `${selSide.charAt(0).toUpperCase()+selSide.slice(1)} ${NORMAL_ROM[selJt]?.label || selJt}`
+    : null;
+
+  // Resize to max 640px width for Firebase (keep aspect ratio)
+  const MAX_W = 640;
+  let finalCanvas = cc;
+  if (cc.width > MAX_W) {
+    const scale   = MAX_W / cc.width;
+    const resized = document.createElement('canvas');
+    resized.width  = MAX_W;
+    resized.height = Math.round(cc.height * scale);
+    resized.getContext('2d').drawImage(cc, 0, 0, resized.width, resized.height);
+    finalCanvas = resized;
+  }
+
+  const snap = {
+    data:          finalCanvas.toDataURL('image/jpeg', 0.5),
+    time:          new Date().toLocaleString(),
+    angles:        { ...currentAngles },
+    selectedJoint: selLabel,
+    selectedValue: selVal,
+  };
+  capturedPhotos.push(snap);
+  updatePhotoCount();
+  renderPhoto(snap, capturedPhotos.length - 1);
+}
+
+function renderPhoto(snap, idx) {
+  const container = document.getElementById('photoDisplay');
+  const card = document.createElement('div');
+  card.className = 'photo-card';
+
+  const angleDisplay = snap.selectedJoint && snap.selectedValue !== null
+    ? `<b>${snap.selectedJoint}:</b> ${snap.selectedValue}°`
+    : (snap.selectedJoint ? `<b>${snap.selectedJoint}:</b> —` : 'No joint selected');
+
+  card.innerHTML = `
+    <img src="${snap.data}" alt="photo ${idx+1}" onclick="previewImg('${snap.data}')">
+    <div class="photo-info">📷 Photo ${idx+1} &nbsp;—&nbsp; ${snap.time}</div>
+    <div class="photo-angles-preview">${angleDisplay}</div>
+    <button class="delete-btn" onclick="deletePhoto(this,${idx})">×</button>`;
+  container.appendChild(card);
+}
+
+function deletePhoto(btn, idx) {
+  if (!confirm('Delete this photo?')) return;
+  btn.closest('.photo-card').remove();
+  capturedPhotos.splice(idx, 1);
+  updatePhotoCount();
+}
+
+function updatePhotoCount() {
+  document.getElementById('photoCount').textContent = `${capturedPhotos.length} / 2`;
+}
+
+/* ════════════════════════════════════════════
+   SAVE TO DATABASE
+════════════════════════════════════════════ */
+async function saveToDatabase() {
+  const name = document.getElementById('patientName').value.trim();
+  if (!name) { showFeedback('⚠️ Please enter patient name', 'error'); return; }
+  if (capturedPhotos.length === 0) { showFeedback('⚠️ Capture at least one photo first', 'error'); return; }
+
+  const saveBtn = document.getElementById('saveDbBtn');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '💾 Saving…'; }
+
+  const user = JSON.parse(localStorage.getItem('currentUser'));
+
+  const session = {
+    id:          Date.now(),
+    doctorEmail: user.email,
+    doctorName:  user.name,
+    date:        new Date().toLocaleString(),
+    patient: {
+      name:    name,
+      age:     document.getElementById('patientAge').value    || '',
+      gender:  document.getElementById('patientGender').value || '',
+      weight:  document.getElementById('patientWeight').value || '',
+      height:  document.getElementById('patientHeight').value || '',
+      history: document.getElementById('patientHistory').value || '',
+    },
+    angles:  { ...currentAngles },
+    photos:  capturedPhotos.map(p => ({
+      data:          p.data,
+      time:          p.time,
+      angles:        p.angles,
+      selectedJoint: p.selectedJoint || null,
+      selectedValue: p.selectedValue ?? null,
+    })),
+  };
+
+  // Save to localStorage always
+  const sessions = getSessions(user.email);
+  sessions.unshift(session);
+  saveSessions(user.email, sessions);
+
+  // Save to Firebase (each session as separate document)
+  if (window.FIREBASE_ENABLED) {
+    await fbSaveSession(session);
+  }
+
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '💾 Save to Database'; }
+  showFeedback('✅ Session saved to database successfully!', 'success');
+}
+
+function getSessions(email) {
+  try { return JSON.parse(localStorage.getItem('romDB_' + email)) || []; }
+  catch { return []; }
+}
+
+function saveSessions(email, sessions) {
+  localStorage.setItem('romDB_' + email, JSON.stringify(sessions));
+}
+
+// Firebase versions
+async function fbGetSessions(email) {
+  if (!window.FIREBASE_ENABLED || !window._fbDb) return null;
+  try {
+    const snap = await window._fbDb.collection('romSessions')
+      .where('doctorEmail', '==', email).get();
+    return snap.docs.map(d => d.data());
+  } catch(e) { console.warn('fbGetSessions:', e); return null; }
+}
+
+async function fbSaveSession(session) {
+  if (!window.FIREBASE_ENABLED || !window._fbDb) return;
+  try {
+    await window._fbDb.collection('romSessions')
+      .doc(String(session.id)).set(session);
+  } catch(e) {
+    // If too large, try without photos
+    console.warn('fbSaveSession first attempt failed:', e);
+    try {
+      const noPhotos = { ...session, photos: [] };
+      await window._fbDb.collection('romSessions')
+        .doc(String(session.id)).set(noPhotos);
+      console.warn('Saved without photos - photos too large for Firestore');
+    } catch(e2) {
+      console.warn('fbSaveSession failed completely:', e2);
+    }
+  }
+}
+
+async function fbDeleteSession(sessionId) {
+  if (!window.FIREBASE_ENABLED || !window._fbDb) return;
+  try {
+    await window._fbDb.collection('romSessions')
+      .doc(String(sessionId)).delete();
+  } catch(e) { console.warn('fbDeleteSession:', e); }
+}
+
+/* ════════════════════════════════════════════
+   DATABASE MODAL
+════════════════════════════════════════════ */
+function openDB() {
+  document.getElementById('dbModal').classList.add('open');
+  renderDB();
+}
+function closeDB() {
+  document.getElementById('dbModal').classList.remove('open');
+}
+
+function renderDB() {
+  const user     = JSON.parse(localStorage.getItem('currentUser'));
+  const sessions = getSessions(user.email);
+  const q        = document.getElementById('dbSearch').value.toLowerCase().trim();
+
+  const filtered = q
+    ? sessions.filter(s => s.patient.name.toLowerCase().includes(q))
+    : sessions;
+
+  // Stats
+  const uniquePts = new Set(sessions.map(s => s.patient.name.toLowerCase())).size;
+  document.getElementById('dbStats').innerHTML = `
+    <div class="db-stat"><div class="dsn">${sessions.length}</div><div class="dsl">Total Sessions</div></div>
+    <div class="db-stat"><div class="dsn">${uniquePts}</div><div class="dsl">Unique Patients</div></div>
+    <div class="db-stat"><div class="dsn">${sessions.reduce((a,s) => a + (s.photos||[]).length, 0)}</div><div class="dsl">Photos</div></div>
+  `;
+
+  const list = document.getElementById('dbList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="db-empty">
+      <div class="db-empty-icon">🗂️</div>
+      <p>${q ? 'No patients match your search.' : 'No sessions saved yet.<br>Start a session and click Save to Database.'}</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(s => buildSessionCard(s, user.email)).join('');
+}
+
+function buildSessionCard(s, email) {
+  const angleRows = TABLE_ROWS.map(r => {
+    const v = s.angles[r.key];
+    const norm = NORMAL_ROM[r.jt]?.normal;
+    let cls = 'na', disp = '--';
+    if (v !== null && v !== undefined && !isNaN(v)) {
+      disp = v + '°';
+      const pct = norm ? v/norm : 0.5;
+      cls = pct >= 0.85 ? '' : '';
+    }
+    return `<div class="ag-item">
+      <div class="ag-name">${r.label}</div>
+      <div class="ag-val ${v!==null&&v!==undefined&&!isNaN(v)?'':'na'}">${disp}</div>
+      ${norm ? `<div class="ag-normal">Normal: 0–${norm}°</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const photos = (s.photos || []).map(p =>
+    `<img class="session-photo-thumb" src="${p.data}" title="${p.time}" onclick="previewImg('${p.data}')">`
+  ).join('');
+
+  const pt = s.patient;
+  return `
+    <div class="session-card" id="sess-${s.id}">
+      <div class="session-card-head">
+        <div>
+          <h3>👤 ${pt.name}</h3>
+          <div style="font-size:12px;color:#78909c;margin-top:2px;">
+            ${pt.age ? 'Age: '+pt.age : ''} ${pt.gender ? '| '+pt.gender : ''}
+            ${pt.weight ? '| '+pt.weight+' kg' : ''} ${pt.height ? '| '+pt.height+' cm' : ''}
+          </div>
+        </div>
+        <div class="session-date">📅 ${s.date}</div>
+      </div>
+      <div class="session-card-body">
+        ${pt.history ? `<div style="background:#fff3e0;border-left:3px solid #ffa726;padding:8px 10px;border-radius:6px;font-size:12px;color:#6d4c41;margin-bottom:10px;">📋 ${pt.history}</div>` : ''}
+        <div class="angles-grid">${angleRows}</div>
+        ${photos ? `<div class="session-photos">${photos}</div>` : ''}
+        <div class="session-actions">
+          <button class="sa-btn sa-print" onclick="printSessionPDF('${s.id}','${email}')">📄 Print PDF</button>
+          <button class="sa-btn sa-del"   onclick="deleteSession('${s.id}','${email}')">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function deleteSession(id, email) {
+  if (!confirm('Delete this session? This cannot be undone.')) return;
+  let sessions = getSessions(email);
+  sessions = sessions.filter(s => String(s.id) !== String(id));
+  saveSessions(email, sessions);
+  renderDB();
+}
+
+/* ════════════════════════════════════════════
+   PDF  (from database session)
+════════════════════════════════════════════ */
+async function printSessionPDF(sessionId, email) {
+  const sessions = getSessions(email);
+  const s = sessions.find(s => String(s.id) === String(sessionId));
+  if (!s) { alert('Session not found'); return; }
+  await buildPDF(s.patient, s.angles, s.photos || []);
+}
+
+async function generatePDF() {
+  const name = document.getElementById('patientName').value.trim();
+  if (!name) { showFeedback('⚠️ Please enter patient name', 'error'); return; }
+  if (capturedPhotos.length === 0) { showFeedback('⚠️ Capture at least one photo first', 'error'); return; }
+
+  const patient = {
+    name,
+    age:     document.getElementById('patientAge').value || '',
+    gender:  document.getElementById('patientGender').value || '',
+    weight:  document.getElementById('patientWeight').value || '',
+    height:  document.getElementById('patientHeight').value || '',
+    history: document.getElementById('patientHistory').value || '',
+  };
+
+  document.getElementById('pdfBtn').disabled    = true;
+  document.getElementById('pdfBtn').textContent = '⏳ Generating…';
+  try {
+    await buildPDF(patient, currentAngles, capturedPhotos);
+    showFeedback('✅ PDF generated!', 'success');
+  } catch(e) {
+    showFeedback('❌ PDF error: ' + e.message, 'error');
+  } finally {
+    document.getElementById('pdfBtn').disabled    = false;
+    document.getElementById('pdfBtn').textContent = '📄 Generate PDF Report';
+  }
+}
+
+async function buildPDF(patient, angles, photos) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const W   = 210;
+  const mar = 14;
+  const cW  = W - 2 * mar;
+
+  // ── HEADER ──
+  doc.setFillColor(0, 131, 143);
+  doc.rect(0, 0, W, 26, 'F');
+  doc.setFillColor(0, 172, 193);
+  doc.rect(0, 26, W, 2, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+  doc.text('ROM ANALYSIS REPORT', W / 2, 10, { align: 'center' });
+  doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+  doc.text('Physio Motion Analyzer  ·  AI Range of Motion Assessment', W / 2, 17, { align: 'center' });
+  doc.text('Generated: ' + new Date().toLocaleString(), W / 2, 23, { align: 'center' });
+
+  let y = 33;
+
+  // ── PATIENT INFORMATION ──
+  const hasHistory = patient.history && patient.history.trim();
+  const infoH = hasHistory ? 34 : 26;
+
+  doc.setFillColor(240, 252, 253);
+  doc.roundedRect(mar, y, cW, infoH, 2, 2, 'F');
+  doc.setDrawColor(0, 172, 193); doc.setLineWidth(0.4);
+  doc.roundedRect(mar, y, cW, infoH, 2, 2);
+  doc.setFillColor(0, 131, 143);
+  doc.rect(mar, y, 3, infoH, 'F');
+
+  doc.setTextColor(0, 96, 100); doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
+  doc.text('PATIENT INFORMATION', mar + 6, y + 6);
+
+  // Row 1: Name + Date
+  doc.setFontSize(8.5);
+  const nameLabel = 'Name:';
+  const dateLabel = 'Date:';
+  doc.setFont('helvetica', 'bold');   doc.setTextColor(0, 96, 100);
+  doc.text(nameLabel, mar + 6, y + 13);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(20, 20, 20);
+  doc.text(patient.name || '—', mar + 6 + doc.getTextWidth(nameLabel) + 2, y + 13);
+  doc.setFont('helvetica', 'bold');   doc.setTextColor(0, 96, 100);
+  doc.text(dateLabel, mar + 100, y + 13);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(20, 20, 20);
+  doc.text(new Date().toLocaleDateString(), mar + 100 + doc.getTextWidth(dateLabel) + 2, y + 13);
+
+  // Row 2: Age / Gender / Weight / Height
+  const row2items = [
+    { l: 'Age:',    v: patient.age    || '—',                             x: mar + 6   },
+    { l: 'Gender:', v: patient.gender || '—',                             x: mar + 38  },
+    { l: 'Weight:', v: patient.weight ? patient.weight + ' kg' : '—',    x: mar + 76  },
+    { l: 'Height:', v: patient.height ? patient.height + ' cm' : '—',    x: mar + 118 },
+  ];
+  row2items.forEach(f => {
+    doc.setFont('helvetica', 'bold');   doc.setTextColor(0, 96, 100);  doc.text(f.l, f.x, y + 20);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(20, 20, 20); doc.text(f.v, f.x + doc.getTextWidth(f.l) + 2, y + 20);
+  });
+
+  if (hasHistory) {
+    doc.setFont('helvetica', 'bold');   doc.setTextColor(0, 96, 100);
+    doc.text('Notes:', mar + 6, y + 28);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(20, 20, 20);
+    const wrapped = doc.splitTextToSize(patient.history, cW - 28);
+    doc.text(wrapped[0] || '', mar + 6 + doc.getTextWidth('Notes:') + 2, y + 28);
+  }
+
+  y += infoH + 8;
+
+  // ── PHOTOS SECTION ──
+  if (photos.length > 0) {
+    // Section title
+    doc.setFillColor(0, 131, 143);
+    doc.rect(mar, y, cW, 8, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    doc.text('CAPTURED PHOTOS', W / 2, y + 5.5, { align: 'center' });
+    y += 10;
+
+    for (let i = 0; i < photos.length; i++) {
+      const ph = photos[i];
+
+      // Photo layout: image full width, angle label below
+      const imgW = cW;     // full width image
+      const imgH = 100;    // image height
+      const labelH = 18;   // label area below
+      const blockH = imgH + labelH + 4;
+
+      if (y + blockH > 272) { doc.addPage(); y = 16; }
+
+      // Card border
+      doc.setDrawColor(0, 172, 193); doc.setLineWidth(0.4);
+      doc.roundedRect(mar, y, cW, blockH, 2, 2);
+
+      // Image — full width
+      try {
+        doc.addImage(ph.data, 'PNG', mar, y, imgW, imgH);
+      } catch (_) {}
+
+      // Thin separator line
+      doc.setDrawColor(0, 172, 193); doc.setLineWidth(0.3);
+      doc.line(mar, y + imgH, mar + cW, y + imgH);
+
+      // Label area background
+      doc.setFillColor(240, 252, 253);
+      doc.rect(mar, y + imgH, cW, labelH, 'F');
+
+      // Photo number + time (left)
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(0, 96, 100);
+      doc.text(`Photo ${i + 1}`, mar + 4, y + imgH + 7);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(80, 100, 110);
+      doc.text(ph.time || '', mar + 4, y + imgH + 13);
+
+      // Selected joint angle (right side — prominent)
+      if (ph.selectedJoint && ph.selectedValue !== null && ph.selectedValue !== undefined) {
+        const jointTxt  = ph.selectedJoint;
+        const angleTxt  = ph.selectedValue + '°';
+
+        // Big angle number on the right
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(0, 131, 143);
+        doc.text(angleTxt, mar + cW - 4, y + imgH + 11, { align: 'right' });
+
+        // Joint name above the number
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(0, 131, 143);
+        doc.text(jointTxt, mar + cW - 4, y + imgH + 5, { align: 'right' });
+      } else {
+        doc.setFont('helvetica', 'italic'); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
+        doc.text('No joint selected', mar + cW - 4, y + imgH + 9, { align: 'right' });
+      }
+
+      y += blockH + 6;
+    }
+  } else {
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(130, 130, 130);
+    doc.text('No photos captured.', W / 2, y + 8, { align: 'center' });
+    y += 18;
+  }
+
+  // ── FOOTER ──
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setDrawColor(0, 172, 193); doc.setLineWidth(0.3);
+    doc.line(mar, 286, W - mar, 286);
+    doc.setTextColor(120, 140, 150); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+    doc.text(
+      `Physio Motion Analyzer  ·  ROM Analysis Report  ·  Page ${p} of ${totalPages}`,
+      W / 2, 291, { align: 'center' }
+    );
+  }
+
+  doc.save(`ROM_${patient.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+}
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+function showFeedback(msg, type) {
+  const el = document.getElementById('feedbackMsg');
+  el.textContent  = msg;
+  el.className    = 'feedback ' + (type === 'success' ? 'fb-success' : 'fb-error');
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+function previewImg(src) {
+  document.getElementById('imgPreview').src = src;
+  document.getElementById('imgModal').classList.add('open');
+}
+function closeImgModal() {
+  document.getElementById('imgModal').classList.remove('open');
+}
+
+function resetSession() {
+  ['patientName','patientAge','patientWeight','patientHeight','patientHistory']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('patientGender').selectedIndex = 0;
+  document.getElementById('jointType').selectedIndex     = 0;
+  document.getElementById('jointSide').selectedIndex     = 0;
+  document.getElementById('angleDisplayBox').classList.remove('active');
+  capturedPhotos = [];
+  currentAngles  = {};
+  updatePhotoCount();
+  document.getElementById('photoDisplay').innerHTML = '';
+}
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+function goDatabase()  { window.location.href = 'database.html'; }
+function goProfile()   { window.location.href = 'profile.html'; }
+function goExercises() { window.location.href = 'exercises-library.html'; }
+function goBack()      { window.location.href = 'choose-year.html'; }
+
+navigator.mediaDevices.addEventListener('devicechange', getCameras);
+</script>
+
+<script src="js/pwa.js"></script>
+<script>
+// Block mobile access to ROM Analysis
+if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.innerHTML = '';
+    document.body.style.cssText = 'background:#FAF7F2;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Rajdhani,sans-serif;padding:30px;';
+    document.body.innerHTML = \`
+      <div style="text-align:center;max-width:340px;">
+        <div style="font-size:64px;margin-bottom:20px;">🖥️</div>
+        <h2 style="font-family:Orbitron,monospace;color:#1a1a1a;font-size:16px;letter-spacing:2px;margin-bottom:14px;">DESKTOP ONLY</h2>
+        <p style="color:var(--charcoal-mid);font-size:15px;line-height:1.7;margin-bottom:28px;">
+          ROM Analysis requires a desktop or laptop computer with a camera.<br><br>
+          Please open the website on a desktop browser to use this feature.
+        </p>
+        <button onclick="window.location.href='choose-year.html'"
+          style="background:linear-gradient(135deg,#5A7A62,#2D4A35);color:#fff;border:none;
+          border-radius:10px;padding:14px 32px;font-family:Rajdhani,sans-serif;
+          font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;">
+          ← Back to Dashboard
+        </button>
+      </div>\`;
+  });
+}
+</script>
+</body>
+</html>

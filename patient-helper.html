@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Patient Helper — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+:root{--cyan:#7A9E82;--border2:rgba(90,122,98,.14);}
+body{display:flex;flex-direction:column;min-height:100vh;}
+.pw{max-width:760px;margin:0 auto;padding:22px 16px 100px;width:100%;position:relative;z-index:1;}
+
+.tabs{display:flex;gap:8px;margin-bottom:18px;}
+.tab{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:rgba(245,239,228,.6);color:rgba(90,122,98,.65);transition:.16s;}
+.tab.on{background:rgba(90,122,98,.16);border-color:var(--cyan);color:var(--cyan);}
+.tab .cnt{margin-left:5px;opacity:.8;}
+
+.req-card{background:rgba(245,239,228,.82);border:1px solid var(--border2);border-radius:14px;padding:15px 16px;margin-bottom:12px;transition:.16s;}
+.req-card:hover{border-color:rgba(90,122,98,.28);}
+.req-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.req-pt{display:flex;align-items:center;gap:10px;}
+.req-av{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.22);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:12px;font-weight:700;color:var(--cyan);flex-shrink:0;}
+.req-name{font-size:13.5px;font-weight:700;color:var(--forest);}
+.req-email{font-size:11px;color:rgba(90,122,98,.55);}
+.req-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;letter-spacing:.4px;white-space:nowrap;}
+.req-status.pending{background:rgba(255,152,0,.12);color:#ff9800;}
+.req-status.answered{background:rgba(76,175,80,.12);color:#4caf50;}
+.req-meta{font-size:11.5px;color:var(--charcoal-mid);margin-bottom:8px;line-height:1.6;}
+.req-meta b{color:var(--text-primary);}
+.req-notes{font-size:12px;color:var(--charcoal-mid);background:rgba(90,122,98,.05);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.req-acts{display:flex;gap:8px;}
+.req-btn{flex:1;padding:8px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;text-align:center;transition:.16s;}
+.req-btn.reply{background:linear-gradient(135deg,var(--sage),#2D4A35);border:1px solid rgba(90,122,98,.3);color:#fff;}
+.req-btn.reply:hover{box-shadow:0 4px 14px rgba(45,74,53,.25);}
+.req-btn.chat{background:rgba(90,122,98,.08);border:1px solid var(--border2);color:var(--cyan);}
+.req-btn.chat:hover{background:rgba(90,122,98,.18);}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty span{font-size:48px;display:block;margin-bottom:12px;}
+.loading{text-align:center;padding:50px;font-family:'Playfair Display',monospace;font-size:11px;color:rgba(90,122,98,.4);letter-spacing:2px;}
+
+/* ── reply modal ── */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:#FFFFFF;border:1px solid var(--border2);border-radius:18px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:26px 22px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6);}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--charcoal-mid);font-size:20px;cursor:pointer;}
+.m-title{font-family:'Playfair Display',monospace;font-size:14px;color:var(--cyan);margin-bottom:3px;}
+.m-sub{font-size:12px;color:var(--charcoal-mid);margin-bottom:16px;}
+.m-lbl{font-family:'Playfair Display',monospace;font-size:10px;letter-spacing:1.4px;color:rgba(90,122,98,.55);margin-bottom:8px;margin-top:16px;}
+.m-lbl:first-of-type{margin-top:0;}
+.rep-summary{background:rgba(90,122,98,.06);border:1px solid var(--border2);border-radius:10px;padding:12px 13px;font-size:12.5px;color:var(--charcoal-mid);line-height:1.7;margin-bottom:4px;}
+.rep-summary b{color:var(--text-primary);}
+textarea.f-input{width:100%;background:rgba(245,239,228,.6);border:1px solid var(--border2);border-radius:10px;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;min-height:100px;resize:vertical;line-height:1.6;}
+textarea.f-input:focus{border-color:rgba(90,122,98,.45);}
+
+.att-type-row{display:flex;gap:7px;flex-wrap:wrap;}
+.att-type{padding:7px 13px;border-radius:16px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:rgba(245,239,228,.6);color:rgba(90,122,98,.7);transition:.16s;}
+.att-type:hover,.att-type.on{background:rgba(90,122,98,.14);border-color:var(--cyan);color:var(--cyan);}
+.att-body{margin-top:10px;}
+input.f-input{width:100%;background:rgba(245,239,228,.6);border:1px solid var(--border2);border-radius:10px;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;}
+.file-picked{font-size:12px;color:var(--charcoal-mid);margin-top:8px;display:none;align-items:center;gap:8px;}
+.file-picked.show{display:flex;}
+.file-picked .rm{cursor:pointer;color:#C84A4A;font-weight:700;}
+
+.btn-confirm{width:100%;margin-top:18px;padding:12px;background:linear-gradient(135deg,var(--sage),rgba(90,122,98,.13));border:1px solid rgba(90,122,98,.38);color:#fff;font-family:'Playfair Display',monospace;font-size:12px;letter-spacing:1px;border-radius:9px;cursor:pointer;transition:.18s;}
+.btn-confirm:hover:not(:disabled){background:rgba(90,122,98,.15);}
+.btn-confirm:disabled{opacity:.4;cursor:not-allowed;}
+
+/* view-only reply block (for already answered) */
+.prev-reply{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border2);}
+.prev-lbl{font-family:'Playfair Display',monospace;font-size:9.5px;letter-spacing:1.2px;color:rgba(76,175,80,.8);margin-bottom:6px;}
+.prev-text{font-size:12.5px;color:var(--text-primary);line-height:1.65;white-space:pre-wrap;}
+.prev-att img,.prev-att video{max-width:100%;border-radius:9px;margin-top:8px;display:block;}
+.prev-att a.att-link{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(90,122,98,.07);border:1px solid var(--border2);border-radius:8px;color:var(--cyan);text-decoration:none;font-size:12px;font-weight:600;margin-top:8px;word-break:break-all;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#2D4A35;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.25s;z-index:400;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🩹</span> Patient Helper</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="window.location.href='chat.html'">💬 Chat</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="pw">
+  <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
+  <div class="page-title">🩹 Patient Helper</div>
+  <div class="page-subtitle">Pain reports sent to you by patients — reply with guidance, notes, files, links or videos</div>
+
+  <div class="tabs">
+    <div class="tab on" data-f="pending" onclick="setTab('pending',this)">⏳ Pending <span class="cnt" id="cntPending">0</span></div>
+    <div class="tab" data-f="answered" onclick="setTab('answered',this)">✅ Answered <span class="cnt" id="cntAnswered">0</span></div>
+    <div class="tab" data-f="all" onclick="setTab('all',this)">📋 All</div>
+  </div>
+
+  <div id="reqList"><div class="loading">LOADING…</div></div>
+</div>
+
+<!-- ══════════════ REPLY MODAL ══════════════ -->
+<div class="overlay" id="replyOverlay" onclick="if(event.target===this)closeReply()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeReply()">✕</button>
+    <div class="m-title" id="mTitle">Reply to Patient</div>
+    <div class="m-sub" id="mSub">Patient report</div>
+
+    <div class="rep-summary" id="repSummary"></div>
+
+    <div id="alreadyAnswered" style="display:none;"></div>
+
+    <div id="replyForm">
+      <div class="m-lbl">Your Notes — what should the patient do?</div>
+      <textarea class="f-input" id="replyNotes" placeholder="e.g. Apply ice for 15 minutes, avoid heavy lifting, try these gentle stretches, book a follow-up if pain persists…"></textarea>
+
+      <div class="m-lbl">Attach (optional)</div>
+      <div class="att-type-row">
+        <div class="att-type on" data-v="none" onclick="setAttType('none',this)">🚫 None</div>
+        <div class="att-type" data-v="link" onclick="setAttType('link',this)">🔗 Link</div>
+        <div class="att-type" data-v="file" onclick="setAttType('file',this)">📎 File</div>
+        <div class="att-type" data-v="video" onclick="setAttType('video',this)">🎬 Video</div>
+        <div class="att-type" data-v="image" onclick="setAttType('image',this)">🖼 Image</div>
+      </div>
+      <div class="att-body" id="attBody"></div>
+
+      <button class="btn-confirm" id="sendReplyBtn" onclick="sendReply()">✅ Send Reply</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" style="display:none;" onchange="handleFilePicked(this)">
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+try {
+  const cfg={apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"};
+  if(!firebase.apps.length)firebase.initializeApp(cfg);
+  window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;
+}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script>
+'use strict';
+
+let ME = null;
+let allReports = [];
+let curTab = 'pending';
+let activeReq = null;
+let attType = 'none';
+let pickedFile = null; // { dataUrl, name, size }
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function initials(name){return(name||'?').split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── tabs ──
+function setTab(f, el){
+  curTab = f;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderList();
+}
+
+// ── load reports ──
+async function loadReports(){
+  try{ allReports = await dbGetDoctorPainRequests(ME.email); }catch(e){ allReports = []; }
+  document.getElementById('cntPending').textContent  = allReports.filter(r=>r.status==='pending').length;
+  document.getElementById('cntAnswered').textContent = allReports.filter(r=>r.status==='answered').length;
+  renderList();
+}
+
+function renderList(){
+  const wrap = document.getElementById('reqList');
+  let list = allReports;
+  if(curTab==='pending') list = allReports.filter(r=>r.status==='pending');
+  else if(curTab==='answered') list = allReports.filter(r=>r.status==='answered');
+
+  if(!list.length){
+    wrap.innerHTML = `<div class="empty"><span>🩹</span><p>No ${curTab==='all'?'':curTab} pain reports${curTab==='pending'?" — you're all caught up!":'.'}</p></div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(r=>{
+    const dateStr = new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return `<div class="req-card">
+      <div class="req-top">
+        <div class="req-pt">
+          <div class="req-av">${initials(r.patientName)}</div>
+          <div>
+            <div class="req-name">${esc(r.patientName)}</div>
+            <div class="req-email">${esc(r.patientEmail)}</div>
+          </div>
+        </div>
+        <div class="req-status ${r.status}">${r.status==='answered'?'ANSWERED':'PENDING'}</div>
+      </div>
+      <div class="req-meta">📍 <b>${esc(r.painLocationLabel)}</b> &nbsp;·&nbsp; ⏳ <b>${esc(r.durationLabel)}</b> &nbsp;·&nbsp; 🗓 ${dateStr}</div>
+      ${r.notes ? `<div class="req-notes">${esc(r.notes)}</div>` : ''}
+      <div class="req-acts">
+        <div class="req-btn reply" onclick="openReply('${esc(r.id)}')">${r.status==='answered' ? '👁 View / Edit Reply' : '💬 Reply'}</div>
+        <div class="req-btn chat" onclick="goToChat('${esc(r.patientEmail)}','${esc(r.patientName)}')">💬 Chat</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── reply modal ──
+function openReply(id){
+  activeReq = allReports.find(r=>r.id===id);
+  if(!activeReq) return;
+  document.getElementById('mTitle').textContent = 'Reply to ' + (activeReq.patientName || activeReq.patientEmail);
+  document.getElementById('mSub').textContent = activeReq.patientEmail;
+  const dateStr = new Date(activeReq.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('repSummary').innerHTML =
+    `📍 <b>${esc(activeReq.painLocationLabel)}</b> &nbsp;·&nbsp; ⏳ <b>${esc(activeReq.durationLabel)}</b> &nbsp;·&nbsp; 🗓 ${dateStr}` +
+    (activeReq.notes ? `<br><br>${esc(activeReq.notes)}` : '');
+
+  // reset form state
+  attType = 'none'; pickedFile = null;
+  document.querySelectorAll('.att-type').forEach(el=>el.classList.toggle('on', el.dataset.v==='none'));
+  document.getElementById('attBody').innerHTML = '';
+  document.getElementById('replyNotes').value = '';
+
+  const already = document.getElementById('alreadyAnswered');
+  if(activeReq.status==='answered' && activeReq.reply){
+    const rep = activeReq.reply;
+    let attHtml = '';
+    if(rep.attachmentType==='image') attHtml = `<div class="prev-att"><img src="${rep.attachmentData}"></div>`;
+    else if(rep.attachmentType==='video') attHtml = `<div class="prev-att"><video src="${rep.attachmentData}" controls></video></div>`;
+    else if(rep.attachmentType==='file') attHtml = `<div class="prev-att"><a class="att-link" href="${rep.attachmentData}" download="${esc(rep.attachmentName||'file')}">📎 ${esc(rep.attachmentName||'Download file')}</a></div>`;
+    else if(rep.attachmentType==='link') attHtml = `<div class="prev-att"><a class="att-link" href="${esc(rep.attachmentData)}" target="_blank" rel="noopener">🔗 ${esc(rep.attachmentData)}</a></div>`;
+    already.style.display = 'block';
+    already.innerHTML = `<div class="prev-reply"><div class="prev-lbl">✅ YOUR PREVIOUS REPLY</div><div class="prev-text">${esc(rep.notes||'')}</div>${attHtml}</div>`;
+    // pre-fill form so doctor can edit/resend
+    document.getElementById('replyNotes').value = rep.notes || '';
+  } else {
+    already.style.display = 'none';
+    already.innerHTML = '';
+  }
+
+  document.getElementById('replyOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeReply(){
+  document.getElementById('replyOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  activeReq = null;
+}
+
+function setAttType(v, el){
+  attType = v; pickedFile = null;
+  document.querySelectorAll('.att-type').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  const body = document.getElementById('attBody');
+  if(v==='none'){ body.innerHTML=''; return; }
+  if(v==='link'){
+    body.innerHTML = `<input class="f-input" id="linkInput" type="text" placeholder="https://example.com/exercise-guide">`;
+    return;
+  }
+  // file / video / image
+  const accept = v==='video' ? 'video/*' : v==='image' ? 'image/*' : '*';
+  body.innerHTML = `
+    <button type="button" class="req-btn chat" style="display:inline-block;padding:8px 16px;" onclick="pickFile('${accept}')">📎 Choose ${v==='video'?'Video':v==='image'?'Image':'File'}</button>
+    <div class="file-picked" id="filePicked"><span id="filePickedName"></span><span class="rm" onclick="clearFile()">✕ remove</span></div>`;
+}
+
+function pickFile(accept){
+  const fi = document.getElementById('fileInput');
+  fi.accept = accept;
+  fi.value = '';
+  fi.click();
+}
+function handleFilePicked(input){
+  const file = input.files[0];
+  if(!file) return;
+  const sizeStr = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    pickedFile = { dataUrl: ev.target.result, name: file.name, size: sizeStr };
+    const pf = document.getElementById('filePicked');
+    if(pf){
+      pf.classList.add('show');
+      document.getElementById('filePickedName').textContent = '📄 ' + file.name + ' (' + sizeStr + ')';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+function clearFile(){
+  pickedFile = null;
+  const pf = document.getElementById('filePicked');
+  if(pf) pf.classList.remove('show');
+}
+
+async function sendReply(){
+  if(!activeReq) return;
+  const notes = document.getElementById('replyNotes').value.trim();
+
+  let attachmentType = null, attachmentData = null, attachmentName = null;
+  if(attType==='link'){
+    const url = (document.getElementById('linkInput')?.value || '').trim();
+    if(url){ attachmentType='link'; attachmentData=url; }
+  } else if(['file','video','image'].includes(attType) && pickedFile){
+    attachmentType = attType;
+    attachmentData = pickedFile.dataUrl;
+    attachmentName = pickedFile.name;
+  }
+
+  if(!notes && !attachmentType){
+    showToast('⚠️ Write a note or attach something first.');
+    return;
+  }
+
+  const btn = document.getElementById('sendReplyBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  const reply = {
+    notes, attachmentType, attachmentData, attachmentName,
+    repliedAt: new Date().toISOString()
+  };
+
+  try{
+    await dbUpdatePainRequest(activeReq.id, { status: 'answered', reply });
+    await pushNotif(activeReq.patientEmail, 'pain_reply', 'Doctor Replied',
+      (ME.name||ME.email) + ' sent you guidance for your ' + (activeReq.painLocationLabel||'').toLowerCase() + ' pain report.');
+    showToast('✅ Reply sent to ' + (activeReq.patientName || activeReq.patientEmail));
+    closeReply();
+    await loadReports();
+  }catch(e){
+    console.warn(e);
+    showToast('⚠️ Could not send reply. Please try again.');
+  }
+  btn.disabled = false; btn.textContent = '✅ Send Reply';
+}
+
+async function pushNotif(toEmail,type,title,body){
+  const notif={id:'n'+Date.now(),type,title,body,ts:Date.now(),read:false};
+  await dbPushNotif(toEmail, notif);
+}
+
+async function goToChat(email, name){
+  const chatId = [ME.email, email].sort().join('||');
+  await dbSaveConv(ME.email, { id:chatId, otherEmail:email, otherName:name||email, lastMsg:'', lastTime:Date.now() });
+  await dbSaveConv(email, { id:chatId, otherEmail:ME.email, otherName:ME.name||ME.email, lastMsg:'', lastTime:Date.now() });
+  window.location.href = 'chat.html?with=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name||email);
+}
+
+// ── init ──
+document.addEventListener('DOMContentLoaded', async ()=>{
+  ME = requireAuth('doctor');
+  if(!ME) return;
+  await loadReports();
+});
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

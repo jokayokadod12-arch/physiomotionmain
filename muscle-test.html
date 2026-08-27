@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Muscle Testing — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+/* ═══════════════════════════════════════════════
+   MUSCLE TEST — VIBRANT CLINICAL DESIGN
+   Palette: #FAF7F2 | #5A7A62 | #7A9E82 | #2C2C2C
+═══════════════════════════════════════════════ */
+:root {
+  --primary:      #5A7A62;
+  --primary-glow: rgba(45,74,53,.35);
+  --primary-dim:  rgba(45,74,53,.12);
+  --accent:      #7A9E82;
+  --accent-glow: rgba(90,122,98,.3);
+  --gold:      #ffd600;
+  --gold-dim:  rgba(255,214,0,.15);
+  --green:     #00e676;
+  --purple:    #5A7A62;
+  --navy:      #FAF7F2;
+  --card-bg:   rgba(245,239,228,.75);
+  --border:    rgba(45,74,53,.2);
+}
+
+body { background: var(--cream); }
+
+/* Animated mesh background */
+body::before {
+  background:
+    linear-gradient(rgba(45,74,53,.06) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(45,74,53,.06) 1px, transparent 1px) !important;
+  background-size: 48px 48px !important;
+}
+body::after {
+  background: radial-gradient(circle, rgba(45,74,53,.08) 0%, transparent 60%) !important;
+  width: 600px; height: 600px;
+  bottom: -200px; right: -100px; top: auto; left: auto !important;
+}
+
+/* Extra glow blobs */
+.blob2 {
+  position:fixed;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(90,122,98,.07) 0%,transparent 70%);
+  top:-80px;right:-80px;pointer-events:none;z-index:0;
+  animation:blobFloat2 14s ease-in-out infinite alternate;
+}
+@keyframes blobFloat2 { to { transform:translate(-50px,60px); } }
+
+/* ── PAGE CONTAINER ── */
+.mt-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+  position: relative; z-index: 1;
+}
+
+/* ── PAGE HERO ── */
+.mt-hero {
+  text-align: center;
+  padding: 36px 0 44px;
+  position: relative;
+}
+.mt-hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 18px;
+  background: var(--primary-dim);
+  border: 1px solid rgba(45,74,53,.3);
+  border-radius: 30px;
+  font-family: 'Playfair Display', monospace;
+  font-size: 10px; letter-spacing: 3px;
+  color: var(--primary); text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.mt-hero-badge span { width:7px;height:7px;border-radius:50%;background:var(--primary);animation:blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+.mt-hero h1 {
+  font-family: 'Playfair Display', monospace;
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff 0%, var(--primary) 50%, var(--accent) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px; line-height: 1.1;
+}
+.mt-hero p {
+  font-size: clamp(14px, 2vw, 17px);
+  color:var(--charcoal-mid);
+  max-width: 520px; margin: 0 auto 32px;
+  line-height: 1.7;
+}
+
+/* ── MMT GRADES QUICK REF ── */
+.grades-strip {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 48px;
+}
+.grade-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  min-width: 100px;
+}
+.grade-pill:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 8px 24px var(--primary-glow); }
+.grade-num {
+  font-family: 'Playfair Display', monospace;
+  font-size: 22px; font-weight: 900;
+  line-height: 1;
+}
+.grade-info { text-align: left; }
+.grade-info .g-name { font-size: 13px; font-weight: 700; color: var(--forest); }
+.grade-info .g-desc { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+/* grade colors */
+.g0 .grade-num { color: var(--muted-light); }
+.g1 .grade-num { color: #ff5252; }
+.g2 .grade-num { color: #ff9800; }
+.g3 .grade-num { color: #ffd600; }
+.g4 .grade-num { color: #388e3c; }
+.g5 .grade-num { color: #2e7d32; }
+
+/* ── SECTION LABEL ── */
+.sec-label-mt {
+  font-family: 'Playfair Display', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--primary);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+.sec-label-mt::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--primary-dim), transparent);
+}
+
+/* ── BODY REGIONS GRID ── */
+.regions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.region-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px 18px 20px;
+  cursor: pointer;
+  transition: all .25s;
+  position: relative; overflow: hidden;
+  text-align: center;
+}
+.region-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--rc, var(--primary));
+  opacity: 0; transition: .25s;
+}
+.region-card:hover { transform: translateY(-6px); border-color: var(--rc, var(--primary)); }
+.region-card:hover::before { opacity: 1; }
+.region-card.active { border-color: var(--rc, var(--primary)); background: rgba(45,74,53,.08); }
+.region-card.active::before { opacity: 1; }
+.region-card.active::after {
+  content: '✓';
+  position: absolute; top: 10px; right: 14px;
+  color: var(--rc, var(--primary)); font-size: 14px; font-weight: 700;
+}
+.rc-emoji { font-size: 38px; margin-bottom: 10px; display: block; line-height: 1; }
+.rc-name {
+  font-family: 'Playfair Display', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: #1A3020; text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.rc-count {
+  font-size: 11px; color: #4A4A4A;
+}
+
+/* ── MUSCLE LIST PANEL ── */
+.muscle-panel {
+  display: none;
+  margin-bottom: 36px;
+  animation: fadeSlideIn .35s ease;
+}
+.muscle-panel.show { display: block; }
+@keyframes fadeSlideIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.panel-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(250,247,242,.95), rgba(245,239,228,.9));
+  border: 1px solid rgba(45,74,53,.25);
+  border-radius: 16px 16px 0 0;
+  border-bottom: none;
+}
+.panel-region-icon { font-size: 40px; }
+.panel-region-title {
+  font-family: 'Playfair Display', monospace;
+  font-size: clamp(14px, 2.5vw, 20px);
+  font-weight: 700; color: var(--charcoal);
+}
+.panel-region-sub { font-size: 13px; color: var(--charcoal-mid); margin-top: 3px; }
+
+.muscles-list {
+  background: var(--card-bg);
+  border: 1px solid rgba(45,74,53,.25);
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+}
+.muscle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(45,74,53,.1);
+  cursor: pointer;
+  transition: all .18s;
+  gap: 12px;
+}
+.muscle-row:last-child { border-bottom: none; }
+.muscle-row:hover { background: rgba(45,74,53,.07); }
+.muscle-row.open { background: rgba(45,74,53,.1); }
+.mr-left { flex: 1; }
+.mr-name {
+  font-size: 15px; font-weight: 700; color: var(--charcoal);
+  margin-bottom: 3px;
+}
+.mr-nerve {
+  font-size: 11px; color: var(--charcoal-mid);
+  font-family: 'Playfair Display', monospace; letter-spacing: .5px;
+}
+.mr-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.mr-tag {
+  font-size: 9px; text-transform: uppercase; letter-spacing: .8px;
+  padding: 2px 8px; border-radius: 10px;
+  font-family: 'Playfair Display', monospace;
+}
+.tag-grade { background: rgba(45,74,53,.1); color: var(--charcoal); border: 1px solid rgba(90,122,98,.25); }
+.tag-joint { background: rgba(255,214,0,.15); color: #8a6d00; border: 1px solid rgba(255,214,0,.35); }
+.mr-arrow {
+  font-size: 18px; color: rgba(45,74,53,.4);
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.muscle-row.open .mr-arrow { transform: rotate(90deg); color: var(--primary); }
+
+/* ── MUSCLE DETAIL CARD ── */
+.muscle-detail {
+  display: none;
+  padding: 0 22px 22px;
+  border-bottom: 1px solid rgba(45,74,53,.1);
+  animation: detailSlide .25s ease;
+}
+.muscle-detail.show { display: block; }
+@keyframes detailSlide {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media(max-width:600px) { .detail-grid { grid-template-columns: 1fr; } }
+
+.detail-block {
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+  padding: 16px;
+}
+.detail-block.accent-pink { border-color: rgba(45,74,53,.25); }
+.detail-block.accent-cyan { border-color: rgba(90,122,98,.2); }
+.detail-block.accent-gold { border-color: rgba(255,214,0,.3); }
+.detail-block.accent-green { border-color: rgba(0,150,80,.25); }
+.detail-block.accent-purple { border-color: rgba(45,74,53,.25); }
+
+.db-label {
+  font-family: 'Playfair Display', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.db-label.pink { color: var(--charcoal); }
+.db-label.cyan  { color: var(--charcoal); }
+.db-label.gold  { color: var(--charcoal); }
+.db-label.green { color: var(--charcoal); }
+.db-label.purple { color: var(--charcoal); }
+
+.db-content {
+  font-size: 13px; color: var(--charcoal-mid);
+  line-height: 1.65;
+}
+.db-content strong { color: var(--charcoal); }
+
+/* Grade scale mini */
+.grade-scale {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+}
+.gs-item {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 10px;
+  background: rgba(255,255,255,.04);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  min-width: 52px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.gs-item:hover { transform: translateY(-2px); }
+.gs-num { font-family: 'Playfair Display', monospace; font-size: 18px; font-weight: 900; line-height: 1; }
+.gs-txt { font-size: 9px; color: var(--charcoal-mid); margin-top: 3px; text-align: center; }
+
+/* Illustration placeholder */
+.muscle-image {
+  width: 100%; height: 160px;
+  background: linear-gradient(135deg, rgba(45,74,53,.08), rgba(90,122,98,.05));
+  border: 1px solid rgba(45,74,53,.15);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+  margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.muscle-image::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg,
+      transparent, transparent 10px,
+      rgba(45,74,53,.03) 10px, rgba(45,74,53,.03) 11px);
+}
+.muscle-image .mi-icon { font-size: 52px; filter: drop-shadow(0 0 16px rgba(45,74,53,.5)); z-index: 1; }
+.muscle-image .mi-text { font-size: 11px; color: var(--charcoal-mid); z-index: 1; letter-spacing: 1px; }
+
+/* Video button */
+.btn-watch-mt {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px;
+  background: linear-gradient(135deg, var(--primary), #0e50c0);
+  border: none; border-radius: 10px;
+  color: #fff; cursor: pointer;
+  font-family: 'Playfair Display', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  box-shadow: 0 6px 24px var(--primary-glow);
+  transition: all .2s;
+  width: 100%;
+  justify-content: center;
+}
+.btn-watch-mt:hover { transform: translateY(-2px); box-shadow: 0 10px 32px var(--primary-glow); }
+
+/* Video list */
+.vid-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.vid-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(45,74,53,.08);
+  border: 1px solid rgba(90,122,98,.15);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  color: var(--text, #2C2C2C);
+}
+.vid-item:hover { background: rgba(90,122,98,.15); border-color: rgba(90,122,98,.4); transform: translateX(3px); }
+.vid-num {
+  min-width: 22px; height: 22px;
+  background: var(--primary); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.vid-title { flex: 1; font-size: 12.5px; line-height: 1.4; color: var(--charcoal); }
+.vid-play { color: var(--accent); font-size: 13px; flex-shrink: 0; }
+.vid-ext  { color: var(--accent); font-size: 13px; flex-shrink: 0; }
+
+/* Steps list */
+.steps-list { display: flex; flex-direction: column; gap: 8px; }
+.step-item {
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-dim); border: 1px solid rgba(45,74,53,.3);
+  font-family: 'Playfair Display', monospace;
+  font-size: 10px; font-weight: 700; color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.step-text { font-size: 13px; color: var(--charcoal-mid); line-height: 1.55; padding-top: 2px; }
+
+/* Grade detail modal */
+.grade-modal-bg {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88);
+  z-index: 9999; align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(8px);
+}
+.grade-modal-bg.open { display: flex; }
+.grade-modal {
+  background: linear-gradient(160deg, #0e2b18, #1a3d25);
+  border: 1px solid rgba(90,122,98,.4);
+  border-radius: 20px; padding: 32px;
+  max-width: 480px; width: 100%;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,.5);
+}
+.gm-close {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(45,74,53,.1); border: 1px solid rgba(45,74,53,.25);
+  color: var(--primary); width: 34px; height: 34px; border-radius: 50%;
+  font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: .2s;
+}
+.gm-close:hover { background: rgba(45,74,53,.25); }
+.gm-grade { font-family: 'Playfair Display', monospace; font-size: 64px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.gm-name { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.gm-pct { font-family: 'Playfair Display', monospace; font-size: 13px; margin-bottom: 20px; }
+.gm-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(90,122,98,.4), transparent); margin-bottom: 18px; }
+.gm-desc { font-size: 14px; color: rgba(200,230,210,.88); line-height: 1.75; margin-bottom: 14px; }
+.gm-test { font-size: 13px; color: rgba(180,215,195,.8); line-height: 1.65; }
+
+/* Video modal */
+.vid-modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(20,45,28,.97); z-index: 9999;
+  align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(12px);
+}
+.vid-modal-bg.open { display: flex; }
+.vid-inner {
+  position: relative; width: 100%; max-width: 860px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.vid-close {
+  position: absolute; top: -14px; right: -14px;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(45,74,53,.15); border: 1px solid rgba(45,74,53,.35);
+  color: var(--primary); font-size: 22px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: .2s; z-index: 10;
+}
+.vid-close:hover { background: rgba(45,74,53,.3); }
+.vid-ratio {
+  width: 100%; padding-top: 56.25%; position: relative;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 24px 70px rgba(45,74,53,.2), 0 0 40px rgba(90,122,98,.08);
+  border: 1px solid rgba(45,74,53,.2);
+}
+.vid-ratio iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+}
+.vid-modal-title {
+  font-family: 'Playfair Display', monospace; font-size: 13px;
+  color: rgba(200,220,205,.85); text-align: center; letter-spacing: .5px;
+}
+.vid-yt-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 8px;
+  background: rgba(45,74,53,.12); border: 1px solid rgba(45,74,53,.3);
+  color: var(--primary); text-decoration: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  transition: .2s;
+}
+.vid-yt-btn:hover { background: rgba(45,74,53,.22); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px) {
+  .regions-grid { grid-template-columns: 1fr 1fr; }
+  .grades-strip { gap: 6px; }
+  .grade-pill { min-width: 80px; padding: 8px 10px; }
+  .grade-num { font-size: 18px; }
+  .mt-wrap { padding: 18px 14px 60px; }
+}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<div class="blob2"></div>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">💪</span> Muscle Testing</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='assessments.html'">← Assessments</button>
+    <button class="btn btn-header" onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="mt-wrap">
+
+  <!-- HERO -->
+  <div class="mt-hero">
+    <div class="mt-hero-badge"><span></span> Clinical MMT Reference</div>
+    <h1>Manual Muscle<br>Testing</h1>
+    <p>Complete MMT guide for physiotherapists — grading, nerve supply, patient positioning, examiner technique and video demonstrations for all major muscle groups.</p>
+  </div>
+
+  <!-- GRADE REFERENCE STRIP -->
+  <div class="sec-label-mt">MMT Grading Scale</div>
+  <div class="grades-strip" id="gradesStrip">
+    <div class="grade-pill g5" onclick="openGradeModal(5)">
+      <div class="grade-num">5</div>
+      <div class="grade-info"><div class="g-name">Normal</div><div class="g-desc">Full ROM · Full resistance</div></div>
+    </div>
+    <div class="grade-pill g4" onclick="openGradeModal(4)">
+      <div class="grade-num">4</div>
+      <div class="grade-info"><div class="g-name">Good</div><div class="g-desc">Full ROM · Some resistance</div></div>
+    </div>
+    <div class="grade-pill g3" onclick="openGradeModal(3)">
+      <div class="grade-num">3</div>
+      <div class="grade-info"><div class="g-name">Fair</div><div class="g-desc">Full ROM · Gravity only</div></div>
+    </div>
+    <div class="grade-pill g2" onclick="openGradeModal(2)">
+      <div class="grade-num">2</div>
+      <div class="grade-info"><div class="g-name">Poor</div><div class="g-desc">Full ROM · Gravity eliminated</div></div>
+    </div>
+    <div class="grade-pill g1" onclick="openGradeModal(1)">
+      <div class="grade-num">1</div>
+      <div class="grade-info"><div class="g-name">Trace</div><div class="g-desc">Flicker only · No movement</div></div>
+    </div>
+    <div class="grade-pill g0" onclick="openGradeModal(0)">
+      <div class="grade-num">0</div>
+      <div class="grade-info"><div class="g-name">Zero</div><div class="g-desc">No contraction</div></div>
+    </div>
+  </div>
+
+  <!-- BODY REGIONS -->
+  <div class="sec-label-mt">Select Body Region</div>
+  <div class="regions-grid" id="regionsGrid">
+    <div class="region-card" style="--rc:#5A7A62" onclick="selectRegion('neck')">
+      <span class="rc-emoji">🦒</span>
+      <div class="rc-name">Neck</div>
+      <div class="rc-count">6 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#7A9E82" onclick="selectRegion('shoulder')">
+      <span class="rc-emoji">🤷</span>
+      <div class="rc-name">Shoulder</div>
+      <div class="rc-count">8 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#7A9E82" onclick="selectRegion('elbow')">
+      <span class="rc-emoji">💪</span>
+      <div class="rc-name">Elbow & Forearm</div>
+      <div class="rc-count">6 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#5A7A62" onclick="selectRegion('wrist')">
+      <span class="rc-emoji">🤚</span>
+      <div class="rc-name">Wrist & Hand</div>
+      <div class="rc-count">8 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#4caf50" onclick="selectRegion('trunk')">
+      <span class="rc-emoji">🫀</span>
+      <div class="rc-name">Trunk & Core</div>
+      <div class="rc-count">6 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#5A7A62" onclick="selectRegion('hip')">
+      <span class="rc-emoji">🦵</span>
+      <div class="rc-name">Hip</div>
+      <div class="rc-count">7 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#ffd600" onclick="selectRegion('knee')">
+      <span class="rc-emoji">🦿</span>
+      <div class="rc-name">Knee</div>
+      <div class="rc-count">4 muscles</div>
+    </div>
+    <div class="region-card" style="--rc:#00e676" onclick="selectRegion('ankle')">
+      <span class="rc-emoji">🦶</span>
+      <div class="rc-name">Ankle & Foot</div>
+      <div class="rc-count">7 muscles</div>
+    </div>
+  </div>
+
+  <!-- MUSCLE DETAIL PANEL (populated by JS) -->
+  <div class="muscle-panel" id="musclePanel"></div>
+
+</div>
+
+<!-- GRADE MODAL -->
+<div class="grade-modal-bg" id="gradeModal" onclick="closeGradeModal(event)">
+  <div class="grade-modal">
+    <button class="gm-close" onclick="closeGradeModal()">×</button>
+    <div class="gm-grade" id="gmGrade"></div>
+    <div class="gm-name" id="gmName"></div>
+    <div class="gm-pct" id="gmPct"></div>
+    <div class="gm-divider"></div>
+    <div class="gm-desc" id="gmDesc"></div>
+    <div class="gm-test" id="gmTest"></div>
+  </div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="vid-modal-bg" id="vidModal" onclick="handleVidClick(event)">
+  <div class="vid-inner">
+    <button class="vid-close" onclick="closeVid()">×</button>
+    <div class="vid-ratio" id="vidRatio"></div>
+    <div class="vid-modal-title" id="vidTitle"></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;">
+      <a id="vidYtLink" href="#" target="_blank" rel="noopener" class="vid-yt-btn">▶ Open in YouTube</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+try{if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"});window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+requireAuth('doctor');
+function logout(){if(confirm('Logout?')){localStorage.removeItem('currentUser');window.location.href='login.html';}}
+
+/* ═══════════════════════════════════════════
+   MMT GRADE DATA
+═══════════════════════════════════════════ */
+const GRADES = {
+  5: { name:'Normal',  pct:'100%', color:'#7A9E82',
+    desc:'The muscle completes full range of motion against gravity AND holds against maximal examiner resistance without breaking. This represents completely normal muscle function.',
+    test:'Apply firm resistance throughout the full range. The patient should not "break" (yield) to your pressure. Test bilaterally and compare.' },
+  4: { name:'Good',    pct:'75%',  color:'#69f0ae',
+    desc:'The muscle completes full range of motion against gravity and holds against moderate examiner resistance. Some weakness is present but functional for most activities.',
+    test:'Apply moderate resistance. The muscle will complete full ROM and hold against some resistance but will yield to maximal force.' },
+  3: { name:'Fair',    pct:'50%',  color:'#ffd600',
+    desc:'The muscle completes full range of motion against gravity alone, but cannot tolerate any added resistance. This is the critical grade separating functional from non-functional.',
+    test:'Remove all external resistance. Ask patient to move through full range against gravity only. If they can complete full ROM = Grade 3.' },
+  2: { name:'Poor',    pct:'25%',  color:'#ff9800',
+    desc:'The muscle can complete full range of motion only when gravity is eliminated (horizontal or supported plane). Cannot move against gravity.',
+    test:'Position the limb horizontally (gravity-eliminated position). Support the limb and ask the patient to move. Full ROM in this position = Grade 2.' },
+  1: { name:'Trace',   pct:'10%',  color:'#ff5252',
+    desc:'A visible or palpable flicker/contraction is detected in the muscle belly or tendon but no actual joint movement occurs. Evidence of innervation but no functional movement.',
+    test:'Palpate the muscle belly firmly. Ask patient to try to contract as hard as possible. Feel or observe any flicker of contraction.' },
+  0: { name:'Zero',    pct:'0%',   color:'rgba(255,255,255,.2)',
+    desc:'No visible or palpable contraction. Complete paralysis with no evidence of neuromuscular activation. May indicate complete nerve lesion or severe pathology.',
+    test:'Palpate directly over muscle belly. No contraction felt despite maximal patient effort. Document nerve level and consider further neurological workup.' },
+};
+
+/* ═══════════════════════════════════════════
+   MUSCLE DATABASE
+═══════════════════════════════════════════ */
+const MUSCLES = {
+  neck: {
+    label: 'Neck', icon: '🦒', color: '#5A7A62',
+    muscles: [
+      { name:'Sternocleidomastoid (SCM)', nerve:'Accessory nerve CN XI + C2–C3',
+        action:'Neck flexion, rotation to opposite side, lateral flexion to same side',
+        origin:'Sternum & clavicle', insertion:'Mastoid process of temporal bone',
+        patientPos:'Supine. Head in midline.',
+        examinerPos:'Stand at head of table. One hand stabilizes the shoulder.',
+        technique:'Ask patient to lift head off table and rotate chin toward opposite shoulder. Apply resistance to temporal region.',
+        gradeSteps:['0: No contraction palpable at SCM.','1: Flicker felt at muscle belly.','2: Can rotate in gravity-eliminated (side-lying).','3: Full ROM against gravity, no resistance.','4: Holds against moderate resistance.','5: Holds against maximal resistance.'],
+        ytId:'uW9XIVVxlzU', ytSearch:'sternocleidomastoid muscle test MMT',
+        videos:[
+          {title:'Muscle Testing — Sternocleidomastoid',ytId:'Hah7FWL-k28'},
+          {title:'Sternocleidomastoid Muscle Test',ytId:'mYcxL-meyZM'},
+          {title:'Manual Muscle Test & Lengthening — SCM',ytId:'xRp3_ZnYFNE'},
+        ]},
+      { name:'Upper Trapezius', nerve:'Accessory nerve CN XI + C3–C4',
+        action:'Shoulder elevation (shrug), neck lateral flexion, head extension',
+        origin:'Occipital bone & ligamentum nuchae', insertion:'Clavicle & acromion',
+        patientPos:'Seated or standing.',
+        examinerPos:'Stand behind patient. Both hands on shoulders.',
+        technique:'Ask patient to elevate both shoulders ("shrug"). Apply downward resistance on shoulder girdle.',
+        gradeSteps:['0: No contraction.','1: Flicker visible at trapezius.','2: Partial elevation in gravity-eliminated.','3: Full elevation against gravity.','4: Holds against moderate downward resistance.','5: Holds against full resistance — cannot depress shoulder.'],
+        ytId:'K7_xP7A-OCI', ytSearch:'upper trapezius muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Upper Trapezius',ytId:'l2qcHFlTmoM'},
+          {title:'How to Test the Trapezius Muscle | Chiropractic MMT Protocol',ytId:'fGuaUQNwr_M'},
+          {title:'Manual Muscle Test & Lengthening — Upper Trapezius',ytId:'RYh1PaUVvsw'},
+        ]},
+      { name:'Deep Cervical Flexors (DCF)', nerve:'C1–C4 ventral rami',
+        action:'Cervical spine flexion (cranio-cervical flexion), head on neck nodding',
+        origin:'Vertebral bodies C1–C4', insertion:'Atlas & axis',
+        patientPos:'Supine. Head resting on plinth.',
+        examinerPos:'Stand at side. One hand supports cervical spine.',
+        technique:'Ask patient to perform a gentle chin tuck (nodding "yes"). Do not allow full neck flexion — isolate cranio-cervical segment.',
+        gradeSteps:['0: No activation.','1: Flicker of chin tuck.','2: Partial chin tuck.','3: Full chin tuck, head off pillow.','4: Maintains position against light resistance.','5: Maintains position against moderate resistance.'],
+        ytId:'WqjmUloV4Fs', ytSearch:'deep cervical flexors muscle test',
+        videos:[
+          {title:'Craniocervical Flexion Test / CCFT | Deep Cervical Neck Flexors',ytId:'cAfcQIRm9Ew'},
+          {title:'Deep Cervical Flexor Endurance Test',ytId:'WboIjRgoqkw'},
+        ]},
+      { name:'Cervical Extensors (Semispinalis)', nerve:'C3–C8 dorsal rami',
+        action:'Neck extension, lateral flexion, stabilization of cervical spine',
+        origin:'Thoracic vertebrae', insertion:'Occipital bone & cervical spinous processes',
+        patientPos:'Prone. Head off edge of table in neutral.',
+        examinerPos:'Stand at head. One hand on occiput.',
+        technique:'Ask patient to extend neck (lift head toward ceiling in prone). Apply resistance to occiput.',
+        gradeSteps:['0: No contraction palpable.','1: Flicker at paravertebral muscles.','2: Extension in side-lying.','3: Full extension prone against gravity.','4: Holds against moderate resistance.','5: Holds against maximal resistance.'],
+        ytId:'S1rtAExPqcg', ytSearch:'cervical extensors muscle test MMT',
+        videos:[
+          {title:'Manual Muscle Test for Cervical Extension',ytId:'PBqr0cRr5_8'},
+          {title:'Cervical Extensor Endurance Test',ytId:'ijCY2wFdV3k'},
+          {title:'CEET | Cervical Extensors Endurance Test',ytId:'qUZ5QzuoQsw'},
+        ]},
+      { name:'Scalenes (Anterior, Middle, Posterior)', nerve:'C4–C6 ventral rami',
+        action:'Neck lateral flexion (ipsilateral), cervical flexion, first rib elevation',
+        origin:'Cervical vertebrae C2–C6', insertion:'First & second ribs',
+        patientPos:'Supine or seated.',
+        examinerPos:'Stand at head. Stabilize opposite shoulder.',
+        technique:'Ask patient to laterally flex neck toward tested side. Apply resistance at temporal region pushing to opposite side.',
+        gradeSteps:['0: No contraction.','1: Flicker palpable above clavicle.','2: Lateral flexion in gravity-eliminated.','3: Full lateral flexion against gravity.','4: Holds against moderate resistance.','5: Full resistance tolerated.'],
+        ytId:'-r0eoFS7_5Q', ytSearch:'scalene muscle test MMT cervical',
+        videos:[
+          {title:'How to Muscle Test Anterior Scalenes | Technique Peek Series',ytId:'YtvYwEKnwOk'},
+          {title:'SCALENES MUSCLE LENGTH TEST',ytId:'hNFGkIzE5UQ'},
+          {title:'Manual Muscle Test & Lengthening — Anterior Scalene',ytId:'YWtEOgSwkX8'},
+          {title:'Manual Muscle Test & Lengthening — Middle Scalene',ytId:'vIx1Z5iFwfg'},
+          {title:'Manual Muscle Test & Lengthening — Posterior Scalene',ytId:'CZ1V2v5VTzY'},
+        ]},
+      { name:'Longus Colli & Longus Capitis', nerve:'C1–C6 ventral rami',
+        action:'Cervical spine flexion (deep stabilizers), anterior support of cervical lordosis',
+        origin:'Vertebral bodies C1–T3', insertion:'Atlas & basilar occiput',
+        patientPos:'Supine. Small pillow under head.',
+        examinerPos:'Stand at side. Observe and palpate.',
+        technique:'Same as DCF testing — gentle nodding. These are the deepest flexors and tested simultaneously. Pressure biofeedback (CCFT) can be used: target 22–30 mmHg.',
+        gradeSteps:['0–1: Cannot initiate CCFT.','2: CCFT 22–24 mmHg.','3: CCFT 24–26 mmHg.','4: CCFT 26–28 mmHg.','5: CCFT 28–30 mmHg maintained 10 sec × 10 reps.'],
+        ytId:'ZnD995gh8-s', ytSearch:'longus colli muscle test CCFT',
+        videos:[
+          {title:'Manual Muscle Test & Lengthening — Longus Colli (Cervicis) and Longus Capitis',ytId:'xEjvR0ZtFdQ'},
+          {title:'Deep Cervical Flexor Isolated Activation (Longus Colli, Longus Capitis)',ytId:'SLfXiM5ENzU'},
+        ]},
+    ]
+  },
+  shoulder: {
+    label: 'Shoulder', icon: '🤷', color: '#7A9E82',
+    muscles: [
+      { name:'Deltoid — Anterior', nerve:'Axillary nerve C5–C6',
+        action:'Shoulder flexion (0–90°), internal rotation, horizontal adduction',
+        origin:'Anterior clavicle', insertion:'Deltoid tuberosity of humerus',
+        patientPos:'Seated. Elbow at 90° flexion.',
+        examinerPos:'Stand in front. One hand stabilizes shoulder.',
+        technique:'Ask patient to flex shoulder to 90° (forward raise). Apply resistance proximal to elbow, pressing downward.',
+        gradeSteps:['0: No visible contraction.','1: Flicker anterior deltoid.','2: Flexion in gravity-eliminated (side-lying).','3: Full 0–90° against gravity.','4: Holds against moderate resistance.','5: Holds against maximal force.'],
+        ytId:'QF_ubbr_RUE', ytSearch:'anterior deltoid muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Anterior Deltoid',ytId:'Eg1N2RglmyY'},
+          {title:'Deltoid — Manual Muscle Testing & Lengthening for All 3 Parts',ytId:'-QIEOamyIwg'},
+        ]},
+      { name:'Deltoid — Middle', nerve:'Axillary nerve C5–C6',
+        action:'Shoulder abduction (0–90°)',
+        origin:'Acromion', insertion:'Deltoid tuberosity',
+        patientPos:'Seated. Arm at side.',
+        examinerPos:'Stand behind or in front. Hand on distal humerus.',
+        technique:'Ask patient to abduct arm to 90° (lateral raise). Apply downward resistance at distal humerus.',
+        gradeSteps:['0: No contraction.','1: Palpable flicker middle deltoid.','2: Abduction in horizontal plane.','3: Full abduction 0–90° against gravity.','4: Moderate resistance tolerated.','5: Full resistance tolerated.'],
+        ytId:'-I5OYNpcfzM', ytSearch:'middle deltoid muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Middle Deltoid',ytId:'2dqH4v_BcH0'},
+          {title:'Deltoid Manual Muscle Test (MMT) | Anterior, Middle, Posterior',ytId:'6HR9QinVAM8'},
+        ]},
+      { name:'Rotator Cuff — Supraspinatus', nerve:'Suprascapular nerve C5–C6',
+        action:'Shoulder abduction (initiation 0–15°), humeral head depression',
+        origin:'Supraspinous fossa of scapula', insertion:'Greater tubercle of humerus',
+        patientPos:'Seated. Arm in "empty can" position (30° abduction, internal rotation, slight flexion).',
+        examinerPos:'Stand in front. Hands on forearms.',
+        technique:'Empty can test: arm at 30° abduction, 30° horizontal flexion, fully internally rotated (thumb down). Apply downward resistance.',
+        gradeSteps:['0: No contraction.','1: Flicker palpable above spine of scapula.','2: Can initiate abduction gravity-eliminated.','3: Full abduction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'JvNXABDJv8k', ytSearch:'supraspinatus muscle test empty can',
+        videos:[
+          {title:'Jobe / Empty Can Test | Subacromial Pain Syndrome (SAPS)',ytId:'DeO50UTxwoo'},
+          {title:'Testing the Supraspinatus muscle, Jobes Test',ytId:'r1bnUcjytXk'},
+          {title:'Empty Can Test / Jobe Test (Supraspinatus Special Test)',ytId:'Vsq2iAPnPEQ'},
+        ]},
+      { name:'Rotator Cuff — External Rotators (Infraspinatus & Teres Minor)', nerve:'Suprascapular nerve C5–C6 / Axillary C5–C6',
+        action:'Shoulder external rotation, humeral head stabilization',
+        origin:'Infraspinous fossa / Lateral border scapula', insertion:'Greater tubercle',
+        patientPos:'Prone or seated. Elbow at 90° at side.',
+        examinerPos:'Stand at side. One hand stabilizes elbow.',
+        technique:'Ask patient to externally rotate shoulder (hand moves away from body). Apply resistance to distal forearm pushing inward.',
+        gradeSteps:['0: No contraction.','1: Flicker palpable infraspinatus.','2: External rotation gravity-eliminated.','3: Full ER against gravity.','4: Moderate resistance tolerated.','5: Full resistance.'],
+        ytId:'jJo1CbgXb_A', ytSearch:'infraspinatus external rotation muscle test MMT',
+        videos:[
+          {title:'Shoulder External Rotation MMT',ytId:'dy9DL7Pr7P0'},
+          {title:'Infraspinatus Test | Rotator Cuff Tears',ytId:'vzl97bB2hzQ'},
+          {title:'Examination of the Rotator Cuff — Infraspinatus Test',ytId:'R67cIKM3EAM'},
+        ]},
+      { name:'Serratus Anterior', nerve:'Long thoracic nerve C5–C7',
+        action:'Scapular protraction & upward rotation, stabilizes scapula against thorax',
+        origin:'Ribs 1–8 lateral surface', insertion:'Medial border of scapula (anterior surface)',
+        patientPos:'Standing or seated. Arm raised to 90° flexion.',
+        examinerPos:'Stand beside or behind. Observe scapular winging.',
+        technique:'Ask patient to push wall or extend arm forward against resistance. Observe for scapular winging (medial border lifting off thorax).',
+        gradeSteps:['0: Complete winging at rest.','1: Minimal contraction — winging present.','2: Can protract gravity-eliminated.','3: No winging at 90° flexion.','4: No winging against moderate resistance.','5: No winging — maximal resistance.'],
+        ytId:'NjFTfr0FJJE', ytSearch:'serratus anterior muscle test winging',
+        videos:[
+          {title:'Serratus Anterior Strength Test',ytId:'jatVx3v7qDI'},
+          {title:'MMT Individual Muscle Serratus Anterior',ytId:'-zwpyX5l7no'},
+          {title:'Manual Muscle Test of Serratus Anterior (Abduction & Upward Rotation)',ytId:'DC982el7reo'},
+        ]},
+      { name:'Trapezius — Middle & Lower', nerve:'Accessory nerve CN XI + C3–C4',
+        action:'Middle: scapular retraction. Lower: scapular depression & upward rotation.',
+        origin:'Thoracic vertebrae T1–T12', insertion:'Spine of scapula & clavicle',
+        patientPos:'Prone. Arms at 90° abduction (middle) or 120° (lower).',
+        examinerPos:'Stand at side. Observe scapular position.',
+        technique:'Middle: arm at 90° T-position, resist horizontal abduction. Lower: arm at 120–135°, resist elevation & retraction.',
+        gradeSteps:['0: No contraction.','1: Flicker at trapezius.','2: Partial retraction gravity-eliminated.','3: Full retraction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'WoP0-kLXsRo', ytSearch:'middle lower trapezius muscle test MMT',
+        videos:[
+          {title:'Manual Muscle Test for Middle & Lower Trapezius',ytId:'5AgoD_ELYw8'},
+          {title:'MMT Individual Muscle Middle Trapezius',ytId:'es7Gru81LEk'},
+          {title:'Lower Trapezius Manual Muscle Testing (MMT)',url:'https://brookbushinstitute.com/videos/lower-trapezius-manual-muscle-testing-mmt-for-an-active-population'},
+        ]},
+      { name:'Pectoralis Major', nerve:'Medial & Lateral pectoral nerves C5–T1',
+        action:'Shoulder horizontal adduction, flexion, internal rotation, adduction',
+        origin:'Clavicle, sternum, costal cartilages', insertion:'Lateral lip bicipital groove',
+        patientPos:'Supine. Arm at 90° horizontal abduction.',
+        examinerPos:'Stand at side. Hand on distal humerus.',
+        technique:'Ask patient to horizontally adduct arm (bring hand toward opposite shoulder). Apply resistance at distal humerus pushing outward.',
+        gradeSteps:['0: No contraction.','1: Flicker palpable at pec.','2: Adduction in gravity-eliminated.','3: Full horizontal adduction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'o8lN7lWWlRQ', ytSearch:'pectoralis major muscle test MMT',
+        videos:[
+          {title:'Pec Major Muscle Manual Dr Vizniak',ytId:'mnEWPbgXN3E'},
+          {title:'How to Test the Pectoralis Major | Chiropractic Muscle Testing',ytId:'nWljYnxP3YY'},
+          {title:'MMT Individual Muscle Pectoralis Major Clavicular Portion',ytId:'MPaHOKsmNEE'},
+        ]},
+      { name:'Latissimus Dorsi & Teres Major', nerve:'Thoracodorsal nerve C6–C8 / Lower subscapular C5–C6',
+        action:'Shoulder extension, adduction, internal rotation',
+        origin:'Thoracolumbar fascia & iliac crest / Inferior angle scapula', insertion:'Intertubercular groove',
+        patientPos:'Prone. Arm at side.',
+        examinerPos:'Stand at side. Hand on distal humerus.',
+        technique:'Ask patient to extend and adduct arm (move arm toward hip). Apply resistance against extension/adduction.',
+        gradeSteps:['0: No contraction.','1: Flicker at lats.','2: Extension gravity-eliminated.','3: Full extension & adduction.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'s4wUKmr2xtA', ytSearch:'latissimus dorsi muscle test MMT',
+        videos:[
+          {title:'Shoulder Extension MMT (Latissimus Dorsi, Teres Major, Posterior Deltoid)',ytId:'vEvJoV1z6Q8'},
+          {title:'How to Test the Teres Major Muscle (MMT)',ytId:'vfLrAoNc2Hk'},
+          {title:'Latissimus Dorsi Muscle Strength Assessment',ytId:'BIQtRi0-ECQ'},
+        ]},
+    ]
+  },
+  elbow: {
+    label: 'Elbow & Forearm', icon: '💪', color: '#7A9E82',
+    muscles: [
+      { name:'Biceps Brachii', nerve:'Musculocutaneous nerve C5–C6',
+        action:'Elbow flexion (especially supinated), forearm supination, weak shoulder flexion',
+        origin:'Coracoid process & supraglenoid tubercle', insertion:'Radial tuberosity & bicipital aponeurosis',
+        patientPos:'Seated. Elbow at side, forearm supinated.',
+        examinerPos:'Stand in front. One hand stabilizes elbow.',
+        technique:'Ask patient to flex elbow to 90° against resistance. Test in forearm supination to maximize biceps activation.',
+        gradeSteps:['0: No contraction.','1: Flicker visible in antecubital fossa.','2: Elbow flexion in gravity-eliminated.','3: Full flexion against gravity.','4: Moderate resistance at forearm.','5: Full resistance.'],
+        ytId:'Nr-sPLLOIwE', ytSearch:'biceps muscle test MMT elbow flexion',
+        videos:[
+          {title:'Elbow Flexion (Supinated) MMT',ytId:'f77bPhpv2hw'},
+          {title:'Manual Muscle Test & Lengthening — Biceps Brachii',ytId:'r3uISjfO80A'},
+          {title:'Biceps Brachii Muscle Tightness Test',ytId:'XA2rvd0zBAM'},
+        ]},
+      { name:'Brachialis', nerve:'Musculocutaneous nerve C5–C6',
+        action:'Elbow flexion (in all forearm positions — most powerful flexor)',
+        origin:'Distal anterior humerus', insertion:'Coronoid process & ulnar tuberosity',
+        patientPos:'Seated. Elbow at side, forearm pronated.',
+        examinerPos:'Stand in front. Stabilize distal humerus.',
+        technique:'Test with forearm in pronation to reduce biceps contribution. Ask patient to flex elbow against resistance.',
+        gradeSteps:['0: No contraction palpable.','1: Flicker distal biceps tendon.','2: Flexion prone — gravity-eliminated.','3: Full flexion pronated against gravity.','4: Moderate resistance.','5: Full resistance in pronation.'],
+        ytId:'9byZd7h51DM', ytSearch:'brachialis muscle test elbow',
+        videos:[
+          {title:'MMT Individual Muscle Brachialis',ytId:'dArx6_aiC4s'},
+          {title:'Manual Muscle Test & Lengthening — Brachialis',ytId:'wVypyGtFnL8'},
+          {title:'Manual Muscle Test | Brachialis and Brachioradialis',ytId:'P6os3GC-7nY'},
+        ]},
+      { name:'Triceps Brachii', nerve:'Radial nerve C6–C8',
+        action:'Elbow extension, long head: shoulder extension & adduction',
+        origin:'Long head: infraglenoid tubercle; Lateral/medial heads: posterior humerus', insertion:'Olecranon',
+        patientPos:'Prone. Shoulder at 90° abduction, elbow over edge of table.',
+        examinerPos:'Stand at side. Hand on distal forearm.',
+        technique:'Ask patient to extend elbow against gravity (straighten arm). Apply resistance at distal forearm.',
+        gradeSteps:['0: No contraction.','1: Flicker at olecranon region.','2: Extension in gravity-eliminated.','3: Full extension against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'aSEvWA-dGJ8', ytSearch:'triceps muscle test MMT elbow extension',
+        videos:[
+          {title:'Triceps Brachii Muscle Tests',ytId:'dMVL2m1LntM'},
+          {title:'Manual Muscle Test & Lengthening — Triceps',ytId:'YEAYCNICfss'},
+          {title:'Muscle Testing — Triceps brachii',ytId:'ZGr3806wxz0'},
+        ]},
+      { name:'Supinator', nerve:'Posterior interosseous nerve (deep radial) C5–C6',
+        action:'Forearm supination (with elbow extended — removes biceps contribution)',
+        origin:'Lateral epicondyle, supinator crest of ulna', insertion:'Lateral proximal radius',
+        patientPos:'Seated. Elbow extended at side. Forearm pronated.',
+        examinerPos:'Stand beside. Grip distal forearm.',
+        technique:'Keep elbow extended (eliminates biceps). Ask patient to supinate forearm. Apply rotational resistance against supination.',
+        gradeSteps:['0: No contraction.','1: Slight rotation attempted.','2: Full supination elbow extended.','3: Supination against gravity extended.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'63N_0rzD3KI', ytSearch:'supinator muscle test MMT forearm',
+        videos:[
+          {title:'Forearm Supination MMT',ytId:'rudt-j2oPgE'},
+          {title:'MMT Individual Muscle Supinator',ytId:'BIs4IfkVw1g'},
+          {title:'Manual Muscle Test & Lengthening — Supinator',ytId:'x3sKtX2wO7g'},
+        ]},
+      { name:'Pronator Teres & Pronator Quadratus', nerve:'Median nerve C6–C7 (PT) / C8–T1 (PQ)',
+        action:'Forearm pronation. PT also assists elbow flexion.',
+        origin:'PT: medial epicondyle & coronoid process. PQ: distal anterior ulna', insertion:'Lateral radius',
+        patientPos:'Seated. Elbow at 90°. Forearm supinated.',
+        examinerPos:'Stand beside. Grip distal forearm.',
+        technique:'Ask patient to pronate forearm (palm down). Apply rotational resistance against pronation.',
+        gradeSteps:['0: No contraction.','1: Flicker in pronator teres.','2: Full pronation gravity-eliminated.','3: Pronation against gravity.','4: Moderate resistance.','5: Full resistance — cannot supinate against patient.'],
+        ytId:'Gt2m7mPiwKQ', ytSearch:'pronator teres muscle test MMT',
+        videos:[
+          {title:'Forearm Pronation MMT',ytId:'ScRXwYwLl-U'},
+          {title:'MMT Individual Muscle Pronator Teres',ytId:'xQ8XYC9_dUs'},
+          {title:'MMT Individual Muscle Pronator Quadratus',ytId:'2Wasz4tUv7k'},
+        ]},
+      { name:'Brachioradialis', nerve:'Radial nerve C5–C6',
+        action:'Elbow flexion (greatest when forearm is in mid-position / semi-pronated)',
+        origin:'Lateral supracondylar ridge of humerus', insertion:'Radial styloid process',
+        patientPos:'Seated. Forearm in mid-position (thumb up).',
+        examinerPos:'Stand in front. Stabilize elbow.',
+        technique:'Ask patient to flex elbow with forearm in mid-position (thumb pointing up). Apply resistance at distal forearm.',
+        gradeSteps:['0: No palpable contraction.','1: Flicker palpated over radial border.','2: Flexion in gravity-eliminated.','3: Full flexion mid-pronation against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'VV7zsl6LafM', ytSearch:'brachioradialis muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Brachioradialis',ytId:'aan1d8O-5I8'},
+          {title:'Muscle Testing — Brachioradialis',ytId:'rbL-yOGk3Yc'},
+          {title:'Manual Muscle Test & Lengthening — Brachioradialis',ytId:'MkkLDt4L7k8'},
+        ]},
+    ]
+  },
+  wrist: {
+    label: 'Wrist & Hand', icon: '🤚', color: '#5A7A62',
+    muscles: [
+      { name:'Flexor Carpi Radialis (FCR)', nerve:'Median nerve C6–C7',
+        action:'Wrist flexion & radial deviation',
+        origin:'Medial epicondyle', insertion:'Base of 2nd & 3rd metacarpals',
+        patientPos:'Seated. Forearm supinated on table.',
+        examinerPos:'Stabilize forearm. Hand on thenar side of hand.',
+        technique:'Ask patient to flex wrist toward radial side. Apply resistance to thenar region pushing into extension & ulnar deviation.',
+        gradeSteps:['0: No contraction.','1: Tendon palpable, no movement.','2: Partial wrist flexion.','3: Full flexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'tH0AuoLAJBg', ytSearch:'flexor carpi radialis muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Flexor Carpi Radialis',ytId:'9cajD3eYzcw'},
+          {title:'Wrist Flexion (with Radial or Ulnar Deviation) MMT',ytId:'nsoIu4LCWI0'},
+          {title:'Muscle Palpation — Flexor Carpi Radialis',ytId:'dL9QBowdr3s'},
+        ]},
+      { name:'Flexor Carpi Ulnaris (FCU)', nerve:'Ulnar nerve C7–C8',
+        action:'Wrist flexion & ulnar deviation',
+        origin:'Medial epicondyle & posterior ulna', insertion:'Pisiform, hamate, 5th metacarpal',
+        patientPos:'Seated. Forearm supinated.',
+        examinerPos:'Stabilize forearm. Hand on hypothenar side.',
+        technique:'Ask patient to flex wrist toward ulnar side. Apply resistance to hypothenar region.',
+        gradeSteps:['0: No contraction.','1: FCU tendon flicker at pisiform.','2: Partial ulnar flexion.','3: Full ulnar flexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'m_YP7ofbQM0', ytSearch:'flexor carpi ulnaris muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Flexor Carpi Ulnaris',ytId:'mRICL271obk'},
+          {title:'Manual Muscle Test & Lengthening — Flexor Carpi Ulnaris',ytId:'fPRBx-5tuec'},
+          {title:'Muscle Palpation — Flexor Carpi Ulnaris',ytId:'KSGcRASDm4Q'},
+        ]},
+      { name:'Extensor Carpi Radialis Longus & Brevis (ECRL/ECRB)', nerve:'Radial nerve C6–C7',
+        action:'Wrist extension & radial deviation',
+        origin:'Lateral supracondylar ridge (ECRL) & lateral epicondyle (ECRB)', insertion:'Base of 2nd & 3rd metacarpals',
+        patientPos:'Seated. Forearm pronated on table.',
+        examinerPos:'Stabilize forearm. Push on dorsal-radial hand.',
+        technique:'Ask patient to extend wrist toward radial side (cock wrist up and out). Apply resistance to radial-dorsal aspect.',
+        gradeSteps:['0: No contraction.','1: Tendon palpable dorsal-radial.','2: Partial extension.','3: Full extension against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'wynn9LusrgE', ytSearch:'extensor carpi radialis muscle test MMT',
+        videos:[
+          {title:'Extensor Carpi Radialis Longus & Brevis Muscle Test Palp Dr Vizniak',ytId:'A_z3YS-5R2M'},
+          {title:'Extensor Carpi Radialis Longus, Brevis, & Ulnaris MMT',ytId:'4YwulqU8f2Q'},
+          {title:'Manual Muscle Test MMT — Wrist Extensors ECRL, ECRB, ECU',ytId:'ptcmwsImnMg'},
+        ]},
+      { name:'Extensor Carpi Ulnaris (ECU)', nerve:'Posterior interosseous nerve C7–C8',
+        action:'Wrist extension & ulnar deviation',
+        origin:'Lateral epicondyle & posterior ulna', insertion:'Base of 5th metacarpal',
+        patientPos:'Seated. Forearm pronated.',
+        examinerPos:'Stabilize forearm. Hand on dorsal-ulnar side.',
+        technique:'Ask patient to extend wrist toward ulnar side. Apply resistance to dorsal-ulnar aspect.',
+        gradeSteps:['0: No contraction.','1: ECU tendon flicker.','2: Partial extension.','3: Full extension against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'RG_rI_4zjcw', ytSearch:'extensor carpi ulnaris muscle test MMT',
+        videos:[
+          {title:'MMT Individual Muscle Extensor Carpi Ulnaris (ECU)',ytId:'q_WOfChbk3U'},
+          {title:'Manual Muscle Test & Lengthening — Extensor Carpi Ulnaris',ytId:'3AwcDMJiF4w'},
+          {title:'Muscle Palpation — Extensor Carpi Ulnaris',ytId:'UuCVJK8zOpo'},
+        ]},
+      { name:'Opponens Pollicis', nerve:'Median nerve C8–T1',
+        action:'Thumb opposition (abduction + flexion + rotation to face fingers)',
+        origin:'Flexor retinaculum & trapezium', insertion:'Radial side of 1st metacarpal',
+        patientPos:'Seated. Hand palm up on table.',
+        examinerPos:'Grip distal phalanx of thumb and little finger.',
+        technique:'Ask patient to touch thumb to little finger. Apply resistance attempting to pull thumb away from opposition.',
+        gradeSteps:['0: No pad contact.','1: Slight movement attempt.','2: Partial opposition.','3: Full opposition.','4: Moderate resistance.','5: Full resistance — cannot break opposition.'],
+        ytId:'4QsU3mnsVmM', ytSearch:'opponens pollicis muscle test MMT',
+        videos:[
+          {title:'MMT Opponens pollicis',ytId:'y0YmHTvHs70'},
+          {title:'MMT Individual Muscle Opponens Pollicis',ytId:'1tjcbtpjS4I'},
+          {title:'Manual Muscle Test & Lengthening — Opponens Pollicis',ytId:'Vt4JQnvVHrM'},
+        ]},
+      { name:'Lumbricals & Interossei', nerve:'Median (1st,2nd) & Ulnar (3rd,4th) nerves C8–T1',
+        action:'MCP flexion with IP extension (intrinsic plus position)',
+        origin:'Flexor digitorum profundus tendons (lumbricals) / Metacarpals (interossei)', insertion:'Extensor expansion',
+        patientPos:'Seated. Hand in neutral.',
+        examinerPos:'Stabilize metacarpals. Test each finger.',
+        technique:'Ask patient to flex MCP joint while keeping PIP & DIP extended (like holding a cup). Apply resistance to proximal phalanx.',
+        gradeSteps:['0: Cannot isolate.','1: Flicker MCP flexion.','2: MCP flexion, IP extended.','3: Full intrinsic position.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'n0w4RzSqVaY', ytSearch:'lumbricals interossei muscle test intrinsic',
+        videos:[
+          {title:'Dorsal Palmar Interossei Muscle Test Palp Dr Vizniak',ytId:'GIisZawXoXE'},
+          {title:'Manual Muscle Test & Lengthening — Palmar Interossei',ytId:'3Z7ciAVlsa4'},
+          {title:'Manual Muscle Test and Lengthening — Plantar Interossei',ytId:'AvZ2dxWukus'},
+        ]},
+      { name:'Abductor Pollicis Brevis (APB)', nerve:'Median nerve C8–T1',
+        action:'Thumb abduction (perpendicular to palm)',
+        origin:'Flexor retinaculum & scaphoid/trapezium', insertion:'Radial base of proximal phalanx of thumb',
+        patientPos:'Seated. Hand palm up, thumb relaxed.',
+        examinerPos:'Stabilize hand. Finger on proximal phalanx of thumb.',
+        technique:'Ask patient to lift thumb perpendicular to palm (toward ceiling). Apply resistance pushing thumb back to palm.',
+        gradeSteps:['0: No contraction.','1: Flicker at thenar eminence.','2: Partial abduction.','3: Full abduction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'aVtjSqQTuGs', ytSearch:'abductor pollicis brevis muscle test',
+        videos:[
+          {title:'MMT Individual Muscle Abductor Pollicis Brevis (APB)',ytId:'1PQzTTLoP9k'},
+          {title:'Manual Muscle Test & Lengthening — Abductor Pollicis Brevis',ytId:'70v4etALuq4'},
+          {title:'Muscle Palpation — Abductor Pollicis Brevis',ytId:'4BG7BQZWPFg'},
+        ]},
+      { name:'First Dorsal Interosseous', nerve:'Ulnar nerve C8–T1',
+        action:'Index finger abduction (radial abduction from midline)',
+        origin:'Adjacent sides of 1st & 2nd metacarpals', insertion:'Radial side of proximal phalanx index',
+        patientPos:'Seated. Hand palm down.',
+        examinerPos:'Stabilize 3rd metacarpal.',
+        technique:'Ask patient to abduct index finger away from middle finger. Apply resistance to radial side of index proximal phalanx.',
+        gradeSteps:['0: No movement.','1: Flicker visible/palpable at first web space.','2: Partial abduction.','3: Full abduction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'kgqIdCwVivE', ytSearch:'first dorsal interosseous muscle test MMT',
+        videos:[
+          {title:'FIRST DORSAL INTEROSSEOUS (FDI)',ytId:'CEap0evrSAI'},
+          {title:'1st Dorsal Interosseous Manual Muscle Test | T1 Myotome',ytId:'dS26wyQE_kA'},
+        ]},
+    ]
+  },
+  trunk: {
+    label: 'Trunk & Core', icon: '🫀', color: '#4caf50',
+    muscles: [
+      { name:'Rectus Abdominis', nerve:'Thoracoabdominal nerves T7–T12',
+        action:'Trunk flexion (posterior pelvic tilt, spinal flexion), supports abdominal viscera',
+        origin:'Pubic crest & pubic symphysis', insertion:'Xiphoid process & costal cartilages 5–7',
+        patientPos:'Supine. Knees bent 90°, feet flat.',
+        examinerPos:'Stand beside. Observe and grade based on what patient achieves.',
+        technique:'Grade 5/4: Full sit-up. Grade 3: Lift shoulders off table. Grade 2: Chin tuck only. Apply resistance to chest/shoulders for grades 4–5.',
+        gradeSteps:['0: No contraction.','1: Flicker at rectus.','2: Head & shoulders lift.','3: Full trunk flexion, arms forward.','4: Full sit-up, arms across chest.','5: Full sit-up with hands behind head.'],
+        ytId:'ww-6lRXvI9Y', ytSearch:'rectus abdominis muscle test MMT',
+        videos:[
+          {title:'Muscle Testing — Rectus Abdominis',ytId:'TepcvRFk3D0'},
+          {title:'How to Muscle Test the CORE — Rectus and Transverse Abdominis',ytId:'R7WGTaida30'},
+          {title:'Manual Muscle Test & Lengthening — Rectus Abdominis',ytId:'HM4aIaziHMo'},
+        ]},
+      { name:'External & Internal Obliques', nerve:'Thoracoabdominal nerves T7–L1',
+        action:'Trunk rotation and lateral flexion, compression of abdominal wall',
+        origin:'Ribs 5–12 (EO) / Inguinal ligament & iliac crest (IO)', insertion:'Linea alba, pubic tubercle, iliac crest',
+        patientPos:'Supine. Knees bent.',
+        examinerPos:'Stand beside. Stabilize pelvis.',
+        technique:'Ask patient to rotate trunk — right elbow to left knee (left EO + right IO). Observe how far they can come up and whether rotation is present.',
+        gradeSteps:['0: No contraction.','1: Flicker at obliques.','2: Rotation with body supported.','3: Rotation, shoulders off table.','4: Full rotation with arms crossed.','5: Full rotation hands behind head.'],
+        ytId:'8NBNM8haZx0', ytSearch:'oblique muscle test MMT trunk rotation',
+        videos:[
+          {title:'MMT Manual Muscle Test — Internal and External Obliques Dr. Bryan',ytId:'KAX_CT98yKs'},
+          {title:'How to Test the CORE Muscles — Internal and External Obliques',ytId:'VoCs2iIi7f8'},
+        ]},
+      { name:'Erector Spinae (Iliocostalis, Longissimus, Spinalis)', nerve:'Dorsal rami T1–L5',
+        action:'Spine extension, lateral flexion, spinal stabilization',
+        origin:'Sacrum, iliac crest, lumbar vertebrae', insertion:'Ribs, transverse processes, spinous processes',
+        patientPos:'Prone. Arms at sides.',
+        examinerPos:'Stand beside. Stabilize pelvis.',
+        technique:'Ask patient to extend trunk (lift chest off table). Apply resistance to upper back.',
+        gradeSteps:['0: No contraction.','1: Flicker paravertebral muscles.','2: Partial extension.','3: Full extension — chest off table.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'3NXv0Nany-Q', ytSearch:'erector spinae muscle test prone extension',
+        videos:[
+          {title:'Manual Muscle Testing for Erector Spinae Group',ytId:'V5EzTtBtJ-8'},
+          {title:'Muscle Testing — Erector Spinae',ytId:'jBc3FeRGEds'},
+          {title:'Erector Spinae Muscle Test',ytId:'pfbm_-fgylo'},
+        ]},
+      { name:'Quadratus Lumborum (QL)', nerve:'Subcostal nerve T12 + L1–L4',
+        action:'Lateral trunk flexion (ipsilateral), hip elevation, lumbar stabilization',
+        origin:'Iliolumbar ligament & iliac crest', insertion:'12th rib & transverse processes L1–L4',
+        patientPos:'Side-lying. Body straight.',
+        examinerPos:'Stand behind. Stabilize pelvis.',
+        technique:'Ask patient to laterally flex (hike hip toward ribs, or raise torso in side-lying). Apply resistance at thorax.',
+        gradeSteps:['0: No contraction.','1: Flicker above iliac crest.','2: Hip hike in side-lying.','3: Full lateral flexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'l6AZQV6sncI', ytSearch:'quadratus lumborum muscle test MMT',
+        videos:[
+          {title:'How to Test the Quadratus Lumborum (QL) for Weakness',ytId:'EkFstqTE_yw'},
+          {title:'Manual Muscle Test & Lengthening — Quadratus Lumborum',ytId:'17PbcsYunxc'},
+          {title:'Are You Testing the Quadratus Lumborum Correctly?',ytId:'Bhw_N9v16wc'},
+        ]},
+      { name:'Transversus Abdominis (TrA)', nerve:'Thoracoabdominal nerves T7–L1',
+        action:'Spinal stabilization, intra-abdominal pressure, compresses abdominal contents',
+        origin:'Inguinal ligament, iliac crest, thoracolumbar fascia, costal cartilages 7–12', insertion:'Linea alba & pubic crest',
+        patientPos:'Supine. Knees bent. Small pillow under lumbar spine.',
+        examinerPos:'Palpate 2 cm medial and inferior to ASIS.',
+        technique:'Ask patient to "draw navel toward spine" gently without moving lumbar spine. Palpate for muscle activation. Use pressure biofeedback if available (target: 2 mmHg decrease from 70 mmHg baseline).',
+        gradeSteps:['0: No contraction palpated.','1: Very slight tension felt.','2: Activation with breath holding.','3: Independent activation 10 sec.','4: Activation during limb movement.','5: Activation maintained during functional tasks.'],
+        ytId:'ERZzCKpjEDg', ytSearch:'transversus abdominis muscle test activation',
+        videos:[
+          {title:'Rectus vs. Transversus Abdominis: Muscle Test Guide',ytId:'VnBZ569q9G4'},
+          {title:'How to Muscle Test the CORE — Rectus and Transverse Abdominis',ytId:'R7WGTaida30'},
+          {title:'Muscle Testing — Transverse Abdominis',ytId:'1juDEjdImWw'},
+        ]},
+      { name:'Multifidus', nerve:'Dorsal rami L1–L5',
+        action:'Lumbar segmental stabilization, extension of individual vertebrae, rotation control',
+        origin:'Sacrum, iliac crest, mammillary processes L1–L5', insertion:'Spinous processes 2–4 levels above',
+        patientPos:'Prone. Small pillow under abdomen.',
+        examinerPos:'Palpate directly beside lumbar spinous processes.',
+        technique:'Ask patient to gently swell muscle under fingers without moving spine. Independent segmental contraction felt as tissue swelling unilaterally.',
+        gradeSteps:['0: No activation.','1: Minimal swelling palpated.','2: Contraction one side.','3: Bilateral contraction 10 sec.','4: Maintained during arm/leg movement.','5: Maintained during functional activities.'],
+        ytId:'Sws_GwrlYO0', ytSearch:'multifidus muscle test palpation',
+        videos:[
+          {title:'HOW TO TEST THE MULTIFIDUS | Physical Therapy',ytId:'grfbSojmeSo'},
+          {title:'Multifidus Lift Test',ytId:'4VhV1FrquUs'},
+          {title:'How to Properly Assess the Multifidi Muscles',ytId:'Kce0EESlgSw'},
+        ]},
+    ]
+  },
+  hip: {
+    label: 'Hip', icon: '🦵', color: '#5A7A62',
+    muscles: [
+      { name:'Iliopsoas (Iliacus + Psoas Major)', nerve:'Femoral nerve L1–L3 / L2–L4',
+        action:'Hip flexion (most powerful), trunk flexion when hip fixed, external rotation',
+        origin:'Iliac fossa (iliacus) / T12–L5 vertebrae & discs (psoas)', insertion:'Lesser trochanter of femur',
+        patientPos:'Seated at edge of table. Hip at 90°.',
+        examinerPos:'Stand in front. Hand on distal thigh.',
+        technique:'Ask patient to lift thigh further toward chest (hip flexion beyond 90°). Apply resistance to distal thigh pressing downward.',
+        gradeSteps:['0: No contraction.','1: Flicker in inguinal region.','2: Hip flexion supine gravity-eliminated.','3: Full flexion against gravity seated.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'Q4Ko275cluo', ytSearch:'iliopsoas muscle test MMT hip flexion',
+        videos:[
+          {title:'Hip Flexion MMT',ytId:'50sRc1jHqfw'},
+          {title:'How to Individually Muscle Test the Iliopsoas Muscle Group',ytId:'a8k5Cgw4Bb0'},
+          {title:'Thomas Test | Iliopsoas Tightness',ytId:'NMDd-4NspHs'},
+        ]},
+      { name:'Gluteus Maximus', nerve:'Inferior gluteal nerve L5–S2',
+        action:'Hip extension (from flexed position), external rotation, hip abduction (upper fibers)',
+        origin:'Dorsal sacrum, ilium, sacrotuberous ligament', insertion:'Gluteal tuberosity & iliotibial band',
+        patientPos:'Prone. Knee at 90° flexion on tested side.',
+        examinerPos:'Stand at side. One hand on lower buttock & hamstrings.',
+        technique:'Ask patient to lift thigh off table (hip extension prone with knee bent — reduces hamstring contribution). Apply resistance above knee.',
+        gradeSteps:['0: No contraction.','1: Flicker at gluteal fold.','2: Extension in side-lying.','3: Full extension against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'vsQugiJgZZE', ytSearch:'gluteus maximus muscle test MMT prone',
+        videos:[
+          {title:'Glut Max Manual Muscle Test',ytId:'f0VYqg2wZH4'},
+          {title:'How To Perform A Gluteus Maximus Test?',ytId:'OeqvbqClAe0'},
+          {title:'Gluteus Maximus Strength Test',ytId:'QRQxYz7Hj7Y'},
+        ]},
+      { name:'Gluteus Medius', nerve:'Superior gluteal nerve L4–S1',
+        action:'Hip abduction, internal rotation, pelvic stabilization during gait',
+        origin:'Ilium (between anterior & posterior gluteal lines)', insertion:'Greater trochanter (lateral surface)',
+        patientPos:'Side-lying. Hip neutral, knee extended.',
+        examinerPos:'Stand behind. Hand on distal thigh.',
+        technique:'Ask patient to abduct hip (raise leg toward ceiling). Apply resistance at distal thigh/above knee pressing downward.',
+        gradeSteps:['0: No contraction.','1: Flicker at greater trochanter.','2: Abduction in gravity-eliminated.','3: Full abduction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'O2KPabIoPPk', ytSearch:'gluteus medius muscle test MMT side lying',
+        videos:[
+          {title:'Gluteus Medius Manual Muscle Testing (for an active population)',ytId:'mKWDw03bRho'},
+          {title:'Glut Med Abductor Manual Muscle Test',ytId:'nzEwCzNTqns'},
+          {title:'Gluteus Medius Hip Muscle Strength Test',ytId:'vssOi59LjSQ'},
+        ]},
+      { name:'Hip Adductors (Adductor Group)', nerve:'Obturator nerve L2–L4',
+        action:'Hip adduction, flexion (when hip extended), stabilization of lower extremity',
+        origin:'Pubic rami, ischial ramus, ischial tuberosity', insertion:'Medial femur (linea aspera)',
+        patientPos:'Side-lying. Lower leg is tested leg. Upper leg supported by examiner.',
+        examinerPos:'Support upper leg. Hand on medial aspect of lower leg.',
+        technique:'Ask patient to lift lower leg toward upper leg (adduction). Apply resistance at medial side pushing down.',
+        gradeSteps:['0: No contraction.','1: Flicker inner thigh.','2: Partial adduction.','3: Full adduction against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'AVAXhy6pl7o', ytSearch:'hip adductors muscle test MMT',
+        videos:[
+          {title:'Hip Adduction MMT',ytId:'Pvk5DCb-emY'},
+          {title:'How to Muscle Test Hip Adductors | Technique Peek Series',ytId:'d05zRRFOgoo'},
+          {title:'Manual Muscle Test for Hip Adduction',ytId:'z35WG0lSQDQ'},
+        ]},
+      { name:'Hip External Rotators (Deep 6: Piriformis, Obturators, Gemelli, Quadratus Femoris)', nerve:'L4–S2 (various)',
+        action:'External rotation of hip, some abduction (piriformis)',
+        origin:'Sacrum, obturator foramen, ischium', insertion:'Greater trochanter',
+        patientPos:'Seated at edge of table. Hip & knee at 90°.',
+        examinerPos:'Stand at side. One hand on lateral knee, other on medial ankle.',
+        technique:'Stabilize knee. Ask patient to move foot away from body (external rotation). Apply resistance at ankle pushing inward.',
+        gradeSteps:['0: No contraction.','1: Flicker in posterior hip.','2: External rotation supine.','3: Full ER seated against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'BcF7_fPqfxw', ytSearch:'hip external rotators muscle test MMT piriformis',
+        videos:[
+          {title:'Anatomy & Palpation of Deep Six Muscles — Ask Dr. Abelson',ytId:'8bHjbJFuQfk'},
+          {title:'Manual Muscle Testing: Hip External Rotation',url:'https://www.physio-pedia.com/Manual_Muscle_Testing:_Hip_External_Rotation'},
+        ]},
+      { name:'Tensor Fasciae Latae (TFL)', nerve:'Superior gluteal nerve L4–S1',
+        action:'Hip flexion + abduction + internal rotation, knee stabilization via IT band',
+        origin:'Anterior superior iliac spine (ASIS)', insertion:'Iliotibial band → lateral tibia',
+        patientPos:'Supine. Leg in slight internal rotation and abduction.',
+        examinerPos:'Stand at side. Hand on distal thigh.',
+        technique:'Ask patient to flex and abduct hip with slight internal rotation. Apply resistance in direction of extension, adduction, and external rotation.',
+        gradeSteps:['0: No contraction.','1: Flicker at ASIS region.','2: Movement in gravity-eliminated.','3: Full movement against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'jF6iE0shJKk', ytSearch:'tensor fasciae latae TFL muscle test MMT',
+        videos:[
+          {title:'Manual Muscle Test for the Tensor Fascia Latae',ytId:'kOdv-XF-DnU'},
+          {title:'Tensor Fascia Lata Manual Muscle Testing',ytId:'mgqLKH_G1qs'},
+          {title:'Manual Muscle Test & Lengthening — Tensor Fasciae Latae',ytId:'6lcQtL_tUb8'},
+        ]},
+      { name:'Hamstrings (Biceps Femoris, Semimembranosus, Semitendinosus)', nerve:'Sciatic nerve (tibial & common peroneal) L4–S2',
+        action:'Knee flexion, hip extension, tibial rotation',
+        origin:'Ischial tuberosity (long head BF, SM, ST) / Femur (short head BF)', insertion:'Fibular head (BF) / Medial tibia (SM, ST)',
+        patientPos:'Prone. Hip neutral.',
+        examinerPos:'Stand at side. Hand on posterior leg above ankle.',
+        technique:'Ask patient to flex knee to 90°. Apply resistance at distal leg pushing into extension.',
+        gradeSteps:['0: No contraction.','1: Flicker at ischial tuberosity.','2: Knee flexion gravity-eliminated.','3: Full flexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'w2arL8LK_6E', ytSearch:'hamstrings muscle test MMT prone',
+        videos:[
+          {title:'Hamstring Manual Muscle Strength Test',ytId:'0Ias9j4NmU8'},
+          {title:'90-90 Straight Leg Raise Test — Hamstring Contractures',ytId:'meM4S1vrbpk'},
+          {title:'Torn Hamstrings & Glutes — This is How You Test Them',ytId:'C1zjuMSbp7g'},
+        ]},
+    ]
+  },
+  knee: {
+    label: 'Knee', icon: '🦿', color: '#ffd600',
+    muscles: [
+      { name:'Quadriceps (Rectus Femoris, Vastus Lateralis, Medialis, Intermedius)', nerve:'Femoral nerve L2–L4',
+        action:'Knee extension, rectus femoris also flexes hip',
+        origin:'AIIS & acetabulum (RF) / Femur (vasti)', insertion:'Tibial tuberosity via patellar tendon',
+        patientPos:'Seated at edge of table. Knee at 90°.',
+        examinerPos:'Stand in front. Hand on distal tibia.',
+        technique:'Ask patient to extend knee (kick leg out straight). Apply resistance at distal tibia pushing into flexion.',
+        gradeSteps:['0: No contraction.','1: Patellar movement visible — no extension.','2: Extension gravity-eliminated (supine).','3: Full extension against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'U4L_6JEv9Jg', ytSearch:'quadriceps muscle test MMT knee extension',
+        videos:[
+          {title:'Manual Muscle Test & Lengthening — Quadriceps',ytId:'4LySZfM9iWc'},
+          {title:'Quads Manual Muscle Test',ytId:'TWFa6BEBRFk'},
+          {title:'Quadriceps Muscle Test Palp Dr Vizniak',ytId:'Gogw3izWDi4'},
+        ]},
+      { name:'Popliteus', nerve:'Tibial nerve L4–S1',
+        action:'Knee flexion, internal tibial rotation (unlocks knee from full extension)',
+        origin:'Lateral femoral condyle', insertion:'Posterior proximal tibia',
+        patientPos:'Prone. Knee at 90°.',
+        examinerPos:'Stand at side. Stabilize thigh. Hand on distal leg.',
+        technique:'Ask patient to internally rotate tibia (toes inward with knee bent). Popliteus is deep — difficult to isolate. Test as part of knee flexion assessment.',
+        gradeSteps:['0: Cannot initiate knee unlock.','1: Minimal internal rotation.','2–3: Internal rotation without resistance.','4–5: Resists internal rotation force.'],
+        ytId:'x3xhZTTfZFY', ytSearch:'popliteus muscle test knee MMT',
+        videos:[
+          {title:'Muscle Testing — Popliteus',ytId:'hhS7Hv1f2nI'},
+          {title:'Garrick Test (for Popliteus Tendinopathy)',ytId:'cryMjPdmKY4'},
+          {title:'ASSESSMENT: Garrick Test for Popliteus',ytId:'3oZMet9WoNo'},
+        ]},
+      { name:'Gastrocnemius (knee component)', nerve:'Tibial nerve S1–S2',
+        action:'Knee flexion (bi-articular), plantarflexion',
+        origin:'Medial & lateral femoral condyles', insertion:'Calcaneus via Achilles tendon',
+        patientPos:'Prone. Hip neutral.',
+        examinerPos:'Stand at side. Hand on distal posterior leg.',
+        technique:'Test knee flexion contribution by testing with ankle in slight dorsiflexion (to reduce gastrocnemius effect). Compare to hamstring testing.',
+        gradeSteps:['0: No contraction.','1: Gastrocnemius belly flicker.','2: Knee flexion gravity-eliminated.','3: Full flexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'haKOXlWjR9M', ytSearch:'gastrocnemius knee flexion muscle test',
+        videos:[
+          {title:'Gastrocnemius Muscle Test Vizniak',ytId:'kDU1J1kCMhk'},
+          {title:'MMT Gastrocnemius',ytId:'pFiP8qw4PH8'},
+          {title:'Gastrocnemius | Muscle Testing & Passive Length',ytId:'qhiPsj-fyQA'},
+        ]},
+      { name:'Vastus Medialis Oblique (VMO)', nerve:'Femoral nerve L2–L4',
+        action:'Final 15–30° of knee extension, patellar medial stabilization',
+        origin:'Medial supracondylar line of femur', insertion:'Medial patellar border & patellar tendon',
+        patientPos:'Seated. Knee at 30° flexion.',
+        examinerPos:'Observe and palpate medial distal thigh. Apply resistance at distal tibia.',
+        technique:'Ask patient to extend knee from 30° to full extension. Specifically palpate VMO bulk and observe for atrophy vs. VL. Key test after knee injury/surgery.',
+        gradeSteps:['0: No VMO contraction.','1: VMO flicker only.','2: Can extend 30°→0° gravity-eliminated.','3: Full terminal extension against gravity.','4: Moderate resistance terminal extension.','5: Full resistance.'],
+        ytId:'C0kmJabtk28', ytSearch:'VMO vastus medialis oblique muscle test',
+        videos:[
+          {title:'Vastus Medialis Obliques Muscle Test',ytId:'2yHYqAt-BNU'},
+          {title:'VMO Activation Exercise Instruction Video',ytId:'F4THFkwH6wg'},
+          {title:'Investigation into the Vastus Medialis Oblique Muscle',ytId:'l4Xm4XrkUSc'},
+        ]},
+    ]
+  },
+  ankle: {
+    label: 'Ankle & Foot', icon: '🦶', color: '#00e676',
+    muscles: [
+      { name:'Tibialis Anterior', nerve:'Deep peroneal nerve L4–L5',
+        action:'Ankle dorsiflexion & inversion',
+        origin:'Lateral tibia & interosseous membrane', insertion:'Medial cuneiform & 1st metatarsal base',
+        patientPos:'Seated or supine.',
+        examinerPos:'Stand at foot. Hand on dorsal-medial foot.',
+        technique:'Ask patient to dorsiflex and invert foot (bring toes up and in). Apply resistance to dorsal-medial foot pushing into plantarflexion and eversion.',
+        gradeSteps:['0: No contraction.','1: Tendon visible/palpable, no movement.','2: Dorsiflexion gravity-eliminated.','3: Full dorsiflexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'HmgXnST4Mdw', ytSearch:'tibialis anterior muscle test MMT',
+        videos:[
+          {title:'Tibialis Anterior | Muscle Testing, Lengthening & Activation',ytId:'VG4GFt-TMjA'},
+          {title:'Tibialis Anterior MMT',ytId:'ue4W6DH729Y'},
+          {title:'Tibialis Anterior Test & Stretch',ytId:'a7kA9yNtxIU'},
+        ]},
+      { name:'Gastrocnemius & Soleus (Plantarflexors)', nerve:'Tibial nerve S1–S2',
+        action:'Plantarflexion (gastrocnemius: knee extended; soleus: knee flexed)',
+        origin:'Femoral condyles (gastroc) / Posterior tibia-fibula (soleus)', insertion:'Calcaneus via Achilles tendon',
+        patientPos:'Standing (functional test) or supine.',
+        examinerPos:'Observe or apply resistance to plantar surface.',
+        technique:'Single-leg calf raise: Grade 5 = 20+ repetitions. Grade 4 = 10–19 reps. Grade 3 = 1–9 reps. Grade 2 = plantarflexion non-weight bearing. Grade 1 = trace. Grade 0 = none.',
+        gradeSteps:['0: No contraction.','1: Achilles tendon flicker.','2: Plantarflexion supine — no gravity.','3: 1–9 single leg calf raises.','4: 10–19 single leg calf raises.','5: 20+ single leg calf raises full ROM.'],
+        ytId:'k8ipHzKeAkQ', ytSearch:'gastrocnemius soleus calf muscle test MMT',
+        videos:[
+          {title:'Gastrocnemius and Soleus Muscle Length Test',url:'https://brookbushinstitute.com/videos/gastrocnemius-and-soleus-muscle-length-test'},
+          {title:'Calf Strain Rehab Exercises and Tests (Gastrocnemius or Soleus?)',ytId:'y3zHHIP-iTU'},
+          {title:'Soleus Muscle Test Dr Vizniak Muscle Manual',ytId:'wroCOSHLojA'},
+        ]},
+      { name:'Tibialis Posterior', nerve:'Tibial nerve L4–L5',
+        action:'Ankle inversion, plantarflexion, maintains medial longitudinal arch',
+        origin:'Posterior tibia, fibula & interosseous membrane', insertion:'Navicular & cuneiforms, metatarsals 2–4',
+        patientPos:'Side-lying or supine.',
+        examinerPos:'Stabilize leg. Hand on medial foot.',
+        technique:'Ask patient to invert foot with slight plantarflexion (tilt foot inward and down). Apply resistance to medial foot pushing into eversion.',
+        gradeSteps:['0: No contraction.','1: Flicker posterior-medial leg.','2: Inversion gravity-eliminated.','3: Full inversion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'szca5qbIFdY', ytSearch:'tibialis posterior muscle test MMT inversion',
+        videos:[
+          {title:'Tibialis Posterior MMT',ytId:'UZe5n5VDObo'},
+          {title:'Tibialis Posterior | Muscle Testing, Lengthening & Function',ytId:'O0FrjRMbNrI'},
+          {title:'Tibialis Posterior & Anterior Muscle Testing',ytId:'dBrHdiFB_zM'},
+        ]},
+      { name:'Peroneus Longus & Brevis', nerve:'Superficial peroneal nerve L5–S1',
+        action:'Ankle eversion, plantarflexion, foot arch support',
+        origin:'Fibula (lateral surface)', insertion:'1st metatarsal & medial cuneiform (PL) / 5th metatarsal base (PB)',
+        patientPos:'Side-lying or supine.',
+        examinerPos:'Stabilize leg. Hand on lateral foot.',
+        technique:'Ask patient to evert foot (turn sole outward). Apply resistance to lateral foot pushing into inversion.',
+        gradeSteps:['0: No contraction.','1: Flicker behind lateral malleolus.','2: Eversion gravity-eliminated.','3: Full eversion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'KUTILNtn47E', ytSearch:'peroneus longus brevis eversion muscle test MMT',
+        videos:[
+          {title:'Fibularis Longus & Brevis | Muscle Testing, Activation & Length',ytId:'yS5hEk_pJcA'},
+          {title:'Peroneal Tendon Muscle Testing',ytId:'8tatuNwlReE'},
+          {title:'MMT Peroneus Longus & Brevis',ytId:'mzsPCCJ2rPM'},
+        ]},
+      { name:'Extensor Digitorum Longus & Extensor Hallucis Longus', nerve:'Deep peroneal nerve L4–L5',
+        action:'Toe extension (MTP joints), ankle dorsiflexion',
+        origin:'Fibula & tibia (EDL) / Mid-fibula & interosseous membrane (EHL)', insertion:'Middle & distal phalanges of toes',
+        patientPos:'Supine.',
+        examinerPos:'Stabilize foot. Fingers on dorsal toes.',
+        technique:'Ask patient to extend toes upward. Apply resistance to dorsal aspect of toes pushing downward.',
+        gradeSteps:['0: No extension.','1: Flicker extensor tendons.','2: Extension gravity-eliminated.','3: Full extension against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'Uo77CQqkS-A', ytSearch:'extensor digitorum longus muscle test MMT toes',
+        videos:[
+          {title:'Extensor Hallucis Longus | Muscle Testing, Toe Extension & Length',ytId:'xpFT3qK-ua8'},
+          {title:'Extensor Digitorum Longus | Muscle Testing, Toe Extension & Length',ytId:'oStQFj9t_m8'},
+          {title:'Extensor Digitorum Longus Muscle Test Palp Dr Vizniak',ytId:'W8ziu_i6wzs'},
+        ]},
+      { name:'Flexor Digitorum Longus & Flexor Hallucis Longus', nerve:'Tibial nerve L5–S2',
+        action:'Toe flexion (IP joints), ankle plantarflexion, support medial arch',
+        origin:'Posterior tibia (FDL) / Posterior fibula (FHL)', insertion:'Distal phalanges of toes',
+        patientPos:'Supine. Ankle in neutral.',
+        examinerPos:'Stabilize foot. Fingers on plantar surface of toes.',
+        technique:'Ask patient to curl toes downward (toe flexion). Apply resistance to plantar surface of distal phalanges.',
+        gradeSteps:['0: No contraction.','1: Flicker at plantar toes.','2: Toe flexion gravity-eliminated.','3: Full flexion against gravity.','4: Moderate resistance.','5: Full resistance.'],
+        ytId:'A6xAC0RGGaQ', ytSearch:'flexor digitorum longus muscle test MMT',
+        videos:[
+          {title:'Flexor Digitorum Longus | Toe Curl Muscle Test, Activation',ytId:'sW8WC3VlefY'},
+          {title:'Muscle Testing — Flexor Hallucis Longus',ytId:'3gs0P75LGnY'},
+          {title:'Flexor Digitorum Longus Muscle Test Dr Vizniak',ytId:'XnvvUqXNzeU'},
+        ]},
+      { name:'Intrinsic Foot Muscles (Short Flexors, Interossei, Lumbricals)', nerve:'Medial & Lateral plantar nerves (tibial) S1–S2',
+        action:'Toe MTP flexion, spread/adduct toes, short foot/arch support',
+        origin:'Calcaneus & plantar fascia', insertion:'Proximal phalanges & extensor expansion',
+        patientPos:'Seated. Foot flat on floor.',
+        examinerPos:'Observe and palpate plantar surface.',
+        technique:'Short foot exercise: ask patient to "dome" the foot — shorten it without toe curling. Feel for arch rise. Test individual toe abduction/adduction.',
+        gradeSteps:['0: No activation.','1: Minimal arch rise.','2: Short foot achieved.','3: Short foot maintained 10 sec.','4: Maintained during single leg standing.','5: Maintained during dynamic tasks.'],
+        ytId:'byCTWYxlPfU', ytSearch:'intrinsic foot muscle test short foot exercise',
+        videos:[
+          {title:'Intrinsic FOOT Muscles Dr Vizniak',ytId:'2mqQHhNGcGs'},
+          {title:'A New Clinical Test to Evaluate Intrinsic Foot Muscle Function (Knuckle Test)',ytId:'OiP3J6suCWI'},
+          {title:'Measuring Intrinsic Foot Muscle Strength Using a Dynamometer',ytId:'tUEcJtcco-s'},
+        ]},
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════
+   REGION SELECTION
+═══════════════════════════════════════════ */
+let activeRegion = null;
+
+function selectRegion(regionKey) {
+  // Update card states
+  document.querySelectorAll('.region-card').forEach((c,i) => c.classList.remove('active'));
+  const cards = document.querySelectorAll('.region-card');
+  const regions = ['neck','shoulder','elbow','wrist','trunk','hip','knee','ankle'];
+  const idx = regions.indexOf(regionKey);
+  if(idx >= 0) cards[idx].classList.add('active');
+
+  activeRegion = regionKey;
+  renderMusclePanel(regionKey);
+  // Scroll to panel
+  setTimeout(() => {
+    document.getElementById('musclePanel').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
+}
+
+function renderMusclePanel(regionKey) {
+  const region = MUSCLES[regionKey];
+  if (!region) return;
+  const panel = document.getElementById('musclePanel');
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-region-icon">${region.icon}</div>
+      <div>
+        <div class="panel-region-title">${region.label} Muscles</div>
+        <div class="panel-region-sub">${region.muscles.length} muscles · Click any muscle for full MMT guide</div>
+      </div>
+    </div>
+    <div class="muscles-list" id="musclesList">
+      ${region.muscles.map((m,i) => buildMuscleRow(m, i, regionKey)).join('')}
+    </div>
+  `;
+  panel.classList.add('show');
+}
+
+function buildMuscleRow(m, idx, regionKey) {
+  return `
+    <div class="muscle-row" id="mrow-${regionKey}-${idx}" onclick="toggleMuscle('${regionKey}',${idx})">
+      <div class="mr-left">
+        <div class="mr-name">${m.name}</div>
+        <div class="mr-nerve">⚡ ${m.nerve}</div>
+        <div class="mr-tags">
+          <span class="mr-tag tag-grade">MMT Grades 0–5</span>
+          <span class="mr-tag tag-joint">${m.action.split(',')[0]}</span>
+        </div>
+      </div>
+      <div class="mr-arrow">›</div>
+    </div>
+    <div class="muscle-detail" id="mdetail-${regionKey}-${idx}">
+      ${buildMuscleDetail(m, idx, regionKey)}
+    </div>
+  `;
+}
+
+function buildMuscleDetail(m, idx, regionKey) {
+  const gradeColors = {5:'#2e7d32',4:'#388e3c',3:'#c98d00',2:'#e06a00',1:'#d32f2f',0:'rgba(45,74,53,.35)'};
+  const gradeNames = {5:'Normal',4:'Good',3:'Fair',2:'Poor',1:'Trace',0:'Zero'};
+
+  return `
+    <div class="muscle-image">
+      <div class="mi-icon">💪</div>
+      <div class="mi-text">MUSCLE TESTING — ${m.name.split(' ')[0].toUpperCase()}</div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-block accent-cyan">
+        <div class="db-label cyan">⚡ Nerve Supply</div>
+        <div class="db-content"><strong>${m.nerve}</strong></div>
+      </div>
+      <div class="detail-block accent-pink">
+        <div class="db-label pink">🎯 Action</div>
+        <div class="db-content">${m.action}</div>
+      </div>
+      <div class="detail-block accent-gold">
+        <div class="db-label gold">📍 Origin</div>
+        <div class="db-content">${m.origin}</div>
+      </div>
+      <div class="detail-block accent-green">
+        <div class="db-label green">📌 Insertion</div>
+        <div class="db-content">${m.insertion}</div>
+      </div>
+    </div>
+
+    <div class="detail-block accent-purple" style="margin-bottom:12px;">
+      <div class="db-label purple">🧑‍🦽 Patient Position</div>
+      <div class="db-content">${m.patientPos}</div>
+    </div>
+
+    <div class="detail-block accent-pink" style="margin-bottom:12px;">
+      <div class="db-label pink">👨‍⚕️ Examiner Position</div>
+      <div class="db-content">${m.examinerPos}</div>
+    </div>
+
+    <div class="detail-block" style="margin-bottom:16px;border-color:var(--charcoal-mid);">
+      <div class="db-label cyan">📋 Testing Technique</div>
+      <div class="db-content">${m.technique}</div>
+    </div>
+
+    <div class="detail-block accent-gold" style="margin-bottom:16px;">
+      <div class="db-label gold">📊 Grading Steps</div>
+      <div class="grade-scale">
+        ${[5,4,3,2,1,0].map(g => `
+          <div class="gs-item" onclick="openGradeModal(${g})" style="border-color:${gradeColors[g]}22;">
+            <div class="gs-num" style="color:${gradeColors[g]}">${g}</div>
+            <div class="gs-txt">${gradeNames[g]}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-top:14px;">
+        <div class="steps-list">
+          ${m.gradeSteps.map((s,i) => `
+            <div class="step-item">
+              <div class="step-num" style="background:${gradeColors[5-i]}18;border-color:${gradeColors[5-i]}40;color:${gradeColors[5-i]}">${5-i}</div>
+              <div class="step-text">${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    ${(m.videos && m.videos.length) ? `
+    <div class="detail-block" style="margin-bottom:0;border-color:rgba(90,122,98,.2);">
+      <div class="db-label cyan">🎬 Reference Videos</div>
+      <div class="vid-list">
+        ${m.videos.map((v,vi) => v.url
+          ? `<a class="vid-item" href="${v.url}" target="_blank" rel="noopener">
+               <span class="vid-num">${vi+1}</span>
+               <span class="vid-title">${v.title}</span>
+               <span class="vid-ext">↗</span>
+             </a>`
+          : `<div class="vid-item" onclick="playMuscleVid('${v.ytId}','${escHTML(v.title)}')">
+               <span class="vid-num">${vi+1}</span>
+               <span class="vid-title">${v.title}</span>
+               <span class="vid-play">▶</span>
+             </div>`
+        ).join('')}
+      </div>
+    </div>
+    ` : `
+    <button class="btn-watch-mt" onclick="playMuscleVid('${m.ytId}','${escHTML(m.name)} — Muscle Test')">
+      ▶ &nbsp; Watch MMT Demonstration Video
+    </button>
+    `}
+  `;
+}
+
+function toggleMuscle(regionKey, idx) {
+  const row    = document.getElementById(`mrow-${regionKey}-${idx}`);
+  const detail = document.getElementById(`mdetail-${regionKey}-${idx}`);
+  const isOpen = row.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.muscle-row').forEach(r => r.classList.remove('open'));
+  document.querySelectorAll('.muscle-detail').forEach(d => d.classList.remove('show'));
+  if (!isOpen) {
+    row.classList.add('open');
+    detail.classList.add('show');
+    setTimeout(() => detail.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GRADE MODAL
+═══════════════════════════════════════════ */
+const gradeColors = {5:'#7A9E82',4:'#69f0ae',3:'#ffd600',2:'#ff9800',1:'#ff5252',0:'rgba(255,255,255,.3)'};
+function openGradeModal(g) {
+  const data = GRADES[g];
+  document.getElementById('gmGrade').textContent = g;
+  document.getElementById('gmGrade').style.color = gradeColors[g];
+  document.getElementById('gmName').textContent  = data.name;
+  document.getElementById('gmPct').textContent   = data.pct + ' strength';
+  document.getElementById('gmPct').style.color   = gradeColors[g];
+  document.getElementById('gmDesc').textContent  = data.desc;
+  document.getElementById('gmTest').textContent  = '🔬 Testing: ' + data.test;
+  document.getElementById('gradeModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeGradeModal(e) {
+  if (e && e.target !== document.getElementById('gradeModal') && !e.target.classList.contains('gm-close')) return;
+  document.getElementById('gradeModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ═══════════════════════════════════════════
+   VIDEO MODAL
+═══════════════════════════════════════════ */
+function playMuscleVid(ytId, title) {
+  const wrap  = document.getElementById('vidRatio');
+  const old   = wrap.querySelector('iframe');
+  if (old) old.remove();
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1';
+  iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+  iframe.allowFullscreen = true;
+  wrap.appendChild(iframe);
+  document.getElementById('vidTitle').textContent = title;
+  document.getElementById('vidYtLink').href = 'https://www.youtube.com/watch?v=' + ytId;
+  document.getElementById('vidModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeVid() {
+  const wrap = document.getElementById('vidRatio');
+  const iframe = wrap.querySelector('iframe');
+  if (iframe) iframe.remove();
+  document.getElementById('vidModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleVidClick(e) { if (e.target === document.getElementById('vidModal')) closeVid(); }
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeVid(); closeGradeModal(); }});
+
+function escHTML(s){ return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pain Helper — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+:root{--cyan:#7A9E82;--border2:rgba(90,122,98,.14);}
+body{display:flex;flex-direction:column;min-height:100vh;}
+.pw{max-width:680px;margin:0 auto;padding:22px 16px 100px;width:100%;position:relative;z-index:1;}
+
+/* ── section card ── */
+.sec-card{background:rgba(245,239,228,.82);border:1px solid var(--border2);border-radius:16px;padding:20px 18px;margin-bottom:22px;}
+.sec-head{font-family:'Playfair Display',monospace;font-size:13px;color:var(--forest);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.sec-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+
+/* ── form fields ── */
+.f-lbl{font-family:'Playfair Display',monospace;font-size:10px;letter-spacing:1.3px;color:rgba(90,122,98,.6);margin-bottom:7px;margin-top:14px;}
+.f-lbl:first-child{margin-top:0;}
+select.f-input,input.f-input,textarea.f-input{width:100%;background:rgba(255,255,255,.7);border:1px solid var(--border2);border-radius:10px;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 13px;outline:none;transition:border-color .18s;}
+select.f-input:focus,input.f-input:focus,textarea.f-input:focus{border-color:rgba(90,122,98,.45);}
+textarea.f-input{resize:vertical;min-height:80px;line-height:1.6;}
+
+/* pain area grid */
+.area-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:480px){.area-grid{grid-template-columns:repeat(3,1fr);}}
+.area-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;border-radius:10px;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,.6);transition:.16s;text-align:center;}
+.area-btn:hover{border-color:rgba(90,122,98,.35);}
+.area-btn.on{border-color:var(--cyan);background:rgba(90,122,98,.14);}
+.area-ico{font-size:20px;}
+.area-txt{font-size:10.5px;color:var(--charcoal-mid);font-weight:600;}
+
+/* duration chips */
+.dur-row{display:flex;gap:7px;flex-wrap:wrap;}
+.dur-chip{padding:7px 13px;border-radius:16px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,.6);color:rgba(90,122,98,.7);transition:.16s;}
+.dur-chip:hover,.dur-chip.on{background:rgba(90,122,98,.14);border-color:var(--cyan);color:var(--cyan);}
+
+/* specialty search */
+.search-row{display:flex;gap:9px;margin-top:6px;}
+.search-input{flex:1;background:rgba(255,255,255,.7);border:1px solid var(--border2);border-radius:10px;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 13px;outline:none;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.chip{padding:5px 12px;border-radius:18px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,.6);color:rgba(90,122,98,.6);transition:.18s;}
+.chip:hover,.chip.on{background:rgba(90,122,98,.14);border-color:var(--cyan);color:var(--cyan);}
+
+/* doctor pick list */
+.dr-pick-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;max-height:340px;overflow-y:auto;}
+.dr-pick{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;border:1px solid var(--border2);background:rgba(255,255,255,.6);cursor:pointer;transition:.16s;}
+.dr-pick:hover{border-color:rgba(90,122,98,.3);}
+.dr-pick.on{border-color:var(--cyan);background:rgba(90,122,98,.14);}
+.dr-pick-av{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.22);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:12px;font-weight:700;color:var(--cyan);flex-shrink:0;}
+.dr-pick-info{flex:1;min-width:0;}
+.dr-pick-name{font-size:13px;font-weight:700;color:var(--forest);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dr-pick-spec{font-size:11px;color:rgba(90,122,98,.65);}
+.dr-pick-check{font-size:16px;color:var(--cyan);opacity:0;transition:.16s;}
+.dr-pick.on .dr-pick-check{opacity:1;}
+.empty-mini{text-align:center;padding:24px 10px;color:var(--muted);font-size:12px;}
+
+.btn-send{width:100%;margin-top:18px;padding:13px;background:linear-gradient(135deg,var(--sage),#2D4A35);border:1px solid rgba(90,122,98,.3);color:#fff;font-family:'Playfair Display',monospace;font-size:12px;letter-spacing:1px;border-radius:10px;cursor:pointer;transition:.18s;box-shadow:0 4px 14px rgba(45,74,53,.2);}
+.btn-send:hover:not(:disabled){box-shadow:0 6px 20px rgba(90,122,98,.3);transform:translateY(-1px);}
+.btn-send:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ── inbox ── */
+.inbox-item{background:rgba(255,255,255,.65);border:1px solid var(--border2);border-radius:13px;padding:14px 15px;margin-bottom:10px;}
+.ib-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.ib-dr{font-size:13px;font-weight:700;color:var(--forest);}
+.ib-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;letter-spacing:.4px;}
+.ib-status.pending{background:rgba(255,152,0,.12);color:#ff9800;}
+.ib-status.answered{background:rgba(76,175,80,.12);color:#4caf50;}
+.ib-meta{font-size:11.5px;color:var(--charcoal-mid);margin-bottom:6px;line-height:1.6;}
+.ib-meta b{color:var(--text-primary);}
+.ib-notes{font-size:12px;color:var(--charcoal-mid);background:rgba(90,122,98,.05);border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.6;}
+.ib-reply{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2);}
+.ib-reply-lbl{font-family:'Playfair Display',monospace;font-size:9.5px;letter-spacing:1.2px;color:rgba(76,175,80,.8);margin-bottom:6px;}
+.ib-reply-text{font-size:12.5px;color:var(--text-primary);line-height:1.65;margin-bottom:8px;white-space:pre-wrap;}
+.ib-att{margin-bottom:8px;}
+.ib-att img{max-width:100%;border-radius:9px;display:block;}
+.ib-att video{max-width:100%;border-radius:9px;display:block;}
+.ib-att a.att-link{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(90,122,98,.07);border:1px solid var(--border2);border-radius:8px;color:var(--cyan);text-decoration:none;font-size:12px;font-weight:600;word-break:break-all;}
+.ib-acts{display:flex;gap:8px;margin-top:4px;}
+.ib-btn{flex:1;padding:8px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;text-align:center;transition:.16s;}
+.ib-btn.profile{background:rgba(255,255,255,.5);border:1px solid var(--border2);color:var(--charcoal-mid);}
+.ib-btn.profile:hover{background:rgba(255,255,255,.9);}
+.ib-btn.chat{background:rgba(90,122,98,.1);border:1px solid rgba(90,122,98,.28);color:var(--cyan);}
+.ib-btn.chat:hover{background:rgba(90,122,98,.2);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#2D4A35;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.25s;z-index:400;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* profile modal (reused mini) */
+.prof-overlay{display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:20px;}
+.prof-overlay.open{display:flex;}
+.prof-box{background:#FFFFFF;border:1px solid var(--border2);border-radius:18px;width:100%;max-width:420px;padding:26px 22px;position:relative;}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--charcoal-mid);font-size:20px;cursor:pointer;}
+.p-avatar{width:66px;height:66px;border-radius:14px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.22);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:20px;font-weight:700;color:var(--cyan);margin:0 auto 12px;}
+.p-name{font-family:'Playfair Display',monospace;font-size:15px;color:var(--forest);text-align:center;margin-bottom:4px;}
+.p-spec{font-size:13px;color:rgba(90,122,98,.7);text-align:center;margin-bottom:14px;}
+.p-row{font-size:13px;color:var(--charcoal-mid);margin-bottom:7px;display:flex;gap:8px;}
+.p-row strong{color:#2C2C2C;min-width:80px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🩹</span> Pain Helper</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-role.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="pw">
+  <button class="btn-back" onclick="window.location.href='choose-role.html'">← Dashboard</button>
+  <div class="page-title">🩹 Pain Helper</div>
+  <div class="page-subtitle">Tell us where it hurts, pick a specialist, and send your report</div>
+
+  <!-- ══════════ REPORT FORM ══════════ -->
+  <div class="sec-card">
+    <div class="sec-head">📝 Report Your Pain</div>
+    <div class="sec-sub">Fill in the details below. This information will be sent directly to the doctor you choose.</div>
+
+    <div class="f-lbl">Where does it hurt?</div>
+    <div class="area-grid" id="areaGrid"></div>
+
+    <div class="f-lbl">How long have you had this pain?</div>
+    <div class="dur-row" id="durRow"></div>
+
+    <div class="f-lbl">Notes — describe your injury / pain in detail</div>
+    <textarea class="f-input" id="notesInput" placeholder="e.g. Since when exactly, how it started, what makes it worse or better, any swelling, previous injuries…"></textarea>
+
+    <div class="f-lbl">Find a specialist</div>
+    <div class="search-row">
+      <input class="search-input f-input" id="searchQ" type="text" placeholder="Search doctor by name…" oninput="renderDoctors()">
+    </div>
+    <div class="chips" id="specChips"></div>
+
+    <div class="dr-pick-list" id="drPickList">
+      <div class="empty-mini">Loading doctors…</div>
+    </div>
+
+    <button class="btn-send" id="sendBtn" onclick="sendReport()" disabled>📩 Send to Doctor</button>
+  </div>
+
+  <!-- ══════════ INBOX ══════════ -->
+  <div class="sec-card">
+    <div class="sec-head">📥 My Pain Helper Inbox</div>
+    <div class="sec-sub">Reports you've sent and replies from your doctors.</div>
+    <div id="inboxList">
+      <div class="empty-mini">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- doctor profile modal -->
+<div class="prof-overlay" id="profOverlay" onclick="if(event.target===this)closeProf()">
+  <div class="prof-box">
+    <button class="modal-close" onclick="closeProf()">✕</button>
+    <div class="p-avatar" id="pAvatar">?</div>
+    <div class="p-name" id="pName">—</div>
+    <div class="p-spec" id="pSpec">—</div>
+    <div id="pDetails"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+try {
+  const cfg={apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"};
+  if(!firebase.apps.length)firebase.initializeApp(cfg);
+  window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;
+}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script>
+'use strict';
+
+let ME = null;
+let allDoctors = [];
+let selArea = null, selDur = null, specFilter = 'all', selDoctor = null;
+
+const AREAS = [
+  {v:'neck',       l:'Neck',        i:'🦴'},
+  {v:'shoulder',   l:'Shoulder',    i:'💪'},
+  {v:'upper_back', l:'Upper Back',  i:'🔙'},
+  {v:'lower_back', l:'Lower Back',  i:'🩻'},
+  {v:'elbow',      l:'Elbow',       i:'🦾'},
+  {v:'wrist_hand', l:'Wrist / Hand',i:'✋'},
+  {v:'hip',        l:'Hip',         i:'🦵'},
+  {v:'knee',       l:'Knee',        i:'🦿'},
+  {v:'ankle_foot', l:'Ankle / Foot',i:'🦶'},
+  {v:'chest',      l:'Chest',       i:'🫁'},
+  {v:'head',       l:'Head',        i:'🧠'},
+  {v:'other',      l:'Other',       i:'❓'},
+];
+
+const DURATIONS = [
+  {v:'today',      l:'Today'},
+  {v:'few_days',   l:'A few days'},
+  {v:'a_week',     l:'About a week'},
+  {v:'2_4_weeks',  l:'2–4 weeks'},
+  {v:'1_3_months', l:'1–3 months'},
+  {v:'3_plus',     l:'3+ months'},
+];
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function initials(name){return(name||'?').split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── build the pain-area buttons ──
+function buildAreas(){
+  document.getElementById('areaGrid').innerHTML = AREAS.map(a=>
+    `<div class="area-btn" data-v="${a.v}" onclick="pickArea('${a.v}',this)">
+      <div class="area-ico">${a.i}</div><div class="area-txt">${a.l}</div>
+    </div>`).join('');
+}
+function pickArea(v,el){
+  selArea=v;
+  document.querySelectorAll('.area-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  updateSendState();
+}
+
+// ── build duration chips ──
+function buildDurations(){
+  document.getElementById('durRow').innerHTML = DURATIONS.map(d=>
+    `<div class="dur-chip" data-v="${d.v}" onclick="pickDur('${d.v}',this)">${d.l}</div>`).join('');
+}
+function pickDur(v,el){
+  selDur=v;
+  document.querySelectorAll('.dur-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  updateSendState();
+}
+
+function areaLabel(v){ const a=AREAS.find(x=>x.v===v); return a?a.l:v; }
+function durLabel(v){ const d=DURATIONS.find(x=>x.v===v); return d?d.l:v; }
+
+// ── load doctors ──
+async function loadDoctors(){
+  let users=[];
+  if(window.FIREBASE_ENABLED && window._fbDb){
+    try{
+      const snap = await window._fbDb.collection('users').where('role','==','doctor').get();
+      users = snap.docs.map(d=>d.data());
+    }catch(e){
+      try{
+        const snap2 = await window._fbDb.collection('users').get();
+        users = snap2.docs.map(d=>d.data()).filter(u=>u.role==='doctor');
+      }catch(e2){}
+    }
+  }
+  allDoctors = users;
+  buildSpecChips();
+  renderDoctors();
+}
+
+function buildSpecChips(){
+  const seen = new Map();
+  allDoctors.forEach(d=>{
+    if(d.profile?.specialty) seen.set(d.profile.specialty, d.profile.specialtyLabel || d.profile.specialty);
+  });
+  const container = document.getElementById('specChips');
+  container.innerHTML = '';
+  const allChip = document.createElement('div');
+  allChip.className = 'chip on';
+  allChip.textContent = '🏥 All Specialties';
+  allChip.onclick = function(){ setSpecFilter('all', this); };
+  container.appendChild(allChip);
+  seen.forEach((label,value)=>{
+    const chip=document.createElement('div');
+    chip.className='chip';
+    chip.textContent=label;
+    chip.onclick=function(){ setSpecFilter(value, this); };
+    container.appendChild(chip);
+  });
+}
+function setSpecFilter(v, el){
+  specFilter=v;
+  document.querySelectorAll('#specChips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderDoctors();
+}
+
+function renderDoctors(){
+  const q = (document.getElementById('searchQ').value||'').toLowerCase().trim();
+  let list = allDoctors.filter(d=>{
+    const matchesSpec = specFilter==='all' || (d.profile?.specialty||'')===specFilter;
+    const matchesQ = !q || (d.name||'').toLowerCase().includes(q) || (d.email||'').toLowerCase().includes(q);
+    return matchesSpec && matchesQ;
+  });
+  const wrap = document.getElementById('drPickList');
+  if(!list.length){
+    wrap.innerHTML = '<div class="empty-mini">🔍 No doctors match. Try a different specialty or name.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(d=>{
+    const spec = d.profile?.specialtyLabel || d.profile?.specialty || 'Physiotherapist';
+    const on = selDoctor && selDoctor.email===d.email ? ' on' : '';
+    return `<div class="dr-pick${on}" data-email="${esc(d.email)}" onclick="pickDoctor('${esc(d.email)}')">
+      <div class="dr-pick-av">${initials(d.name)}</div>
+      <div class="dr-pick-info">
+        <div class="dr-pick-name">${esc(d.name||d.email)}</div>
+        <div class="dr-pick-spec">🏥 ${esc(spec)}</div>
+      </div>
+      <div class="dr-pick-check">✓</div>
+    </div>`;
+  }).join('');
+}
+
+function pickDoctor(email){
+  selDoctor = allDoctors.find(d=>d.email===email) || null;
+  document.querySelectorAll('.dr-pick').forEach(el=>{
+    el.classList.toggle('on', el.dataset.email===email);
+  });
+  updateSendState();
+}
+
+function updateSendState(){
+  document.getElementById('sendBtn').disabled = !(selArea && selDur && selDoctor);
+}
+
+// ── send report ──
+async function sendReport(){
+  if(!selArea || !selDur || !selDoctor) return;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  const req = {
+    id: 'pr_' + Date.now(),
+    patientEmail: ME.email,
+    patientName: ME.name || ME.email,
+    doctorEmail: selDoctor.email,
+    doctorName: selDoctor.name || selDoctor.email,
+    doctorSpec: selDoctor.profile?.specialtyLabel || selDoctor.profile?.specialty || '',
+    painLocation: selArea,
+    painLocationLabel: areaLabel(selArea),
+    duration: selDur,
+    durationLabel: durLabel(selDur),
+    notes: document.getElementById('notesInput').value.trim(),
+    status: 'pending',
+    reply: null,
+    createdAt: new Date().toISOString()
+  };
+
+  try{
+    await dbSavePainRequest(req);
+    await pushNotif(selDoctor.email, 'pain_request', 'New Pain Report',
+      (ME.name||ME.email) + ' reported ' + areaLabel(selArea).toLowerCase() + ' pain and needs your guidance.');
+    showToast('✅ Sent to ' + (selDoctor.name || selDoctor.email));
+
+    // reset form
+    selArea = null; selDur = null; selDoctor = null;
+    document.querySelectorAll('.area-btn,.dur-chip,.dr-pick').forEach(el=>el.classList.remove('on'));
+    document.getElementById('notesInput').value = '';
+    updateSendState();
+    await loadInbox();
+  }catch(e){
+    console.warn(e);
+    showToast('⚠️ Could not send. Please try again.');
+  }
+  btn.textContent = '📩 Send to Doctor';
+}
+
+async function pushNotif(toEmail,type,title,body){
+  const notif={id:'n'+Date.now(),type,title,body,ts:Date.now(),read:false};
+  await dbPushNotif(toEmail, notif);
+}
+
+// ── inbox ──
+async function loadInbox(){
+  const wrap = document.getElementById('inboxList');
+  let reports = [];
+  try{ reports = await dbGetPatientPainRequests(ME.email); }catch(e){}
+  if(!reports.length){
+    wrap.innerHTML = '<div class="empty-mini">📭 No reports sent yet. Fill the form above to get started.</div>';
+    return;
+  }
+  wrap.innerHTML = reports.map(r=>{
+    const dateStr = new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    let replyBlock = '';
+    if(r.status==='answered' && r.reply){
+      let attBlock = '';
+      const rep = r.reply;
+      if(rep.attachmentType==='image'){
+        attBlock = `<div class="ib-att"><img src="${rep.attachmentData}" alt="attachment"></div>`;
+      }else if(rep.attachmentType==='video'){
+        attBlock = `<div class="ib-att"><video src="${rep.attachmentData}" controls></video></div>`;
+      }else if(rep.attachmentType==='file'){
+        attBlock = `<div class="ib-att"><a class="att-link" href="${rep.attachmentData}" download="${esc(rep.attachmentName||'file')}">📎 ${esc(rep.attachmentName||'Download file')}</a></div>`;
+      }else if(rep.attachmentType==='link'){
+        attBlock = `<div class="ib-att"><a class="att-link" href="${esc(rep.attachmentData)}" target="_blank" rel="noopener">🔗 ${esc(rep.attachmentData)}</a></div>`;
+      }
+      replyBlock = `<div class="ib-reply">
+        <div class="ib-reply-lbl">💬 DOCTOR'S REPLY</div>
+        ${rep.notes ? `<div class="ib-reply-text">${esc(rep.notes)}</div>` : ''}
+        ${attBlock}
+        <div class="ib-acts">
+          <div class="ib-btn profile" onclick="openDoctorProfile('${esc(r.doctorEmail)}')">👤 Doctor Profile</div>
+          <div class="ib-btn chat" onclick="goToChat('${esc(r.doctorEmail)}','${esc(r.doctorName)}')">💬 Chat with Doctor</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="inbox-item">
+      <div class="ib-top">
+        <div class="ib-dr">👨‍⚕️ ${esc(r.doctorName)}</div>
+        <div class="ib-status ${r.status}">${r.status==='answered' ? 'ANSWERED' : 'PENDING'}</div>
+      </div>
+      <div class="ib-meta">📍 <b>${esc(r.painLocationLabel)}</b> &nbsp;·&nbsp; ⏳ <b>${esc(r.durationLabel)}</b> &nbsp;·&nbsp; 🗓 ${dateStr}</div>
+      ${r.notes ? `<div class="ib-notes">${esc(r.notes)}</div>` : ''}
+      ${replyBlock}
+    </div>`;
+  }).join('');
+}
+
+// ── doctor profile / chat from inbox ──
+let profDr = null;
+async function openDoctorProfile(email){
+  profDr = allDoctors.find(d=>d.email===email);
+  if(!profDr){
+    try{ const snap = await window._fbDb.collection('users').doc(email).get(); if(snap.exists) profDr = snap.data(); }catch(e){}
+  }
+  if(!profDr) return;
+  document.getElementById('pAvatar').textContent = initials(profDr.name);
+  document.getElementById('pName').textContent = profDr.name || profDr.email;
+  document.getElementById('pSpec').textContent = profDr.profile?.specialtyLabel || 'Physiotherapist';
+  const p = profDr.profile || {};
+  let det = '';
+  if(p.years) det += `<div class="p-row"><strong>Experience</strong><span>${esc(p.years)} years</span></div>`;
+  if(p.clinic) det += `<div class="p-row"><strong>Clinic</strong><span>${esc(p.clinic)}</span></div>`;
+  if(p.address) det += `<div class="p-row"><strong>Location</strong><span>${esc(p.address)}</span></div>`;
+  if(p.bio) det += `<div class="p-row"><strong>About</strong><span>${esc(p.bio.slice(0,150))}</span></div>`;
+  det += `<div class="p-row"><strong>Email</strong><span>${esc(profDr.email)}</span></div>`;
+  document.getElementById('pDetails').innerHTML = det;
+  document.getElementById('profOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeProf(){
+  document.getElementById('profOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function goToChat(email, name){
+  const chatId = [ME.email, email].sort().join('||');
+  await dbSaveConv(ME.email, { id:chatId, otherEmail:email, otherName:name||email, lastMsg:'', lastTime:Date.now() });
+  await dbSaveConv(email, { id:chatId, otherEmail:ME.email, otherName:ME.name||ME.email, lastMsg:'', lastTime:Date.now() });
+  window.location.href = 'chat.html?with=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name||email);
+}
+
+// ── init ──
+document.addEventListener('DOMContentLoaded', async ()=>{
+  ME = requireAuth('patient');
+  if(!ME) return;
+  buildAreas();
+  buildDurations();
+  await loadDoctors();
+  await loadInbox();
+});
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

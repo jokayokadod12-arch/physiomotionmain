@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Patient Database - Physio Motion Analyzer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+/* ── database.html — dark theme ── */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  min-height:100vh;
+  font-family:'DM Sans','Segoe UI',sans-serif;
+  color:#2C2C2C;
+  overflow-x:hidden;
+}
+
+/* Header */
+header {
+  position:sticky; top:0; z-index:200;
+  height:62px;
+  background:rgba(250,247,242,.92);
+  border-bottom:1px solid rgba(90,122,98,.14);
+  backdrop-filter:blur(14px);
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 28px;
+  box-shadow:0 2px 20px rgba(0,0,0,.4);
+}
+header > div:first-child {
+  font-family:'Playfair Display',monospace;
+  font-size:14px; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  color:#7A9E82; text-shadow:0 0 14px rgba(90,122,98,.4);
+}
+header button {
+  padding:8px 16px;
+  border:1px solid rgba(90,122,98,.25);
+  border-radius:20px;
+  background:rgba(90,122,98,.08);
+  color:#7A9E82; cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:13px; font-weight:700;
+  letter-spacing:.5px; text-transform:uppercase;
+  margin-left:8px; transition:.2s;
+}
+header button:hover {
+  background:rgba(90,122,98,.2);
+  box-shadow:0 0 14px rgba(90,122,98,.2);
+  transform:translateY(-1px);
+}
+
+/* Container */
+.container {
+  max-width:1380px; margin:0 auto;
+  padding:22px 20px 60px;
+  position:relative; z-index:1;
+}
+
+/* Back btn */
+.back-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:9px 20px; border-radius:8px; border:none;
+  background:transparent; color:#7A9E82;
+  border:1px solid rgba(90,122,98,.28);
+  font-family:'DM Sans',sans-serif;
+  font-size:13px; font-weight:700;
+  letter-spacing:.5px; text-transform:uppercase;
+  cursor:pointer; transition:.2s; margin-bottom:20px;
+}
+.back-btn:hover {
+  background:rgba(90,122,98,.1);
+  box-shadow:0 0 14px rgba(90,122,98,.15);
+}
+
+/* Search box */
+.search-box {
+  width:100%;
+  padding:12px 16px; margin-bottom:18px;
+  background:rgba(20,45,30,.85);
+  border:1px solid rgba(90,122,98,.3);
+  border-radius:10px;
+  color:rgba(220,240,225,.92);
+  -webkit-text-fill-color:rgba(220,240,225,.92);
+  caret-color:#9DC4A4;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px; font-weight:500;
+  outline:none; transition:.2s;
+}
+.search-box::placeholder { color:rgba(160,210,175,.35); }
+.search-box:focus {
+  border-color:#9DC4A4;
+  box-shadow:0 0 0 3px rgba(90,122,98,.15);
+  background:rgba(20,45,30,.98);
+}
+.search-box:-webkit-autofill {
+  -webkit-box-shadow:0 0 0 1000px rgba(20,45,30,.98) inset !important;
+  -webkit-text-fill-color:rgba(220,240,225,.92) !important;
+}
+
+/* Tabs */
+.tabs {
+  display:flex; gap:8px; margin-bottom:0;
+}
+.tab {
+  padding:11px 24px;
+  background:rgba(20,45,30,.7);
+  border:1px solid rgba(90,122,98,.2);
+  border-bottom:none;
+  border-radius:10px 10px 0 0;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:13px; font-weight:700;
+  letter-spacing:.8px; text-transform:uppercase;
+  color:rgba(160,210,175,.55); transition:.2s;
+}
+.tab.active {
+  background:rgba(45,74,53,.5);
+  color:#9DC4A4;
+  border-color:rgba(90,122,98,.4);
+  text-shadow:0 0 10px rgba(90,122,98,.3);
+}
+.tab:hover:not(.active) {
+  background:rgba(45,74,53,.25);
+  color:rgba(160,210,175,.8);
+}
+
+/* Tab content */
+.tab-content {
+  display:none;
+  background:rgba(245,239,228,.75);
+  border:1px solid rgba(90,122,98,.14);
+  border-radius:0 10px 10px 10px;
+  padding:22px;
+  backdrop-filter:blur(10px);
+}
+.tab-content.active { display:block; }
+
+/* Stats grid */
+.stats {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px; margin-bottom:22px;
+}
+.stat-card {
+  background:linear-gradient(135deg,rgba(90,122,98,.1),rgba(90,122,98,.05));
+  border:1px solid rgba(90,122,98,.18);
+  padding:20px 16px; border-radius:12px;
+  text-align:center; transition:.25s;
+}
+.stat-card:hover {
+  border-color:rgba(90,122,98,.4);
+  box-shadow:0 0 20px rgba(90,122,98,.1);
+}
+.stat-card h3 {
+  font-family:'Playfair Display',monospace;
+  font-size:34px; font-weight:800;
+  color:#2D4A35;
+  margin-bottom:6px;
+}
+.stat-card p {
+  font-size:11px; text-transform:uppercase;
+  letter-spacing:1px; color:#2C2C2C;
+}
+
+/* Filter buttons */
+.filter-buttons {
+  display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;
+}
+.filter-btn {
+  padding:7px 18px;
+  border:1px solid rgba(90,122,98,.25);
+  background:rgba(20,45,30,.7);
+  color:rgba(160,210,175,.6);
+  border-radius:20px; cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:12px; font-weight:700;
+  letter-spacing:.8px; text-transform:uppercase;
+  transition:.2s;
+}
+.filter-btn.active, .filter-btn:hover {
+  background:rgba(45,74,53,.5);
+  color:#9DC4A4;
+  border-color:rgba(90,122,98,.5);
+  box-shadow:0 0 10px rgba(90,122,98,.15);
+}
+
+/* Patient group */
+.patient-group { margin-bottom:24px; }
+
+.patient-header {
+  background:linear-gradient(135deg,rgba(90,122,98,.12),rgba(90,122,98,.06));
+  border:1px solid rgba(90,122,98,.25);
+  border-bottom:none;
+  padding:14px 20px;
+  border-radius:12px 12px 0 0;
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:8px;
+}
+.patient-header h2 {
+  font-family:'Playfair Display',monospace;
+  font-size:14px; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  color:#1A3020;
+  margin:0;
+}
+.patient-count {
+  background:rgba(90,122,98,.1);
+  border:1px solid rgba(90,122,98,.25);
+  color:#7A9E82;
+  padding:4px 14px; border-radius:20px;
+  font-size:11px; font-weight:700; letter-spacing:.8px;
+}
+
+/* Session card */
+.session-card {
+  background:rgba(245,239,228,.85);
+  border:1px solid rgba(90,122,98,.18);
+  border-top:none;
+  padding:18px 20px; margin-bottom:2px;
+  transition:.2s;
+}
+.session-card:last-child {
+  border-radius:0 0 12px 12px;
+  border-bottom:1px solid rgba(90,122,98,.18);
+}
+.session-card:hover { background:rgba(240,233,220,.95); }
+
+/* Card header inside session */
+.card-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:14px; padding-bottom:12px;
+  border-bottom:1px solid rgba(90,122,98,.18);
+  flex-wrap:wrap; gap:8px;
+}
+.card-header h3 {
+  font-family:'Playfair Display',monospace;
+  font-size:12px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase;
+  color:#2D4A35; margin:0;
+}
+.card-date {
+  font-size:11px; color:#4A4A4A;
+  letter-spacing:.3px;
+}
+
+/* Info grid */
+.info-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:10px; margin-bottom:14px;
+}
+.info-item {
+  background:rgba(90,122,98,.06);
+  border:1px solid rgba(90,122,98,.2);
+  padding:10px; border-radius:8px; text-align:center;
+}
+.info-item label {
+  display:block; font-size:9px;
+  color:#5A7A62;
+  margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;
+  font-weight:700;
+}
+.info-item value {
+  font-family:'Playfair Display',monospace;
+  font-weight:700; color:#1A3020; font-size:14px;
+}
+
+/* History box */
+.history-box {
+  background:rgba(90,122,98,.05);
+  border:1px solid rgba(90,122,98,.2);
+  border-left:3px solid rgba(90,122,98,.5);
+  padding:12px 14px; border-radius:0 8px 8px 0;
+  margin:12px 0; font-size:13px; color:#2C2C2C;
+  line-height:1.6;
+}
+.history-box strong {
+  display:block; margin-bottom:4px;
+  font-size:10px; text-transform:uppercase;
+  letter-spacing:1px; color:#5A7A62; font-weight:700;
+}
+
+/* Angles table */
+.angles-table {
+  width:100%; border-collapse:collapse;
+  margin:12px 0; font-size:12px;
+}
+.angles-table th {
+  background:rgba(90,122,98,.12);
+  color:#1A3020; padding:10px 12px;
+  font-family:'Playfair Display',monospace;
+  font-size:10px; letter-spacing:1px;
+  text-transform:uppercase; font-weight:700;
+  border:1px solid rgba(90,122,98,.25);
+}
+.angles-table td {
+  background:rgba(255,255,255,.7);
+  border:1px solid rgba(90,122,98,.12);
+  padding:9px 12px; text-align:center;
+  color:#2C2C2C; font-weight:500;
+}
+.angles-table tr:hover td { background:rgba(90,122,98,.07); }
+td.inactive { color:#8A8A8A; font-style:italic; }
+
+/* Images grid */
+.images-grid {
+  display:flex; flex-wrap:wrap; gap:12px;
+  margin:12px 0; padding:14px;
+  background:rgba(255,255,255,.6);
+  border:1px solid rgba(90,122,98,.15);
+  border-radius:10px;
+}
+.images-grid img {
+  width:180px; height:135px;
+  object-fit:cover; border-radius:8px;
+  border:2px solid rgba(90,122,98,.2);
+  cursor:pointer; transition:.25s;
+}
+.images-grid img:hover {
+  transform:scale(1.04);
+  border-color:#7A9E82;
+  box-shadow:0 4px 20px rgba(90,122,98,.25);
+}
+
+/* Actions */
+.actions {
+  display:flex; gap:10px; margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid rgba(90,122,98,.07);
+  flex-wrap:wrap;
+}
+.actions button {
+  padding:8px 18px; border:none; border-radius:8px;
+  cursor:pointer; font-size:12px; font-weight:700;
+  font-family:'DM Sans',sans-serif;
+  letter-spacing:.8px; text-transform:uppercase;
+  display:flex; align-items:center; gap:6px;
+  transition:.2s;
+}
+.btn-pdf {
+  background:linear-gradient(135deg,rgba(198,40,40,.7),rgba(183,28,28,.8));
+  color:#fff; border:1px solid rgba(255,82,82,.25);
+}
+.btn-pdf:hover {
+  background:linear-gradient(135deg,#c62828,#b71c1c);
+  box-shadow:0 4px 14px rgba(255,82,82,.3);
+}
+.btn-delete {
+  background:rgba(255,82,82,.08);
+  color:rgba(255,82,82,.8);
+  border:1px solid rgba(255,82,82,.2);
+}
+.btn-delete:hover {
+  background:rgba(255,82,82,.2);
+  color:#ff5252;
+}
+
+/* Empty state */
+.empty-state {
+  text-align:center; padding:70px 20px;
+  color:var(--muted);
+}
+.empty-state h2 {
+  font-family:'Playfair Display',monospace;
+  font-size:22px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  color:rgba(90,122,98,.3); margin-bottom:12px;
+}
+.empty-state p { font-size:14px; line-height:1.6; }
+
+/* Image modal */
+.modal {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.9); z-index:1000;
+  justify-content:center; align-items:center;
+  backdrop-filter:blur(6px);
+}
+.modal.active { display:flex; }
+.modal-content { max-width:90%; max-height:90%; }
+.modal-content img {
+  max-width:100%; max-height:80vh;
+  border-radius:10px;
+  border:1px solid rgba(90,122,98,.2);
+}
+.modal-close {
+  position:absolute; top:20px; right:36px;
+  color:var(--charcoal-mid); font-size:42px;
+  cursor:pointer; line-height:1; transition:.2s;
+}
+.modal-close:hover { color:#7A9E82; }
+
+/* Summary / statistics cards */
+.summary-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+}
+.summary-card {
+  background:rgba(4,25,48,.7);
+  border:1px solid rgba(90,122,98,.12);
+  border-radius:12px; padding:18px; transition:.2s;
+}
+.summary-card:hover { border-color:rgba(90,122,98,.3); }
+.summary-card h3 {
+  font-family:'Playfair Display',monospace;
+  font-size:12px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase;
+  color:#7A9E82; margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(90,122,98,.1);
+}
+</style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    try {
+      var _FBCFG = {
+        apiKey:            "AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+        authDomain:        "physiowork-8976f.firebaseapp.com",
+        projectId:         "physiowork-8976f",
+        storageBucket:     "physiowork-8976f.firebasestorage.app",
+        messagingSenderId: "789519816056",
+        appId:             "1:789519816056:web:c2c8d82c83f8149fd1a48d"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+      window._fbDb      = firebase.firestore();
+      window._fbStorage = firebase.storage();
+      window.FIREBASE_ENABLED = true;
+    } catch(e) {
+      console.warn('Firebase init failed:', e);
+      window.FIREBASE_ENABLED = false;
+    }
+  </script>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+<header class="site-header" style="height:auto;padding:0 28px;">
+    <div>📁 Patient Database - Dr. <span id="doctorName"></span></div>
+    <div>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div class="container">
+    <button class="back-btn" onclick="goBack()">← Back to Plans</button>
+    
+    <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search by patient name..." onkeyup="searchPatients()">
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('sessions')">📊 Patient Records</button>
+        <button class="tab" onclick="showTab('summary')">📈 Statistics</button>
+    </div>
+    
+    <!-- Sessions Tab -->
+    <div id="sessionsTab" class="tab-content active">
+        <div class="stats" id="sessionStats">
+            <div class="stat-card">
+                <h3 id="totalSessions">0</h3>
+                <p>Total Sessions</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalPatients">0</h3>
+                <p>Unique Patients</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="recentSessions">0</h3>
+                <p>This Month</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalPhotos">0</h3>
+                <p>Total Photos</p>
+            </div>
+        </div>
+        
+        <div class="filter-buttons" id="patientFilters"></div>
+        <div id="sessionsContainer"></div>
+    </div>
+    
+    <!-- Summary Tab -->
+    <div id="summaryTab" class="tab-content">
+        <div id="summaryContainer"></div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+    <span class="modal-close">&times;</span>
+    <div class="modal-content">
+        <img id="modalImage" src="" alt="Full size">
+    </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  database.html — reads romDB_<email> (same key as analyz.html)
+// ════════════════════════════════════════════
+let currentUser    = null;
+let allSessions    = [];
+let filteredSessions = [];
+
+const NORMAL_ROM = {
+  elbow:               { normal: 145, label: 'Elbow Flexion'      },
+  'shoulder-flexion':  { normal: 180, label: 'Shoulder Flexion'   },
+  'shoulder-abduction':{ normal: 180, label: 'Shoulder Abduction' },
+  'shoulder-extension':{ normal: 60,  label: 'Shoulder Extension' },
+  knee:                { normal: 140, label: 'Knee Flexion'        },
+  'hip-flexion':       { normal: 120, label: 'Hip Flexion'         },
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser || currentUser.role !== 'doctor') {
+    window.location.href = 'login.html'; return;
+  }
+  document.getElementById('doctorName').textContent = currentUser.name;
+  await loadSessions();
+});
+
+// ── Load sessions — Firebase first, localStorage fallback ──
+async function loadSessions() {
+  let localSessions = [];
+  try {
+    localSessions = JSON.parse(localStorage.getItem('romDB_' + currentUser.email)) || [];
+  } catch(_) {}
+
+  if (window.FIREBASE_ENABLED && window._fbDb) {
+    try {
+      const snap = await window._fbDb.collection('romSessions')
+        .where('doctorEmail', '==', currentUser.email).get();
+
+      if (!snap.empty) {
+        const fbSessions = snap.docs.map(d => d.data());
+        fbSessions.sort((a, b) => (b.id || 0) - (a.id || 0));
+
+        // Merge: if Firebase session has no photos, try to get from localStorage
+        const localMap = {};
+        localSessions.forEach(s => { localMap[String(s.id)] = s; });
+
+        allSessions = fbSessions.map(s => {
+          const hasPhotos = (s.photos || []).some(p => p.data && p.data.length > 10);
+          if (!hasPhotos && localMap[String(s.id)]) {
+            return { ...s, photos: localMap[String(s.id)].photos || [] };
+          }
+          return s;
+        });
+
+        // Add local sessions not on Firebase yet
+        localSessions.forEach(s => {
+          if (!allSessions.find(f => String(f.id) === String(s.id))) {
+            allSessions.unshift(s);
+          }
+        });
+
+        allSessions.sort((a, b) => (b.id || 0) - (a.id || 0));
+        localStorage.setItem('romDB_' + currentUser.email, JSON.stringify(allSessions));
+      } else {
+        allSessions = localSessions;
+      }
+    } catch(e) {
+      console.warn('Firebase load failed:', e);
+      allSessions = localSessions;
+    }
+  } else {
+    allSessions = localSessions;
+  }
+
+  filteredSessions = [...allSessions];
+  updateStats();
+  renderPatientFilters();
+  renderSessions();
+}
+
+function saveSessions() {
+  localStorage.setItem('romDB_' + currentUser.email, JSON.stringify(allSessions));
+  // Also delete from Firebase when session is deleted
+}
+
+// ── Tab management ──
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  if (tab === 'sessions') {
+    document.querySelector('.tab:nth-child(1)').classList.add('active');
+    document.getElementById('sessionsTab').classList.add('active');
+  } else {
+    document.querySelector('.tab:nth-child(2)').classList.add('active');
+    document.getElementById('summaryTab').classList.add('active');
+    loadSummary();
+  }
+}
+
+// ── Stats ──
+function updateStats() {
+  document.getElementById('totalSessions').textContent = allSessions.length;
+  const unique = new Set(allSessions.map(s => (s.patient?.name || '').toLowerCase())).size;
+  document.getElementById('totalPatients').textContent = unique;
+  const now = new Date();
+  const thisMonth = allSessions.filter(s => {
+    const d = new Date(s.date); return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  }).length;
+  document.getElementById('recentSessions').textContent = thisMonth;
+  const photos = allSessions.reduce((a, s) => a + (s.photos||[]).length, 0);
+  document.getElementById('totalPhotos').textContent = photos;
+}
+
+// ── Patient filter buttons ──
+function renderPatientFilters() {
+  const names = [...new Set(allSessions.map(s => s.patient?.name || 'Unknown'))].sort();
+  const cont  = document.getElementById('patientFilters');
+  let html = `<button class="filter-btn active" onclick="filterByPatient('all',this)">All Patients</button>`;
+  names.forEach(n => {
+    const cnt = allSessions.filter(s => s.patient?.name === n).length;
+    html += `<button class="filter-btn" onclick="filterByPatient('${n.replace(/'/g,"\'")}',this)">${n} (${cnt})</button>`;
+  });
+  cont.innerHTML = html;
+}
+
+function filterByPatient(name, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  filteredSessions = name === 'all' ? [...allSessions]
+    : allSessions.filter(s => s.patient?.name === name);
+  renderSessions();
+}
+
+function searchPatients() {
+  const q = document.getElementById('searchBox').value.toLowerCase().trim();
+  filteredSessions = q
+    ? allSessions.filter(s => s.patient?.name?.toLowerCase().includes(q) || s.patient?.history?.toLowerCase().includes(q))
+    : [...allSessions];
+  renderSessions();
+}
+
+// ── Render session list ──
+function renderSessions() {
+  const cont = document.getElementById('sessionsContainer');
+  if (!filteredSessions.length) {
+    cont.innerHTML = `<div class="empty-state"><h2>No Sessions Found</h2><p>Start analyzing patients to build your database.</p></div>`;
+    return;
+  }
+
+  // Group by patient name
+  const grouped = {};
+  filteredSessions.forEach(s => {
+    const name = s.patient?.name || 'Unknown';
+    if (!grouped[name]) grouped[name] = [];
+    grouped[name].push(s);
+  });
+
+  let html = '';
+  for (const [name, sessions] of Object.entries(grouped)) {
+    html += `<div class="patient-group">
+      <div class="patient-header">
+        <h2>👤 ${name}</h2>
+        <span class="patient-count">${sessions.length} session${sessions.length>1?'s':''}</span>
+      </div>`;
+    sessions.sort((a,b)=>b.id-a.id).forEach(s => { html += createSessionCard(s); });
+    html += `</div>`;
+  }
+  cont.innerHTML = html;
+}
+
+// ── Single session card ──
+function createSessionCard(s) {
+  const pt = s.patient || {};
+
+  // Photos — each with its selected joint angle
+  const photosHtml = (s.photos||[]).length > 0
+    ? `<div class="images-grid">` + (s.photos||[]).map(ph => {
+        const angleTag = (ph.selectedJoint && ph.selectedValue !== null && ph.selectedValue !== undefined)
+          ? `<div style="font-size:11px;text-align:center;color:#7A9E82;padding:4px 0;font-weight:700;letter-spacing:.5px;">${ph.selectedJoint}: <span style="font-size:14px;">${ph.selectedValue}°</span></div>`
+          : `<div style="font-size:10px;text-align:center;color:var(--muted);padding:3px 0;">No angle recorded</div>`;
+        return `<div style="text-align:center;">
+          <img src="${ph.data}" onclick="openModal('${ph.data}')" title="${ph.time}" style="display:block;margin:0 auto;width:180px;height:135px;object-fit:cover;border-radius:8px;border:2px solid rgba(90,122,98,.2);cursor:pointer;transition:.25s;" onmouseover="this.style.borderColor='#7A9E82'" onmouseout="this.style.borderColor='rgba(90,122,98,.2)'">
+          ${angleTag}
+        </div>`;
+      }).join('') + `</div>`
+    : `<p style="color:var(--muted);font-size:13px;padding:8px 0;">No photos</p>`;
+
+  return `
+    <div class="session-card" id="sess-${s.id}">
+      <div class="card-header">
+        <div>
+          <h3>📅 ${s.date}</h3>
+          <div class="card-date">Dr. ${s.doctorName || ''}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="actions button btn-pdf" onclick="generatePDF('${s.id}')">📄 PDF</button>
+          <button class="actions button btn-delete" onclick="deleteSession('${s.id}')">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item"><label>Age</label><value>${pt.age||'—'}</value></div>
+        <div class="info-item"><label>Gender</label><value>${pt.gender||'—'}</value></div>
+        <div class="info-item"><label>Weight</label><value>${pt.weight ? pt.weight+' kg' : '—'}</value></div>
+        <div class="info-item"><label>Height</label><value>${pt.height ? pt.height+' cm' : '—'}</value></div>
+      </div>
+
+      ${pt.history ? `<div class="history-box"><strong>Notes:</strong> ${pt.history}</div>` : ''}
+
+      ${photosHtml}
+    </div>`;
+}
+
+// ── Delete session ──
+function deleteSession(id) {
+  if (!confirm('Delete this session? Cannot be undone.')) return;
+  allSessions = allSessions.filter(s => String(s.id) !== String(id));
+  saveSessions();
+  // Delete from Firebase too
+  if (window.FIREBASE_ENABLED && window._fbDb) {
+    window._fbDb.collection('romSessions').doc(String(id)).delete().catch(()=>{});
+  }
+  loadSessions();
+}
+
+// ── Image modal ──
+function openModal(src) {
+  document.getElementById('modalImage').src = src;
+  document.getElementById('imageModal').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('imageModal').classList.remove('active');
+}
+
+// ── PDF — same as analyz.html buildPDF logic ──
+function generatePDF(id) {
+  const s = allSessions.find(s => String(s.id) === String(id));
+  if (!s) { alert('Session not found'); return; }
+  buildPDF(s.patient, s.photos || []);
+}
+
+function buildPDF(patient, photos) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','mm','a4');
+  const W = 210, mar = 14, cW = W - 2*mar;
+
+  // Header
+  doc.setFillColor(0,131,143); doc.rect(0,0,W,26,'F');
+  doc.setFillColor(0,172,193); doc.rect(0,26,W,2,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(15); doc.setFont('helvetica','bold');
+  doc.text('ROM ANALYSIS REPORT', W/2, 10, {align:'center'});
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text('Physio Motion Analyzer  ·  AI Range of Motion Assessment', W/2, 17, {align:'center'});
+  doc.text('Generated: ' + new Date().toLocaleString(), W/2, 23, {align:'center'});
+
+  let y = 33;
+
+  // Patient info
+  const hasHistory = patient.history && patient.history.trim();
+  const infoH = hasHistory ? 34 : 26;
+  doc.setFillColor(240,252,253); doc.roundedRect(mar,y,cW,infoH,2,2,'F');
+  doc.setDrawColor(0,172,193); doc.setLineWidth(0.4); doc.roundedRect(mar,y,cW,infoH,2,2);
+  doc.setFillColor(0,131,143); doc.rect(mar,y,3,infoH,'F');
+
+  doc.setTextColor(0,96,100); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+  doc.text('PATIENT INFORMATION', mar+6, y+6);
+
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica','bold'); doc.setTextColor(0,96,100);
+  doc.text('Name:', mar+6, y+13);
+  doc.setFont('helvetica','normal'); doc.setTextColor(20,20,20);
+  doc.text(patient.name||'—', mar+6+doc.getTextWidth('Name:')+2, y+13);
+  doc.setFont('helvetica','bold'); doc.setTextColor(0,96,100);
+  doc.text('Date:', mar+100, y+13);
+  doc.setFont('helvetica','normal'); doc.setTextColor(20,20,20);
+  doc.text(new Date().toLocaleDateString(), mar+100+doc.getTextWidth('Date:')+2, y+13);
+
+  const row2 = [
+    {l:'Age:',    v:patient.age||'—',                           x:mar+6  },
+    {l:'Gender:', v:patient.gender||'—',                         x:mar+38 },
+    {l:'Weight:', v:patient.weight ? patient.weight+' kg':'—',  x:mar+76 },
+    {l:'Height:', v:patient.height ? patient.height+' cm':'—',  x:mar+118},
+  ];
+  row2.forEach(f => {
+    doc.setFont('helvetica','bold');   doc.setTextColor(0,96,100); doc.text(f.l, f.x, y+20);
+    doc.setFont('helvetica','normal'); doc.setTextColor(20,20,20); doc.text(f.v, f.x+doc.getTextWidth(f.l)+2, y+20);
+  });
+
+  if (hasHistory) {
+    doc.setFont('helvetica','bold'); doc.setTextColor(0,96,100); doc.text('Notes:', mar+6, y+28);
+    doc.setFont('helvetica','normal'); doc.setTextColor(20,20,20);
+    const w = doc.splitTextToSize(patient.history, cW-28);
+    doc.text(w[0]||'', mar+6+doc.getTextWidth('Notes:')+2, y+28);
+  }
+  y += infoH + 8;
+
+  // Photos section
+  if (photos.length > 0) {
+    doc.setFillColor(0,131,143); doc.rect(mar,y,cW,8,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('CAPTURED PHOTOS', W/2, y+5.5, {align:'center'});
+    y += 10;
+
+    for (let i=0; i<photos.length; i++) {
+      const ph = photos[i];
+      const imgH = 100, labelH = 18, blockH = imgH + labelH + 4;
+      if (y + blockH > 272) { doc.addPage(); y = 16; }
+
+      doc.setDrawColor(0,172,193); doc.setLineWidth(0.4);
+      doc.roundedRect(mar, y, cW, blockH, 2, 2);
+
+      try { doc.addImage(ph.data, 'PNG', mar, y, cW, imgH); } catch(_) {}
+
+      doc.setDrawColor(0,172,193); doc.setLineWidth(0.3);
+      doc.line(mar, y+imgH, mar+cW, y+imgH);
+      doc.setFillColor(240,252,253);
+      doc.rect(mar, y+imgH, cW, labelH, 'F');
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,96,100);
+      doc.text('Photo '+(i+1), mar+4, y+imgH+7);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(80,100,110);
+      doc.text(ph.time||'', mar+4, y+imgH+13);
+
+      if (ph.selectedJoint && ph.selectedValue !== null && ph.selectedValue !== undefined) {
+        doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(0,131,143);
+        doc.text(ph.selectedValue+'°', mar+cW-4, y+imgH+11, {align:'right'});
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(0,131,143);
+        doc.text(ph.selectedJoint, mar+cW-4, y+imgH+5, {align:'right'});
+      } else {
+        doc.setFont('helvetica','italic'); doc.setFontSize(8); doc.setTextColor(150,150,150);
+        doc.text('No joint selected', mar+cW-4, y+imgH+9, {align:'right'});
+      }
+      y += blockH + 6;
+    }
+  } else {
+    doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(130,130,130);
+    doc.text('No photos captured.', W/2, y+8, {align:'center'});
+    y += 18;
+  }
+
+  // Footer
+  const total = doc.internal.getNumberOfPages();
+  for (let p=1; p<=total; p++) {
+    doc.setPage(p);
+    doc.setDrawColor(0,172,193); doc.setLineWidth(0.3);
+    doc.line(mar, 286, W-mar, 286);
+    doc.setTextColor(120,140,150); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+    doc.text(`Physio Motion Analyzer  ·  ROM Report  ·  Page ${p} of ${total}`, W/2, 291, {align:'center'});
+  }
+
+  doc.save(`ROM_${(patient.name||'Patient').replace(/\s+/g,'_')}_${Date.now()}.pdf`);
+}
+
+// ── Summary tab ──
+function loadSummary() {
+  const cont = document.getElementById('summaryContainer');
+  if (!allSessions.length) {
+    cont.innerHTML = `<div class="empty-state"><h2>No Data Yet</h2><p>Sessions will appear here once saved.</p></div>`;
+    return;
+  }
+  const byPt = {};
+  allSessions.forEach(s => {
+    const n = s.patient?.name || 'Unknown';
+    if (!byPt[n]) byPt[n] = { count:0, photos:0 };
+    byPt[n].count++;
+    byPt[n].photos += (s.photos||[]).length;
+  });
+  let html = `<div class="summary-grid">`;
+  for (const [name, data] of Object.entries(byPt)) {
+    html += `<div class="summary-card">
+      <h3>👤 ${name}</h3>
+      <p style="color:var(--charcoal-mid);font-size:13px;">${data.count} session${data.count>1?'s':''} &nbsp;·&nbsp; ${data.photos} photo${data.photos!==1?'s':''}</p>
+    </div>`;
+  }
+  html += `</div>`;
+  cont.innerHTML = html;
+}
+
+// ── Navigation ──
+function goBack()      { window.location.href = 'plans.html'; }
+function goExercises() { window.location.href = 'exercises-library.html'; }
+function logout()      { localStorage.removeItem('currentUser'); window.location.href = 'login.html'; }
+</script>
+
+
+<script src="js/pwa.js"></script>
+</body>
+</html>

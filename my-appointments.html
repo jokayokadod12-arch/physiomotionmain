@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>My Appointments — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .page-wrap { max-width:820px; margin:0 auto; padding:24px 18px 80px; width:100%; position:relative; z-index:1; }
+
+    .tab-bar {
+      display:flex; gap:0; background:rgba(245,239,228,.7);
+      border:1px solid rgba(90,122,98,.14); border-radius:10px;
+      overflow:hidden; margin-bottom:22px;
+    }
+    .tab-btn {
+      flex:1; padding:11px; text-align:center; cursor:pointer; transition:.2s;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+      letter-spacing:.5px; color:var(--charcoal-mid); border:none;
+      background:transparent;
+    }
+    .tab-btn.active {
+      background:rgba(90,122,98,.1); color:#7A9E82;
+      box-shadow:inset 0 -2px 0 #7A9E82;
+    }
+
+    /* Stats strip */
+    .stats-mini {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:22px;
+    }
+    .sm-card {
+      background:rgba(245,239,228,.7); border:1px solid rgba(90,122,98,.1);
+      border-radius:10px; padding:12px; text-align:center;
+    }
+    .sm-num { font-family:'Playfair Display',monospace; font-size:20px; font-weight:700; color:#7A9E82; }
+    .sm-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-top:2px; }
+
+    /* Appointment cards */
+    .appt-card {
+      background:rgba(245,239,228,.82); border:1px solid rgba(90,122,98,.13);
+      border-radius:16px; padding:18px 20px; margin-bottom:12px;
+      position:relative; overflow:hidden;
+    }
+    .appt-card.upcoming { border-left:3px solid #7A9E82; }
+    .appt-card.completed { border-left:3px solid #4caf50; opacity:.75; }
+    .appt-card.cancelled { border-left:3px solid rgba(255,82,82,.5); opacity:.55; }
+
+    .appt-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .appt-dr { font-family:'Playfair Display',monospace; font-size:13px; font-weight:700; color:var(--forest); }
+    .appt-spec { font-size:12px; color:rgba(90,122,98,.7); margin-top:2px; }
+
+    .status-badge {
+      padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.5px;
+    }
+    .status-confirmed { background:rgba(90,122,98,.12); border:1px solid rgba(90,122,98,.25); color:#7A9E82; }
+    .status-completed { background:rgba(76,175,80,.12); border:1px solid rgba(76,175,80,.25); color:#4caf50; }
+    .status-cancelled { background:rgba(255,82,82,.1); border:1px solid rgba(255,82,82,.2); color:rgba(255,82,82,.7); }
+    .status-pending_approval { background:rgba(184,148,63,.12); border:1px solid rgba(184,148,63,.3); color:#B8943F; }
+    .status-rejected { background:rgba(200,74,74,.1); border:1px solid rgba(200,74,74,.2); color:var(--danger); }
+    .appt-card.pending { border-left:3px solid #B8943F; }
+    .appt-card.rejected { border-left:3px solid rgba(200,74,74,.5); opacity:.7; }
+
+    .appt-details { display:flex; flex-wrap:wrap; gap:12px; font-size:13px; color:var(--charcoal-mid); margin-bottom:12px; }
+    .appt-detail strong { color:#2C2C2C; }
+
+    .countdown-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 12px; border-radius:8px; font-size:12px; font-weight:600;
+      background:rgba(90,122,98,.07); border:1px solid rgba(90,122,98,.15);
+      color:#7A9E82; margin-bottom:12px;
+    }
+
+    .appt-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-sm-action {
+      padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600;
+      letter-spacing:.4px; cursor:pointer; transition:.2s; border:none;
+    }
+    .btn-cancel { background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.2) !important; color:rgba(255,120,120,.8); border:1px solid; }
+    .btn-cancel:hover { background:rgba(255,82,82,.18); }
+    .btn-rate { background:rgba(255,193,7,.08); border:1px solid rgba(255,193,7,.2) !important; color:#ffc107; border:1px solid; }
+    .btn-rate:hover { background:rgba(255,193,7,.18); }
+    .btn-rebook { background:rgba(90,122,98,.08); border:1px solid rgba(90,122,98,.2) !important; color:#7A9E82; border:1px solid; }
+    .btn-rebook:hover { background:rgba(90,122,98,.18); }
+
+    .empty { text-align:center; padding:60px 20px; color:var(--muted); }
+    .empty span { font-size:48px; display:block; margin-bottom:12px; }
+
+    /* Rating modal */
+    .rating-modal {
+      display:none; position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,.7); backdrop-filter:blur(6px);
+      align-items:center; justify-content:center; padding:20px;
+    }
+    .rating-modal.show { display:flex; }
+    .rating-box {
+      background:#FFFFFF; border:1px solid var(--border);
+      border-radius:16px; padding:28px 24px; max-width:420px; width:100%;
+    }
+    .stars-row { display:flex; gap:8px; justify-content:center; margin:16px 0; }
+    .star-btn { font-size:30px; cursor:pointer; transition:.15s; filter:grayscale(1) opacity(.4); }
+    .star-btn.lit { filter:none; }
+    .review-input {
+      width:100%; background:rgba(250,247,242,.7); border:1px solid rgba(90,122,98,.2);
+      border-radius:8px; color:#2C2C2C; font-family:'DM Sans',sans-serif;
+      font-size:14px; padding:10px 12px; resize:vertical; min-height:80px;
+      outline:none; box-sizing:border-box; margin-bottom:14px;
+    }
+    .btn-submit-rating {
+      width:100%; padding:12px; background:linear-gradient(135deg,#5A7A62,#7A9E8222);
+      border:1px solid rgba(90,122,98,.4); color:#7A9E82;
+      font-family:'Playfair Display',monospace; font-size:12px; letter-spacing:1px;
+      border-radius:8px; cursor:pointer; transition:.2s;
+    }
+    .btn-submit-rating:hover { background:rgba(90,122,98,.15); }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📅</span> My Appointments</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-role.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <button class="btn-back" onclick="window.location.href='choose-role.html'">← Dashboard</button>
+  <div class="page-title">📅 My Appointments</div>
+  <div class="page-subtitle">Manage your bookings and track upcoming sessions</div>
+
+  <!-- Stats -->
+  <div class="stats-mini">
+    <div class="sm-card"><div class="sm-num" id="statUpcoming">0</div><div class="sm-lbl">Upcoming</div></div>
+    <div class="sm-card"><div class="sm-num" id="statCompleted">0</div><div class="sm-lbl">Completed</div></div>
+    <div class="sm-card"><div class="sm-num" id="statTotal">0</div><div class="sm-lbl">Total</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('upcoming',this)">Upcoming</button>
+    <button class="tab-btn" onclick="setTab('past',this)">Past</button>
+    <button class="tab-btn" onclick="setTab('all',this)">All</button>
+  </div>
+
+  <div id="appointmentsList"></div>
+
+  <div style="margin-top:20px;">
+    <button class="btn btn-header" onclick="window.location.href='find-doctor.html'" style="padding:12px 20px;font-size:13px;">
+      🔍 Find & Book a New Doctor →
+    </button>
+  </div>
+</div>
+
+<!-- Rating Modal -->
+<div class="rating-modal" id="ratingModal">
+  <div class="rating-box" style="position:relative;">
+    <button onclick="closeRating()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--charcoal-mid);font-size:20px;cursor:pointer;">✕</button>
+    <div style="font-family:'Playfair Display',monospace;font-size:14px;color:#7A9E82;margin-bottom:4px;">Rate Your Session</div>
+    <div style="font-size:12px;color:var(--charcoal-mid);margin-bottom:4px;" id="ratingDrName"></div>
+    <div class="stars-row" id="starsRow">
+      <span class="star-btn" data-v="1" onclick="setStar(1)">⭐</span>
+      <span class="star-btn" data-v="2" onclick="setStar(2)">⭐</span>
+      <span class="star-btn" data-v="3" onclick="setStar(3)">⭐</span>
+      <span class="star-btn" data-v="4" onclick="setStar(4)">⭐</span>
+      <span class="star-btn" data-v="5" onclick="setStar(5)">⭐</span>
+    </div>
+    <textarea class="review-input" id="reviewText" placeholder="Tell us about your experience (optional)…"></textarea>
+    <button class="btn-submit-rating" onclick="submitRating()">Submit Rating</button>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  var _FBCFG = {
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+  window._fbDb = firebase.firestore();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script>
+
+let currentUser = null;
+let activeTab = 'upcoming';
+let ratingBookingId = null;
+let selectedStars = 0;
+let _bookingsCache = [];  // loaded from Firestore
+
+function getBookings() { return _bookingsCache; }
+async function saveBookings(bks) { _bookingsCache = bks; }
+
+function getMyBookings() {
+  const all = getBookings();
+  return all.filter(b => b.patientEmail === currentUser.email && !b.patientDeleted);
+}
+
+function isUpcoming(b) {
+  if (b.status === 'cancelled' || b.status === 'rejected' || b.status === 'deleted') return false;
+  if (b.status === 'completed' || b.status === 'noshow') return false;
+  // Also filter out past date+time that was never marked done (auto-expire after 24h)
+  const bTime = new Date(b.date + 'T' + b.time).getTime();
+  if (bTime < Date.now() - 24*60*60*1000 && b.status === 'confirmed') return false;
+  return true;
+}
+
+function getCountdown(dateStr, timeStr) {
+  const dt = new Date(dateStr + 'T' + timeStr);
+  const now = new Date();
+  const diff = dt - now;
+  if (diff < 0) return null;
+  const days  = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  if (days > 0) return `${days}d ${hours}h until appointment`;
+  if (hours > 0) return `${hours}h until appointment`;
+  return 'Appointment is very soon!';
+}
+
+function setTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function render() {
+  const mine = getMyBookings();
+
+  // Stats
+  const upcoming = mine.filter(isUpcoming);
+  const completed = mine.filter(b => b.status === 'completed' || b.status === 'noshow');
+  document.getElementById('statUpcoming').textContent  = upcoming.length;
+  document.getElementById('statCompleted').textContent = completed.length;
+  document.getElementById('statTotal').textContent     = mine.length;
+
+  // Filter for tab — past = completed or noshow (doctor confirmed session done)
+  let filtered;
+  if (activeTab === 'upcoming') filtered = mine.filter(isUpcoming).sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time));
+  else if (activeTab === 'past') filtered = mine.filter(b => !isUpcoming(b) && b.status !== 'cancelled' && b.status !== 'rejected' && b.status !== 'deleted').sort((a,b) => new Date(b.date+'T'+b.time) - new Date(a.date+'T'+a.time));
+  else filtered = [...mine].sort((a,b) => new Date(b.date+'T'+b.time) - new Date(a.date+'T'+a.time));
+
+  const list = document.getElementById('appointmentsList');
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><span>${activeTab==='upcoming'?'📅':'📋'}</span><p>${activeTab==='upcoming'?'No upcoming appointments.<br>Book one now!':'No past appointments yet.'}</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(b => {
+    const upcoming = isUpcoming(b);
+    const isCompleted = b.status === 'completed';
+    const isNoshow    = b.status === 'noshow';
+    const isPendingApproval = b.status === 'pending_approval';
+    const isRejected = b.status === 'rejected';
+    const cardClass   = b.status === 'cancelled' ? 'cancelled' : isRejected ? 'rejected' : isPendingApproval ? 'pending' : (!upcoming) ? 'completed' : 'upcoming';
+    const statusClass = b.status === 'cancelled' ? 'status-cancelled' : isRejected ? 'status-rejected' : isPendingApproval ? 'status-pending_approval' : isCompleted ? 'status-completed' : isNoshow ? 'status-cancelled' : 'status-confirmed';
+    const statusLabel = b.status === 'cancelled' ? 'Cancelled' : isRejected ? '✕ Rejected' : isPendingApproval ? '⏳ Pending Approval' : isCompleted ? 'Completed' : isNoshow ? 'No-show' : 'Confirmed';
+    const dateLabel = new Date(b.date).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const countdown = upcoming ? getCountdown(b.date, b.time) : null;
+
+    return `
+    <div class="appt-card ${cardClass}">
+      <div class="appt-header">
+        <div>
+          <div class="appt-dr">${b.doctorName}</div>
+          <div class="appt-spec">${b.doctorSpec || 'Physiotherapy'}</div>
+        </div>
+        <span class="status-badge ${statusClass}">${statusLabel}</span>
+      </div>
+      ${countdown ? `<div class="countdown-badge">⏰ ${countdown}</div>` : ''}
+      <div class="appt-details">
+        <span>📅 <strong>${dateLabel}</strong></span>
+        <span>🕐 <strong>${b.time}</strong></span>
+        <span>🗂 <strong>${b.typeLabel || b.type}</strong></span>
+        <span>⏱ ${b.duration} min</span>
+      </div>
+      <div class="appt-actions">
+        ${upcoming && !isPendingApproval ? `<button class="btn-sm-action btn-cancel" onclick="cancelBooking('${b.id}')">✕ Cancel</button>` : ''}
+        ${isPendingApproval ? `<span style="font-size:11px;color:#B8943F;padding:6px 10px;border:1px solid rgba(184,148,63,.2);border-radius:8px;background:rgba(184,148,63,.06);">⏳ Waiting for doctor to confirm</span>` : ''}
+        ${isPendingApproval ? `<button class="btn-sm-action btn-cancel" onclick="cancelBooking('${b.id}')">✕ Cancel Request</button>` : ''}
+        ${isRejected ? `<button class="btn-sm-action" style="background:rgba(200,74,74,.08);border:1px solid rgba(200,74,74,.2);color:var(--danger);" onclick="deleteRecord('${b.id}')">🗑 Remove</button>` : ''}
+        <button class="btn-sm-action" style="background:rgba(90,122,98,.08);border:1px solid rgba(90,122,98,.2);color:#7A9E82;" onclick="goChat('${b.doctorEmail}','${b.doctorName}')">💬 Chat</button>
+        ${(isCompleted || isNoshow) && !b.rated ? `<button class="btn-sm-action btn-rate" onclick="openRating('${b.id}','${b.doctorName}')">⭐ Rate</button>` : ''}
+        ${(b.status === 'cancelled' || isCompleted || isNoshow) ? `<button class="btn-sm-action btn-rebook" onclick="window.location.href='find-doctor.html'">📅 Book Again</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteRecord(id) {
+  if (!confirm('Remove this record from your list?')) return;
+  const idx = _bookingsCache.findIndex(x => x.id === id);
+  if (idx !== -1) _bookingsCache.splice(idx, 1);
+  await dbUpdateBooking(id, { patientDeleted: true }).catch(()=>{});
+  render();
+}
+
+async function cancelBooking(id) {
+  if (!confirm('Cancel this appointment? This cannot be undone.')) return;
+  const idx = _bookingsCache.findIndex(b => b.id === id);
+  if (idx === -1) return;
+  const b = _bookingsCache[idx];
+  // If doctor hasn't confirmed yet, allow immediate cancellation
+  if (b.status !== 'pending_approval') {
+    const dt = new Date(b.date + 'T' + b.time);
+    const hoursUntil = (dt - new Date()) / 3600000;
+    if (hoursUntil < 2) { alert('Cancellations must be made at least 2 hours before the appointment.'); return; }
+  }
+  _bookingsCache[idx].status = 'cancelled';
+  await dbUpdateBooking(id, { status: 'cancelled' });
+  render();
+}
+
+function openRating(id, drName) {
+  ratingBookingId = id;
+  selectedStars = 0;
+  document.getElementById('ratingDrName').textContent = drName;
+  document.getElementById('reviewText').value = '';
+  document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('lit'));
+  document.getElementById('ratingModal').classList.add('show');
+}
+
+function closeRating() { document.getElementById('ratingModal').classList.remove('show'); }
+
+function setStar(n) {
+  selectedStars = n;
+  document.querySelectorAll('.star-btn').forEach((s,i) => {
+    s.classList.toggle('lit', i < n);
+  });
+}
+
+async function submitRating() {
+  if (!selectedStars) { alert('Please select a star rating.'); return; }
+  const idx = _bookingsCache.findIndex(b => b.id === ratingBookingId);
+  if (idx !== -1) {
+    const fields = { rated: true, rating: selectedStars, review: document.getElementById('reviewText').value };
+    Object.assign(_bookingsCache[idx], fields);
+    await dbUpdateBooking(ratingBookingId, fields);
+  }
+  closeRating();
+  render();
+}
+
+async function goChat(email, name) {
+  if (!email) return;
+  const chatId = [currentUser.email, email].sort().join('||');
+  await dbSaveConv(currentUser.email, { id:chatId, otherEmail:email, otherName:name||email, lastMsg:'', lastTime:Date.now() });
+  await dbSaveConv(email, { id:chatId, otherEmail:currentUser.email, otherName:currentUser.name||currentUser.email, lastMsg:'', lastTime:Date.now() });
+  window.location.href = 'chat.html?with=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name||email);
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  currentUser = requireAuth('patient');
+  if (!currentUser) return;
+  _bookingsCache = await dbGetPatientBookings(currentUser.email).catch(() => []);
+  render();
+  // Poll Firestore every 5s for real-time status updates from doctor
+  setInterval(async () => {
+    _bookingsCache = await dbGetPatientBookings(currentUser.email).catch(() => _bookingsCache);
+    render();
+  }, 5000);
+});
+</script>
+<script src="js/pwa.js"></script>
+
+<script>
+(function(){
+  // Notification badge handled by Firestore poll above
+  // Request browser notification permission
+  if(window.Notification && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Schedule — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+:root{--cyan:#7A9E82;--blue:#5A7A62;--dark:#FAF7F2;--text:#2C2C2C;--border:rgba(90,122,98,.14);}
+body{display:flex;flex-direction:column;min-height:100vh;}
+.pw{max-width:980px;margin:0 auto;padding:22px 16px 80px;width:100%;position:relative;z-index:1;}
+
+/* Tabs */
+.tabs{display:flex;background:rgba(245,239,228,.75);border:1px solid var(--border);border-radius:10px;overflow-x:auto;overflow-y:hidden;margin-bottom:22px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:1;padding:12px 8px;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--charcoal-mid);border:none;background:transparent;transition:.18s;white-space:nowrap;}
+.tab.on{background:rgba(90,122,98,.1);color:var(--cyan);box-shadow:inset 0 -2px 0 var(--cyan);}
+
+/* Panels */
+.panel{display:none;} .panel.on{display:block;}
+
+/* ── DAY NAV ── */
+.day-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.day-label{font-family:'Playfair Display',monospace;font-size:14px;color:#2C2C2C;font-weight:700;}
+.arr-btn{background:rgba(90,122,98,.08);border:1px solid var(--border);color:var(--cyan);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:18px;transition:.18s;}
+.arr-btn:hover{background:rgba(90,122,98,.18);}
+
+/* Day stats */
+.day-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.ds{background:rgba(245,239,228,.7);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.ds strong{font-family:'Playfair Display',monospace;font-size:14px;color:var(--cyan);}
+
+/* Legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--charcoal-mid);margin-bottom:14px;align-items:center;}
+.leg{display:flex;align-items:center;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;}
+
+/* Slot grid */
+.slot-grid{display:flex;flex-direction:column;gap:6px;}
+.slot-row{display:flex;align-items:center;gap:10px;background:rgba(245,239,228,.72);border:1px solid var(--border);border-radius:12px;padding:12px 14px;transition:.18s;flex-wrap:wrap;}
+.slot-row.booked{border-color:rgba(90,122,98,.35);background:rgba(45,74,53,.08);padding:14px;}
+@media(max-width:600px){
+  .slot-row{gap:8px;}
+  .slot-row.booked{flex-direction:column;align-items:flex-start;gap:10px;}
+  .slot-row.booked .slot-info{width:100%;}
+  .slot-row.booked .slot-actions-wrap{display:flex;gap:8px;width:100%;justify-content:flex-end;}
+}
+.slot-row.break-row{opacity:.6;background:rgba(255,152,0,.04);border-color:rgba(255,152,0,.14);}
+.slot-row.closed{opacity:.35;}
+.slot-ind{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ind-open{background:#4caf50;box-shadow:0 0 7px #4caf50;}
+.ind-booked{background:var(--cyan);box-shadow:0 0 7px var(--cyan);}
+.ind-break{background:#ff9800;}
+.ind-closed{background:#444;}
+.slot-time{font-family:'Playfair Display',monospace;font-size:13px;font-weight:700;color:var(--cyan);min-width:58px;flex-shrink:0;}
+.slot-info{flex:1;}
+.slot-patient{font-size:13px;color:#2C2C2C;font-weight:600;}
+.slot-type{font-size:11px;color:rgba(90,122,98,.55);margin-top:1px;}
+.slot-empty{font-size:12px;color:var(--muted);}
+.slot-act{background:transparent;border:1px solid var(--border);color:var(--charcoal-mid);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap;}
+.slot-act:hover{background:rgba(90,122,98,.1);color:var(--cyan);}
+.slot-act.red:hover{background:rgba(255,82,82,.1);color:#ff6b6b;border-color:rgba(255,82,82,.25);}
+
+/* ── BOOKINGS ── */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.fchip{padding:6px 14px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(245,239,228,.7);color:rgba(90,122,98,.65);transition:.18s;}
+.fchip.on,.fchip:hover{background:rgba(90,122,98,.14);border-color:var(--cyan);color:var(--cyan);}
+
+.bk-card{background:rgba(245,239,228,.82);border:1px solid var(--border);border-radius:13px;padding:15px 18px;margin-bottom:10px;transition:.18s;}
+.bk-card.upcoming{border-left:3px solid var(--cyan);}
+.bk-card.pending{border-left:3px solid var(--gold);background:rgba(184,148,63,.04);}
+.bk-card.done{border-left:3px solid #4caf50;opacity:.75;}
+.bk-card.ns{border-left:3px solid rgba(255,82,82,.5);opacity:.65;}
+.bk-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.bk-name{font-family:'Playfair Display',monospace;font-size:13px;color:#2C2C2C;font-weight:700;}
+.bk-datetime{font-size:12px;color:var(--cyan);font-family:'Playfair Display',monospace;}
+.bk-meta{font-size:12px;color:var(--charcoal-mid);margin-bottom:10px;}
+.bk-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.bk-btn{padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:.18s;}
+.btn-complete{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.25);color:#4caf50;}
+.btn-complete:hover{background:rgba(76,175,80,.22);}
+.btn-noshow{background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.22);color:#ff6b6b;}
+.btn-noshow:hover{background:rgba(255,82,82,.18);}
+.btn-chat{background:rgba(90,122,98,.08);border:1px solid var(--border);color:var(--cyan);}
+.btn-chat:hover{background:rgba(90,122,98,.18);}
+.status-badge{padding:3px 9px;border-radius:11px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.s-confirmed{background:rgba(90,122,98,.12);border:1px solid rgba(90,122,98,.25);color:var(--cyan);}
+.s-completed{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.25);color:#4caf50;}
+.s-noshow{background:rgba(255,82,82,.1);border:1px solid rgba(255,82,82,.22);color:#ff6b6b;}
+.s-pending_approval{background:rgba(184,148,63,.12);border:1px solid rgba(184,148,63,.3);color:var(--gold);}
+
+/* ── REQUESTS ── */
+.req-card{background:rgba(245,239,228,.82);border:1px solid rgba(255,152,0,.18);border-left:3px solid #ff9800;border-radius:13px;padding:15px 18px;margin-bottom:10px;}
+.req-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.req-name{font-size:14px;font-weight:700;color:#2C2C2C;}
+.req-time{font-size:11px;color:var(--muted);}
+.req-msg{font-size:13px;color:var(--charcoal-mid);margin-bottom:10px;line-height:1.55;}
+.req-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-arrange{background:rgba(90,122,98,.1);border:1px solid var(--border);color:var(--cyan);padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:.18s;}
+.btn-arrange:hover{background:rgba(90,122,98,.2);}
+.btn-dismiss{background:rgba(255,82,82,.06);border:1px solid rgba(255,82,82,.18);color:rgba(255,82,82,.65);padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:.18s;}
+.btn-dismiss:hover{background:rgba(255,82,82,.15);}
+
+/* ── SETTINGS ── */
+.set-section{margin-bottom:22px;}
+.set-head{font-family:'Playfair Display',monospace;font-size:10px;letter-spacing:1.5px;color:rgba(90,122,98,.55);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.set-head::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(90,122,98,.18),transparent);}
+.set-card{background:rgba(245,239,228,.72);border:1px solid var(--border);border-radius:11px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.set-lbl{font-size:14px;color:#2C2C2C;font-weight:600;}
+.set-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.set-input{background:rgba(250,247,242,.72);border:1px solid rgba(90,122,98,.2);border-radius:8px;color:#2C2C2C;font-family:'DM Sans',sans-serif;font-size:14px;padding:8px 11px;outline:none;min-width:90px;}
+.set-input:focus{border-color:rgba(90,122,98,.45);}
+.toggle{position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.ttrack{position:absolute;inset:0;background:rgba(90,122,98,.12);border:1px solid rgba(90,122,98,.25);border-radius:12px;transition:.2s;}
+.toggle input:checked + .ttrack{background:rgba(90,122,98,.38);border-color:var(--cyan);}
+.tthumb{position:absolute;width:18px;height:18px;background:var(--cyan);border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 0 6px rgba(90,122,98,.4);}
+.toggle input:checked ~ .tthumb{left:22px;}
+.btn-save{padding:12px 28px;background:linear-gradient(135deg,var(--sage),#5A7A62);border:1px solid rgba(90,122,98,.5);color:#ffffff;font-family:'Playfair Display',monospace;font-size:11px;letter-spacing:1px;border-radius:9px;cursor:pointer;transition:.2s;margin-top:8px;font-weight:700;}
+.btn-save:hover{background:linear-gradient(135deg,#5A7A62,#2D4A35);box-shadow:0 4px 16px rgba(90,122,98,.35);}
+
+/* Month calendar for quick day-opening */
+.month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.month-title{font-family:'Playfair Display',monospace;font-size:13px;color:var(--forest);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-hdr{text-align:center;font-size:10px;color:rgba(90,122,98,.4);letter-spacing:1px;padding:4px 0;}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid transparent;transition:.18s;position:relative;}
+.cal-day:hover{background:rgba(90,122,98,.1);border-color:rgba(90,122,98,.2);}
+.cal-day.today{border-color:rgba(90,122,98,.4);color:var(--cyan);}
+.cal-day.has-open{background:rgba(76,175,80,.07);border-color:rgba(76,175,80,.18);color:#4caf50;}
+.cal-day.fully-booked{background:rgba(90,122,98,.07);border-color:rgba(90,122,98,.15);color:var(--cyan);}
+.cal-day.closed-day{opacity:.25;}
+.cal-day.other-month{opacity:.2;}
+.cal-day.selected{background:rgba(90,122,98,.2);border-color:var(--cyan);color:#2C2C2C;}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state span{font-size:40px;display:block;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📅</span> My Schedule</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='chat.html'" style="position:relative;">
+      💬 Chat<span id="chatBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:#e91e63;color:#2C2C2C;border-radius:8px;font-size:9px;font-weight:700;padding:1px 4px;"></span>
+    </button>
+    <button class="btn btn-header" onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="pw">
+  <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
+  <div class="page-title">📅 Schedule Manager</div>
+  <div class="page-subtitle">Control your availability and manage bookings</div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on"  id="tab-slots"    onclick="switchTab('slots')">📅 Time Slots</button>
+    <button class="tab"     id="tab-month"    onclick="switchTab('month')">🗓 Month View</button>
+    <button class="tab"     id="tab-bookings" onclick="switchTab('bookings')">👥 Bookings</button>
+    <button class="tab"     id="tab-requests" onclick="switchTab('requests')">📩 Requests</button>
+    <button class="tab"     id="tab-settings" onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- ── TIME SLOTS PANEL ── -->
+  <div class="panel on" id="panel-slots">
+    <div id="slotsInfoBanner" style="background:rgba(90,122,98,.06);border:1px solid rgba(90,122,98,.14);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--charcoal-mid);display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">💡</span>
+      <span>All slots are <strong style="color:rgba(90,122,98,.8);">closed by default</strong>. Click <strong style="color:#4caf50;">🔓 Open Slot</strong> to make a time available for patients to book, or use <strong style="color:#4caf50;">🔓 Open All</strong> to open the entire day.</span>
+    </div>
+    <div class="day-nav">
+      <button class="arr-btn" onclick="changeDay(-1)">‹</button>
+      <div class="day-label" id="dayLabel">—</div>
+      <button class="arr-btn" onclick="changeDay(+1)">›</button>
+    </div>
+    <div class="day-stats" id="dayStats"></div>
+    <div class="legend">
+      <div class="leg"><div class="dot" style="background:#4caf50;"></div> Open</div>
+      <div class="leg"><div class="dot" style="background:var(--cyan);"></div> Booked</div>
+      <div class="leg"><div class="dot" style="background:#444;"></div> Closed</div>
+      <button class="slot-act" style="margin-left:auto;" onclick="openAllDay()">🔓 Open All</button>
+      <button class="slot-act red" onclick="closeAllDay()">🔒 Close All</button>
+    </div>
+    <div class="slot-grid" id="slotGrid"></div>
+  </div>
+
+  <!-- ── MONTH VIEW PANEL ── -->
+  <div class="panel" id="panel-month">
+    <div class="month-head">
+      <button class="arr-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-title" id="monthTitle">—</div>
+      <button class="arr-btn" onclick="changeMonth(+1)">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div style="margin-top:14px;font-size:12px;color:var(--muted);">Click a day to open it in Time Slots view.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+      <div class="leg"><div class="dot" style="background:#4caf50;border-radius:50%;display:inline-block;width:8px;height:8px;margin-right:4px;"></div> Has open slots</div>
+      <div class="leg"><div class="dot" style="background:var(--cyan);border-radius:50%;display:inline-block;width:8px;height:8px;margin-right:4px;"></div> Fully booked</div>
+    </div>
+  </div>
+
+  <!-- ── BOOKINGS PANEL ── -->
+  <div class="panel" id="panel-bookings">
+    <div class="filter-row">
+      <div class="fchip on" id="fc-upcoming" onclick="setBookingFilter('upcoming',this)">Upcoming</div>
+      <div class="fchip"    id="fc-past"     onclick="setBookingFilter('past',this)">Past</div>
+      <div class="fchip"    id="fc-all"      onclick="setBookingFilter('all',this)">All</div>
+    </div>
+    <div id="bookingsList"></div>
+  </div>
+
+  <!-- ── REQUESTS PANEL ── -->
+  <div class="panel" id="panel-requests">
+    <div id="requestsList"></div>
+  </div>
+
+  <!-- ── SETTINGS PANEL ── -->
+  <div class="panel" id="panel-settings">
+    <div class="set-section">
+      <div class="set-head">Working Hours</div>
+      <div class="set-card">
+        <div class="set-row">
+          <div><div class="set-lbl">Start Time</div><div class="set-sub">Hour your day opens (0–23)</div></div>
+          <select class="set-input" id="s-start" style="width:90px;">
+            <option value="0">00:00</option>
+            <option value="1">01:00</option>
+            <option value="2">02:00</option>
+            <option value="3">03:00</option>
+            <option value="4">04:00</option>
+            <option value="5">05:00</option>
+            <option value="6">06:00</option>
+            <option value="7">07:00</option>
+            <option value="8">08:00</option>
+            <option value="9" selected>09:00</option>
+            <option value="10">10:00</option>
+            <option value="11">11:00</option>
+            <option value="12">12:00</option>
+            <option value="13">13:00</option>
+            <option value="14">14:00</option>
+            <option value="15">15:00</option>
+            <option value="16">16:00</option>
+            <option value="17">17:00</option>
+            <option value="18">18:00</option>
+            <option value="19">19:00</option>
+            <option value="20">20:00</option>
+            <option value="21">21:00</option>
+            <option value="22">22:00</option>
+            <option value="23">23:00</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <div><div class="set-lbl">End Time</div><div class="set-sub">Hour your day closes (0–23)</div></div>
+          <select class="set-input" id="s-end" style="width:90px;">
+            <option value="0">00:00</option>
+            <option value="1">01:00</option>
+            <option value="2">02:00</option>
+            <option value="3">03:00</option>
+            <option value="4">04:00</option>
+            <option value="5">05:00</option>
+            <option value="6">06:00</option>
+            <option value="7">07:00</option>
+            <option value="8">08:00</option>
+            <option value="9">09:00</option>
+            <option value="10">10:00</option>
+            <option value="11">11:00</option>
+            <option value="12">12:00</option>
+            <option value="13">13:00</option>
+            <option value="14">14:00</option>
+            <option value="15">15:00</option>
+            <option value="16">16:00</option>
+            <option value="17" selected>17:00</option>
+            <option value="18">18:00</option>
+            <option value="19">19:00</option>
+            <option value="20">20:00</option>
+            <option value="21">21:00</option>
+            <option value="22">22:00</option>
+            <option value="23">23:00</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-head">Session Settings</div>
+      <div class="set-card">
+        <div class="set-row">
+          <div><div class="set-lbl">Session Duration</div><div class="set-sub">Minutes per session</div></div>
+          <select class="set-input" id="s-dur">
+            <option value="30">30 min</option>
+            <option value="45" selected>45 min</option>
+            <option value="60">60 min</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <div><div class="set-lbl">Buffer Between Sessions</div><div class="set-sub">Prep/cleanup time</div></div>
+          <select class="set-input" id="s-buf">
+            <option value="0">None</option>
+            <option value="10">10 min</option>
+            <option value="15" selected>15 min</option>
+            <option value="20">20 min</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <div><div class="set-lbl">Min Notice (hours)</div><div class="set-sub">Min advance booking time</div></div>
+          <select class="set-input" id="s-notice">
+            <option value="1">1 hr</option>
+            <option value="2" selected>2 hrs</option>
+            <option value="4">4 hrs</option>
+            <option value="24">24 hrs</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <div><div class="set-lbl">Max Advance Booking</div><div class="set-sub">Days ahead patients can book</div></div>
+          <select class="set-input" id="s-max">
+            <option value="7">1 week</option>
+            <option value="14">2 weeks</option>
+            <option value="30" selected>1 month</option>
+            <option value="60">2 months</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-head">Automation</div>
+      <div class="set-card">
+        <div class="set-row" style="border-bottom:2px solid rgba(90,122,98,.15);padding-bottom:14px;margin-bottom:4px;">
+          <div>
+            <div class="set-lbl" style="font-size:13px;color:#3D5A45;">🌐 Accept Online Bookings</div>
+            <div class="set-sub">When ON — patients can find &amp; book you in "Find Doctor".<br>When OFF — your profile is hidden from patients.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="s-online" onchange="onOnlineToggle(this)"><div class="ttrack"></div><div class="tthumb"></div></label>
+        </div>
+        <div class="set-row">
+          <div><div class="set-lbl">Auto-Accept Bookings</div><div class="set-sub">Confirm new slots automatically</div></div>
+          <label class="toggle"><input type="checkbox" id="s-auto" checked><div class="ttrack"></div><div class="tthumb"></div></label>
+        </div>
+        <div class="set-row">
+          <div><div class="set-lbl">Send Reminders</div><div class="set-sub">24h and 2h before appointment</div></div>
+          <label class="toggle"><input type="checkbox" id="s-remind" checked><div class="ttrack"></div><div class="tthumb"></div></label>
+        </div>
+      </div>
+    </div>
+    <button class="btn-save" onclick="saveSettings()">💾 Save Settings</button>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  const cfg={apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"};
+  if(!firebase.apps.length)firebase.initializeApp(cfg);
+  window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;
+}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script>
+'use strict';
+
+let ME = null;
+let viewDate = new Date();
+let calMonth = new Date();
+let activeTab = 'slots';
+let bookingFilter = 'upcoming';
+
+// In-memory caches loaded from Firestore
+let _schedSettings = {};
+let _openSlots     = [];
+let _bookings      = [];
+let _requests      = [];
+
+// ── Storage ──────────────────────────────────────────────
+function settingsKey() { return 'psch_settings_' + ME.email; }
+function openKey()     { return 'psch_open_'    + ME.email; }
+
+function getSettings() {
+  const s = _schedSettings;
+  return {
+    start:  s.start  ?? 9,
+    end:    s.end    ?? 17,
+    dur:    s.dur    ?? 45,
+    buf:    s.buf    ?? 15,
+    notice: s.notice ?? 2,
+    maxAdv: s.maxAdv ?? 30,
+    auto:   s.auto   ?? true,
+    remind: s.remind ?? true,
+    online: s.online ?? false,
+  };
+}
+
+async function saveSettings() {
+  const s = {
+    start:  parseInt(document.getElementById('s-start').value),
+    end:    parseInt(document.getElementById('s-end').value),
+    dur:    parseInt(document.getElementById('s-dur').value),
+    buf:    parseInt(document.getElementById('s-buf').value),
+    notice: parseInt(document.getElementById('s-notice').value),
+    maxAdv: parseInt(document.getElementById('s-max').value),
+    auto:   document.getElementById('s-auto').checked,
+    remind: document.getElementById('s-remind').checked,
+    online: document.getElementById('s-online').checked,
+  };
+  _schedSettings = s;
+  // Sync acceptOnline flag directly on the user doc so find-doctor can read it fast
+  await Promise.all([
+    dbSaveScheduleSettings(ME.email, s),
+    window._fbDb.collection('users').doc(ME.email).update({ acceptOnline: s.online }).catch(()=>{}),
+  ]);
+  // Show success banner
+  const banner = document.createElement('div');
+  banner.textContent = '✅ Settings saved! Your schedule will now generate slots based on these times.';
+  banner.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(76,175,80,.18);border:1px solid rgba(76,175,80,.35);color:#4caf50;padding:10px 20px;border-radius:10px;font-family:Orbitron,monospace;font-size:11px;letter-spacing:.5px;z-index:999;';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 3000);
+  // Re-render active view
+  renderSlots();
+}
+
+function loadSettingsForm() {
+  const s = getSettings();
+  document.getElementById('s-start').value  = String(s.start);
+  document.getElementById('s-end').value    = String(s.end);
+  document.getElementById('s-dur').value    = s.dur;
+  document.getElementById('s-buf').value    = s.buf;
+  document.getElementById('s-notice').value = s.notice;
+  document.getElementById('s-max').value    = s.maxAdv;
+  document.getElementById('s-auto').checked   = s.auto;
+  document.getElementById('s-remind').checked = s.remind !== false;
+  document.getElementById('s-online').checked = s.online === true;
+  updateOnlineBadge(s.online === true);
+}
+
+// ─── Online toggle helpers ────────────────────────────────
+async function onOnlineToggle(cb) {
+  const isOn = cb.checked;
+  updateOnlineBadge(isOn);
+  // Save immediately to Firebase — don't wait for Save Settings button
+  try {
+    await Promise.all([
+      window._fbDb.collection('users').doc(ME.email).update({ acceptOnline: isOn }),
+      dbSaveScheduleSettings(ME.email, { ...(_schedSettings || {}), online: isOn }),
+    ]);
+    _schedSettings = { ...(_schedSettings || {}), online: isOn };
+    // Keep local auth cache in sync for pages that read currentUser quickly.
+    updateCurrentUser({ ...(getCurrentUser() || ME || {}), acceptOnline: isOn });
+    const msg = isOn
+      ? '✅ You are now visible to patients in Find Doctor'
+      : '🔒 You are now hidden from patients in Find Doctor';
+    showBanner(msg, isOn ? '#4caf50' : '#ff9800');
+  } catch(e) { console.error('Failed to save online status:', e); }
+}
+
+function updateOnlineBadge(isOn) {
+  let badge = document.getElementById('onlineBadge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'onlineBadge';
+    badge.style.cssText = 'position:fixed;top:68px;right:20px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;z-index:300;transition:.3s;';
+    document.body.appendChild(badge);
+  }
+  badge.textContent  = isOn ? '🌐 VISIBLE TO PATIENTS' : '🔒 HIDDEN FROM PATIENTS';
+  badge.style.background = isOn ? 'rgba(76,175,80,.18)' : 'rgba(255,152,0,.15)';
+  badge.style.border     = isOn ? '1px solid rgba(76,175,80,.4)' : '1px solid rgba(255,152,0,.35)';
+  badge.style.color      = isOn ? '#4caf50' : '#ff9800';
+}
+
+function showBanner(msg, color) {
+  const b = document.createElement('div');
+  b.textContent = msg;
+  b.style.cssText = `position:fixed;top:60px;left:50%;transform:translateX(-50%);background:${color}22;border:1px solid ${color}55;color:${color};padding:10px 20px;border-radius:10px;font-size:11px;letter-spacing:.5px;z-index:999;`;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 3000);
+}
+
+function getOpenSlots()  { return _openSlots; }
+async function saveOpenSlots(o) {
+  _openSlots = o;
+  await dbSaveOpenSlots(ME.email, o);
+}
+
+function isSlotOpen(dateStr, time) { return getOpenSlots().includes(dateStr + ':' + time); }
+
+async function toggleSlot(dateStr, time) {
+  const open = [...getOpenSlots()];
+  const key  = dateStr + ':' + time;
+  const idx  = open.indexOf(key);
+  if (idx === -1) open.push(key); else open.splice(idx, 1);
+  await saveOpenSlots(open);
+  renderSlots();
+}
+
+// ── Bookings ─────────────────────────────────────────────
+function getBookings() { return _bookings; }
+async function saveBookings(bks) {
+  _bookings = bks;
+  // Individual updates handled via dbUpdateBooking in setBkStatus
+}
+
+function getMyBookings() {
+  return getBookings().filter(b =>
+    (b.doctorEmail === ME.email ||
+    (ME.name && b.doctorName && b.doctorName.toLowerCase().includes(ME.name.replace(/^dr\.?\s*/i,'').trim().toLowerCase())))
+    && b.status !== 'deleted'
+  );
+}
+
+// ── Slot generator ────────────────────────────────────────
+function generateSlots(dateStr) {
+  const s      = getSettings();
+  const bks    = getMyBookings().filter(b => b.date === dateStr && b.status !== 'cancelled');
+  const bookedT = {};
+  bks.forEach(b => { bookedT[b.time] = b; });
+
+  const slots  = [];
+  let cur      = s.start * 60;
+  const endMin = s.end   * 60;
+
+  while (cur + s.dur <= endMin) {
+    const h   = String(Math.floor(cur / 60)).padStart(2, '0');
+    const m   = String(cur % 60).padStart(2, '0');
+    const t   = h + ':' + m;
+
+    // Default closed unless doctor explicitly opened
+    let kind = 'closed';
+    let booking = null;
+    if (bookedT[t] && bookedT[t].status === 'rejected') { kind = isSlotOpen(dateStr, t) ? 'open' : 'closed'; }
+    else if (bookedT[t] && bookedT[t].status === 'cancelled') { kind = isSlotOpen(dateStr, t) ? 'open' : 'closed'; }
+    else if (bookedT[t])               { kind = 'booked'; booking = bookedT[t]; if(booking.status==='pending_approval') kind='pending'; }
+    else if (isSlotOpen(dateStr, t)) { kind = 'open'; }
+
+    slots.push({ time: t, kind, booking });
+    cur += s.dur + s.buf;
+  }
+  return slots;
+}
+
+
+// ── Bulk open/close day ───────────────────────────────────
+async function openAllDay() {
+  const ds    = viewDate.toISOString().slice(0, 10);
+  const slots = generateSlots(ds);
+  const open  = getOpenSlots();
+  slots.forEach(sl => {
+    const key = ds + ':' + sl.time;
+    if (!open.includes(key)) open.push(key);
+  });
+  saveOpenSlots(open);
+  renderSlots();
+}
+async function closeAllDay() {
+  const ds   = viewDate.toISOString().slice(0, 10);
+  const open = getOpenSlots().filter(k => !k.startsWith(ds + ':'));
+  saveOpenSlots(open);
+  renderSlots();
+}
+
+// ── Tabs ──────────────────────────────────────────────────
+function switchTab(name) {
+  activeTab = name;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('tab-' + name).classList.add('on');
+  document.getElementById('panel-' + name).classList.add('on');
+  if (name === 'slots')    renderSlots();
+  if (name === 'month')    renderMonth();
+  if (name === 'bookings') renderBookings();
+  if (name === 'requests') renderRequests();
+  if (name === 'settings') loadSettingsForm();
+}
+
+// ── Time Slots ────────────────────────────────────────────
+function changeDay(d) { viewDate.setDate(viewDate.getDate() + d); renderSlots(); }
+
+function renderSlots() {
+  const ds    = viewDate.toISOString().slice(0, 10);
+  const label = viewDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('dayLabel').textContent = label;
+
+  const slots   = generateSlots(ds);
+  const booked  = slots.filter(s => s.kind === 'booked').length;
+  const open    = slots.filter(s => s.kind === 'open').length;
+  const total   = slots.length;
+
+  document.getElementById('dayStats').innerHTML =
+    `<div class="ds">🗓 <strong>${total}</strong> Slots</div>` +
+    `<div class="ds">✅ <strong>${booked}</strong> Booked</div>` +
+    `<div class="ds">🟢 <strong>${open}</strong> Open</div>`;
+
+  if (!slots.length) {
+    document.getElementById('slotGrid').innerHTML = '<div class="empty-state"><span>📅</span><p>No slots generated. Check your settings.</p></div>';
+    return;
+  }
+
+  document.getElementById('slotGrid').innerHTML = slots.map(sl => {
+
+    if (sl.kind === 'booked') {
+      const b = sl.booking;
+      return `
+      <div class="slot-row booked">
+        <div class="slot-ind ind-booked"></div>
+        <div class="slot-time">${sl.time}</div>
+        <div class="slot-info">
+          <div class="slot-patient">👤 ${esc(b.patientName || b.patientEmail || '—')}</div>
+          <div class="slot-type">${esc(b.typeLabel || b.type || '')} · ${b.duration || '?'} min · <span class="status-badge s-${b.status||'confirmed'}">${b.status||'confirmed'}</span></div>
+        </div>
+        <div class="slot-actions-wrap">
+          <button class="slot-act btn-chat" onclick="openChat('${esc(b.patientEmail)}','${esc(b.patientName||'')}')">💬</button>
+          ${b.status === 'confirmed' ? `
+          <button class="slot-act" onclick="setBkStatus('${b.id}','completed')">✅ Done</button>
+          <button class="slot-act red" onclick="setBkStatus('${b.id}','noshow')">❌ No-show</button>` : ''}
+        </div>
+      </div>`;
+    }
+
+    if (sl.kind === 'closed') return `
+      <div class="slot-row closed">
+        <div class="slot-ind ind-closed"></div>
+        <div class="slot-time">${sl.time}</div>
+        <div class="slot-info"><div class="slot-empty">Closed — click to open for patients</div></div>
+        <button class="slot-act" onclick="toggleSlot('${ds}','${sl.time}')" style="border-color:rgba(76,175,80,.3);color:rgba(76,175,80,.8);">🔓 Open Slot</button>
+      </div>`;
+
+    // open (doctor has opened this)
+    return `
+      <div class="slot-row" style="border-color:rgba(76,175,80,.2);">
+        <div class="slot-ind ind-open"></div>
+        <div class="slot-time">${sl.time}</div>
+        <div class="slot-info"><div class="slot-empty" style="color:rgba(76,175,80,.75);">🟢 Open for booking</div></div>
+        <button class="slot-act red" onclick="toggleSlot('${ds}','${sl.time}')">🔒 Close Slot</button>
+      </div>`;
+  }).join('');
+}
+
+// ── Month View ────────────────────────────────────────────
+function changeMonth(d) { calMonth.setMonth(calMonth.getMonth() + d); renderMonth(); }
+
+function renderMonth() {
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  document.getElementById('monthTitle').textContent =
+    calMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayStr  = new Date().toISOString().slice(0, 10);
+
+  const hdrs = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d =>
+    `<div class="cal-day-hdr">${d}</div>`).join('');
+
+  let cells = '';
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) cells += '<div class="cal-day other-month"></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds    = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const slots = generateSlots(ds);
+    const open  = slots.filter(s => s.kind === 'open').length;  // doctor-opened slots
+    const booked= slots.filter(s => s.kind === 'booked').length;
+    const isToday = ds === todayStr;
+    const isSel   = ds === viewDate.toISOString().slice(0, 10);
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (isSel)   cls += ' selected';
+    if (open > 0 && !isSel) cls += ' has-open';
+    else if (open === 0 && booked > 0 && !isSel) cls += ' fully-booked';
+    cells += `<div class="${cls}" onclick="jumpToDay('${ds}')" title="${booked} booked, ${open} open">${d}</div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = hdrs + cells;
+}
+
+function jumpToDay(ds) {
+  viewDate = new Date(ds + 'T12:00:00');
+  switchTab('slots');
+}
+
+// ── Bookings ──────────────────────────────────────────────
+function setBookingFilter(f, el) {
+  bookingFilter = f;
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderBookings();
+}
+
+function renderBookings() {
+  let bks = getMyBookings().filter(b => b.status !== 'cancelled');
+  // Upcoming = confirmed/pending_approval AND session not yet past
+  // Past     = completed or noshow (doctor explicitly marked done)
+  const nowMs = Date.now();
+  function isFuture(b) { return new Date(b.date + 'T' + b.time).getTime() > nowMs; }
+  if (bookingFilter === 'upcoming') bks = bks.filter(b => b.status === 'pending_approval' || ((b.status === 'confirmed') && isFuture(b))).sort((a, b) => cmpDt(a) - cmpDt(b));
+  else if (bookingFilter === 'past') bks = bks.filter(b => b.status === 'completed' || b.status === 'noshow').sort((a, b) => cmpDt(b) - cmpDt(a));
+  else bks = [...bks].sort((a, b) => cmpDt(b) - cmpDt(a));
+
+  const el = document.getElementById('bookingsList');
+  if (!bks.length) { el.innerHTML = '<div class="empty-state"><span>📋</span><p>No bookings in this view.</p></div>'; return; }
+
+  el.innerHTML = bks.map(b => {
+    const cls    = b.status === 'completed' ? 'done' : b.status === 'noshow' ? 'ns' : b.status === 'pending_approval' ? 'pending' : 'upcoming';
+    const dl     = new Date(b.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const sBadge = `<span class="status-badge s-${b.status||'confirmed'}">${b.status||'confirmed'}</span>`;
+    // Show rating if patient rated this booking
+    const ratingHtml = b.rated
+      ? `<div style="font-size:11px;color:#ffc107;margin-top:4px;">⭐ Patient rating: ${'★'.repeat(b.rating||0)}${'☆'.repeat(5-(b.rating||0))} ${b.review ? `<span style="color:var(--charcoal-mid);font-style:italic;">"${esc(b.review.slice(0,80))}"</span>` : ''}</div>`
+      : '';
+    return `
+    <div class="bk-card ${cls}">
+      <div class="bk-head">
+        <div>
+          <div class="bk-name" style="color:#2C2C2C">👤 ${esc(b.patientName || b.patientEmail || '—')}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="bk-datetime">${dl} · ${b.time}</div>
+          ${sBadge}
+        </div>
+      </div>
+      <div class="bk-meta">🗂 ${esc(b.typeLabel||b.type||'Session')} &nbsp;·&nbsp; ⏱ ${b.duration||'?'} min</div>
+      ${ratingHtml}
+      <div class="bk-actions">
+        <button class="bk-btn btn-chat" onclick="openChat('${esc(b.patientEmail)}','${esc(b.patientName||'')}')">💬 Chat</button>
+        ${b.status === 'pending_approval' ? `<button class="bk-btn btn-complete" onclick="approveBooking('${b.id}')">✅ Accept</button>` : ''}
+        ${b.status === 'pending_approval' ? `<button class="bk-btn btn-noshow" onclick="rejectBooking('${b.id}')">✕ Reject</button>` : ''}
+        ${b.status === 'confirmed' ? `<button class="bk-btn btn-complete" onclick="setBkStatus('${b.id}','completed')">✅ Done</button>` : ''}
+        ${b.status === 'confirmed' ? `<button class="bk-btn btn-noshow"  onclick="setBkStatus('${b.id}','noshow')">❌ No-show</button>` : ''}
+        ${b.status === 'confirmed' ? `<button class="bk-btn" style="background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.25);color:#ff9800;" onclick="cancelConfirmedBooking('${b.id}')">✕ Cancel & Reopen Slot</button>` : ''}
+        ${(b.status === 'completed' || b.status === 'noshow' || b.status === 'rejected') ? `<button class="bk-btn" style="background:rgba(200,74,74,.08);border:1px solid rgba(200,74,74,.2);color:var(--danger);" onclick="deleteBooking('${b.id}')">🗑 Delete</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function approveBooking(id) {
+  const b = _bookings.find(x => x.id === id);
+  if (b) { b.status = 'confirmed'; await dbUpdateBooking(id, { status: 'confirmed' }); }
+  // Notify patient
+  if (b) await pushNotif(b.patientEmail,'booking','Booking Confirmed',
+    'Dr. '+(ME.name||ME.email)+' confirmed your appointment on '+b.date+' at '+b.time).catch(()=>{});
+  renderBookings(); if (activeTab === 'slots') renderSlots();
+}
+
+async function rejectBooking(id) {
+  if (!confirm('Reject this booking? The slot will be freed.')) return;
+  const b = _bookings.find(x => x.id === id);
+  if (b) { b.status = 'rejected'; await dbUpdateBooking(id, { status: 'rejected' }); }
+  // Notify patient
+  if (b) await pushNotif(b.patientEmail,'booking','Booking Not Available',
+    'Dr. '+(ME.name||ME.email)+' could not confirm your appointment on '+b.date+' at '+b.time+'. Please book another slot.').catch(()=>{});
+  renderBookings(); if (activeTab === 'slots') renderSlots();
+}
+
+async function cancelConfirmedBooking(id) {
+  if (!confirm('Cancel this confirmed appointment? The slot will be reopened for other patients.')) return;
+  const b = _bookings.find(x => x.id === id);
+  if (!b) return;
+  b.status = 'cancelled';
+  await dbUpdateBooking(id, { status: 'cancelled' });
+  // Reopen the slot
+  const slotKey = b.date + ':' + b.time;
+  const open = [...getOpenSlots()];
+  if (!open.includes(slotKey)) { open.push(slotKey); await saveOpenSlots(open); }
+  // Notify patient
+  await pushNotif(b.patientEmail,'booking','Appointment Cancelled',
+    'Dr. '+(ME.name||ME.email)+' cancelled your appointment on '+b.date+' at '+b.time+'. Please book another slot.').catch(()=>{});
+  renderBookings(); renderSlots();
+}
+
+async function deleteBooking(id) {
+  if (!confirm('Delete this booking record? This cannot be undone.')) return;
+  _bookings = _bookings.filter(x => x.id !== id);
+  await dbUpdateBooking(id, { deleted: true, status: 'deleted' }).catch(()=>{});
+  renderBookings();
+}
+
+async function setBkStatus(id, status) {
+  const b = _bookings.find(x => x.id === id);
+  if (b) {
+    b.status = status;
+    await dbUpdateBooking(id, { status });
+  }
+  renderBookings();
+  if (activeTab === 'slots') renderSlots();
+}
+
+// ── Requests ──────────────────────────────────────────────
+function renderRequests() {
+  const reqs    = _requests.filter(r => r.status !== 'deleted');
+  const pending = reqs.filter(r => r.status === 'pending');
+  const tabEl   = document.getElementById('tab-requests');
+  if (tabEl) tabEl.textContent = '📩 Requests' + (pending.length ? ` (${pending.length})` : '');
+
+  const el = document.getElementById('requestsList');
+  if (!el) return;
+  if (!reqs.length) { el.innerHTML = '<div class="empty-state"><span>📩</span><p>No appointment requests yet.</p></div>'; return; }
+
+  el.innerHTML = reqs.map(r => {
+    const dl = new Date(r.createdAt).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const isPending = r.status === 'pending';
+    const statusColor = isPending ? '#7A9E82' : 'rgba(224,247,250,.28)';
+    return `
+    <div class="req-card" style="border-left:3px solid ${statusColor};">
+      <div class="req-head">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,rgba(90,122,98,.18),rgba(45,74,53,.25));border:1px solid rgba(90,122,98,.22);display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:var(--cyan);flex-shrink:0;">
+            ${initials(r.patientName || r.patientEmail)}
+          </div>
+          <div>
+            <div class="req-name" style="font-size:14px;font-weight:700;color:#2C2C2C;">👤 ${esc(r.patientName || r.patientEmail || '—')}</div>
+            <div style="font-size:11px;color:rgba(90,122,98,.55);">${esc(r.patientEmail || '')}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="req-time">${dl}</div>
+          <span style="font-size:10px;font-weight:700;color:${statusColor};text-transform:uppercase;letter-spacing:.5px;">${r.status}</span>
+        </div>
+      </div>
+      <div class="req-msg" style="margin:10px 0 12px;">${esc(r.message || 'Appointment request — no message.')}</div>
+      <div class="req-actions">
+        <button class="btn-arrange" onclick="openChat('${esc(r.patientEmail)}','${esc(r.patientName||'')}')">💬 Open Chat</button>
+        ${isPending ? `<button class="btn-dismiss" onclick="dismissReq('${r.id}')">✕ Dismiss</button>` : ''}
+        <button class="btn-dismiss" style="background:rgba(200,74,74,.08);border-color:rgba(200,74,74,.2);color:var(--danger);" onclick="deleteReq('${r.id}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function initials(name) { return (name||'?').split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+
+async function dismissReq(id) {
+  const r = _requests.find(x => x.id === id);
+  if (r) {
+    r.status = 'dismissed';
+    await dbUpdateRequest(id, { status: 'dismissed' });
+  }
+  renderRequests();
+}
+
+async function deleteReq(id) {
+  if (!confirm('Delete this request message permanently?')) return;
+  _requests = _requests.filter(x => x.id !== id);
+  await dbUpdateRequest(id, { deleted: true, status: 'deleted' }).catch(() => {});
+  renderRequests();
+}
+
+// ── Utils ─────────────────────────────────────────────────
+function isPast(dateStr, timeStr) {
+  return new Date(dateStr + 'T' + timeStr) < new Date();
+}
+function cmpDt(b) { return new Date(b.date + 'T' + b.time).getTime(); }
+async function openChat(email, name) {
+  // Pre-seed conversation in both users' Firestore lists
+  const chatId = [ME.email, email].sort().join('||');
+  await dbSaveConv(ME.email, { id:chatId, otherEmail:email, otherName:name||email, lastMsg:'', lastTime:Date.now() });
+  await dbSaveConv(email, { id:chatId, otherEmail:ME.email, otherName:ME.name||ME.email, lastMsg:'', lastTime:Date.now() });
+  window.location.href = 'chat.html?with=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name || email);
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Notification badge ────────────────────────────────────
+// updateBadge is defined above as async function using Firestore
+
+// ── Load all doctor data from Firestore ───────────────────
+async function loadDoctorData() {
+  [_schedSettings, _openSlots, _bookings, _requests] = await Promise.all([
+    dbGetScheduleSettings(ME.email).catch(() => ({})),
+    dbGetOpenSlots(ME.email).catch(() => []),
+    dbGetDoctorBookings(ME.email).catch(() => []),
+    dbGetDoctorRequests(ME.email).catch(() => []),
+  ]);
+  // Sync acceptOnline: schedule_settings is the source of truth,
+  // but also check the user doc for backwards compat
+  if (_schedSettings.online === undefined) {
+    const freshMe = await fbGetUser(ME.email).catch(() => null);
+    _schedSettings.online = (freshMe?.acceptOnline === true) || (ME.acceptOnline === true);
+  }
+}
+
+// ── Poll Firestore for updates every 5s ──────────────────
+async function pollDoctorData() {
+  [_openSlots, _bookings, _requests] = await Promise.all([
+    dbGetOpenSlots(ME.email).catch(() => _openSlots),
+    dbGetDoctorBookings(ME.email).catch(() => _bookings),
+    dbGetDoctorRequests(ME.email).catch(() => _requests),
+  ]);
+  if (activeTab === 'slots')    renderSlots();
+  if (activeTab === 'month')    renderMonth();
+  if (activeTab === 'bookings') renderBookings();
+  if (activeTab === 'requests') renderRequests();
+  renderRequests(); // always update badge count on tab
+  updateBadge();
+}
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  ME = requireAuth('doctor');
+  if (!ME) return;
+  await loadDoctorData();
+  loadSettingsForm();
+  renderSlots();
+  renderMonth();
+  updateBadge();
+  setInterval(pollDoctorData, 5000);
+});
+</script>
+</body>
+</html>

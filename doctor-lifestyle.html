@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Saved Nutrition Plans — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .wrap { max-width:900px; margin:0 auto; padding:24px 18px 80px; position:relative; z-index:1; width:100%; }
+    .filter-row { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+    .filter-row input { flex:1; min-width:200px; }
+
+    .plan-card { background:rgba(245,239,228,.8); border:1px solid rgba(90,122,98,.13); border-radius:14px; margin-bottom:14px; overflow:hidden; transition:.2s; }
+    .plan-card:hover { border-color:rgba(90,122,98,.3); }
+    .plan-head { padding:14px 18px; display:flex; justify-content:space-between; align-items:flex-start; background:rgba(90,122,98,.04); border-bottom:1px solid rgba(90,122,98,.08); flex-wrap:wrap; gap:10px; }
+    .ph-info h3 { font-family:'Playfair Display',monospace; font-size:12px; font-weight:700; color:#7A9E82; margin-bottom:4px; }
+    .ph-info p  { font-size:12px; color:var(--charcoal-mid); }
+    .ph-actions { display:flex; gap:7px; flex-wrap:wrap; }
+    .btn-sm { padding:6px 12px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; cursor:pointer; transition:.2s; letter-spacing:.3px; }
+    .b-view   { background:rgba(90,122,98,.08); border:1px solid rgba(90,122,98,.25); color:#7A9E82; }
+    .b-view:hover { background:rgba(90,122,98,.16); }
+    .b-pdf    { background:rgba(45,74,53,.15); border:1px solid rgba(45,74,53,.4); color:#64b5f6; }
+    .b-pdf:hover { background:rgba(45,74,53,.3); }
+    .b-del    { background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.25); color:rgba(255,82,82,.7); }
+    .b-del:hover { background:rgba(255,82,82,.18); }
+
+    .plan-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px 18px; border-bottom:1px solid rgba(90,122,98,.05); }
+    @media(max-width:500px){ .plan-metrics{ grid-template-columns:repeat(2,1fr); } }
+    .pm-box { text-align:center; }
+    .pm-val { font-family:'Playfair Display',monospace; font-size:14px; font-weight:700; color:#7A9E82; }
+    .pm-lbl { font-size:10px; color:var(--muted); letter-spacing:.8px; text-transform:uppercase; margin-top:2px; }
+
+    .plan-body { display:none; padding:14px 18px 18px; }
+    .plan-body.open { display:block; }
+
+    .meal-day { background:rgba(250,247,242,.5); border:1px solid rgba(90,122,98,.08); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .mday-h { background:rgba(45,74,53,.1); padding:8px 12px; display:flex; justify-content:space-between; font-size:11px; }
+    .mday-t { font-family:'Playfair Display',monospace; color:#7A9E82; letter-spacing:1.5px; }
+    .mday-c { color:var(--charcoal-mid); }
+    .meal-r { display:grid; grid-template-columns:85px 1fr auto; gap:8px; padding:7px 12px; border-bottom:1px solid rgba(90,122,98,.04); font-size:12px; align-items:start; }
+    .meal-r:last-child { border-bottom:none; }
+    .mt { font-size:10px; font-weight:700; color:rgba(90,122,98,.6); text-transform:uppercase; padding-top:1px; }
+    .mi { color:#2C2C2C; line-height:1.5; }
+    .mc { font-family:'Playfair Display',monospace; font-size:10px; color:#7A9E82; white-space:nowrap; }
+
+    .tips-g { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+    @media(max-width:500px){ .tips-g{ grid-template-columns:1fr; } }
+    .tip-c { background:rgba(250,247,242,.4); border:1px solid rgba(90,122,98,.08); border-radius:8px; padding:10px; }
+    .tip-t { font-size:11px; font-weight:700; color:#7A9E82; margin-bottom:3px; }
+    .tip-x { font-size:12px; color:var(--charcoal-mid); line-height:1.5; }
+
+    .empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
+    .empty-state span { font-size:56px; display:block; margin-bottom:14px; }
+    .empty-state p { font-size:14px; line-height:1.8; }
+  </style>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📋</span> Saved Nutrition Plans</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='lifestyle.html'">➕ New Plan</button>
+    <button class="btn btn-header" onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <button class="btn-back" onclick="window.location.href='plans.html'">← Plans</button>
+  <div class="page-title">📋 Saved Nutrition Plans</div>
+  <div class="page-subtitle">All lifestyle modification plans you created for patients</div>
+
+  <div class="filter-row">
+    <input type="text" id="searchInput" placeholder="🔍 Search patient name…" oninput="filterPlans(this.value)">
+  </div>
+
+  <div id="statsRow" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;"></div>
+  <div id="plansContainer"><div class="empty-state"><span>⏳</span><p>Loading…</p></div></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  var _FBCFG={apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"};
+  if(!firebase.apps.length)firebase.initializeApp(_FBCFG);
+  window._fbDb=firebase.firestore(); window.FIREBASE_ENABLED=true;
+}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script>
+let doctor = null;
+let allPlans = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  doctor = requireAuth('doctor');
+  if (!doctor) return;
+  if (window.FIREBASE_ENABLED) {
+    const fresh = await fbGetUser(doctor.email).catch(()=>null);
+    if (fresh) { doctor = fresh; updateCurrentUser(fresh); }
+  }
+  allPlans = doctor.lifestylePlans || [];
+  renderStats(); render(allPlans);
+});
+
+function renderStats() {
+  const total = allPlans.length;
+  const pts   = new Set(allPlans.map(p => p.patientName)).size;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><h3>${total}</h3><p>Total Plans</p></div>
+    <div class="stat-card"><h3>${pts}</h3><p>Patients</p></div>
+    <div class="stat-card"><h3>${allPlans.filter(p=>p.goal==='lose').length}</h3><p>Weight Loss</p></div>`;
+}
+
+function filterPlans(q) {
+  const filtered = allPlans.filter(p =>
+    (p.patientName||'').toLowerCase().includes(q.toLowerCase()));
+  render(filtered);
+}
+
+function render(plans) {
+  const el = document.getElementById('plansContainer');
+  if (!plans.length) {
+    el.innerHTML = `<div class="empty-state"><span>🥗</span><p>No plans found.<br><a href="lifestyle.html" style="color:#7A9E82;">Create your first plan →</a></p></div>`;
+    return;
+  }
+  const sorted = [...plans].sort((a,b)=>(b.id||0)-(a.id||0));
+  el.innerHTML = sorted.map(p => {
+    const ri = allPlans.findIndex(x => x.id === p.id);
+    const g  = p.goal==='lose'?'📉 Weight Loss':p.goal==='gain'?'📈 Weight Gain':'⚖️ Maintain';
+    const dis = (p.diseases||[]).filter(d=>d!=='none').join(', ')||'No conditions';
+    return `
+      <div class="plan-card">
+        <div class="plan-head">
+          <div class="ph-info">
+            <h3>🧑 ${esc(p.patientName||'—')}</h3>
+            <p>${esc(p.date||'')} &nbsp;·&nbsp; ${g}</p>
+            <p style="margin-top:2px;">${esc(dis)}</p>
+          </div>
+          <div class="ph-actions">
+            <button class="btn-sm b-view" onclick="toggleBody(${p.id})">👁 View</button>
+            <button class="btn-sm b-pdf"  onclick="printPlan(${ri})">🖨️ PDF</button>
+            <button class="btn-sm b-del"  onclick="deletePlan(${ri})">🗑 Delete</button>
+          </div>
+        </div>
+        <div class="plan-metrics">
+          <div class="pm-box"><div class="pm-val">${p.target||'—'}</div><div class="pm-lbl">Target kcal</div></div>
+          <div class="pm-box"><div class="pm-val">${p.bmi||'—'}</div><div class="pm-lbl">BMI</div></div>
+          <div class="pm-box"><div class="pm-val">${p.macros?.protein||'—'}g</div><div class="pm-lbl">Protein</div></div>
+          <div class="pm-box"><div class="pm-val">${p.weight||'—'}kg</div><div class="pm-lbl">Weight</div></div>
+        </div>
+        <div class="plan-body" id="pb-${p.id}">
+          <div style="font-family:'Playfair Display',monospace;font-size:10px;color:#7A9E82;letter-spacing:2px;margin-bottom:10px;">🍽️ 7-DAY MEAL PLAN</div>
+          ${(p.meals||[]).map(d=>`
+            <div class="meal-day">
+              <div class="mday-h"><div class="mday-t">${d.day}</div><div class="mday-c">${d.totalCals} kcal</div></div>
+              ${d.meals.map(m=>`<div class="meal-r"><div class="mt">${m.type}</div><div class="mi">${m.items}</div><div class="mc">${m.cals}</div></div>`).join('')}
+            </div>`).join('')}
+          <div style="font-family:'Playfair Display',monospace;font-size:10px;color:#7A9E82;letter-spacing:2px;margin:12px 0 8px;">💡 TIPS</div>
+          <div class="tips-g">
+            ${(p.tips||[]).map(t=>`<div class="tip-c"><div class="tip-t">${t.title}</div><div class="tip-x">${t.txt}</div></div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleBody(id) {
+  document.getElementById(`pb-${id}`)?.classList.toggle('open');
+}
+
+async function deletePlan(idx) {
+  if (!confirm('Delete this plan permanently?')) return;
+  doctor.lifestylePlans = (doctor.lifestylePlans||[]).filter((_,i)=>i!==idx);
+  await asyncSaveUser(doctor).catch(()=>{});
+  updateCurrentUser(doctor);
+  allPlans = doctor.lifestylePlans || [];
+  renderStats(); render(allPlans);
+}
+
+function printPlan(idx) {
+  const p = (doctor.lifestylePlans||[])[idx];
+  if (!p) return;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Nutrition Plan — ${p.patientName}</title>
+  <style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:30px;color:#222;}h1{color:#5A7A62;font-size:22px;}h2{color:#2D4A35;border-bottom:2px solid #5A7A62;padding-bottom:5px;margin-top:22px;}.meta{font-size:13px;color:#555;margin-bottom:16px;}.warn{background:#fff8e1;border:1px solid #ffc107;border-radius:6px;padding:10px;font-size:12px;color:#795548;margin-bottom:16px;}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}.metric{background:#f0fdff;border:1px solid #b2ebf2;border-radius:8px;padding:10px;text-align:center;}.mv{font-size:17px;font-weight:bold;color:#5A7A62;}.ml{font-size:10px;color:#666;text-transform:uppercase;}table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;}th{background:#5A7A62;color:#fff;padding:8px;text-align:left;}td{padding:7px 8px;border-bottom:1px solid #2C2C2C;vertical-align:top;}tr:nth-child(even){background:#f0fdff;}.tips{display:grid;grid-template-columns:1fr 1fr;gap:8px;}.tip{background:#f0fdff;border-left:3px solid #5A7A62;padding:8px;font-size:12px;}.tip b{color:#2D4A35;display:block;margin-bottom:2px;}footer{text-align:center;font-size:11px;color:#888;margin-top:24px;border-top:1px solid #ccc;padding-top:10px;}</style>
+  </head><body>
+  <h1>🥗 Personalized Nutrition Plan</h1>
+  <div class="meta"><b>Patient:</b> ${p.patientName} | <b>Age:</b> ${p.age} yrs | <b>Gender:</b> ${p.gender} | <b>Weight:</b> ${p.weight}kg | <b>Height:</b> ${p.height}cm<br><b>Goal:</b> ${p.goal==='lose'?'Weight Loss':p.goal==='gain'?'Weight Gain':'Maintain'} | <b>BMI:</b> ${p.bmi} (${p.bmiCat}) | <b>Conditions:</b> ${(p.diseases||[]).join(', ')||'None'}<br><b>Dr.</b> ${p.doctorName} | <b>Date:</b> ${p.date}</div>
+  <div class="warn">⚠️ General guideline only. Consult a licensed dietitian.</div>
+  <h2>📊 Metabolic Analysis</h2>
+  <div class="metrics">
+    <div class="metric"><div class="mv">${p.bmr} kcal</div><div class="ml">BMR</div></div>
+    <div class="metric"><div class="mv">${p.tdee} kcal</div><div class="ml">TDEE</div></div>
+    <div class="metric"><div class="mv">${p.target} kcal</div><div class="ml">Daily Target</div></div>
+    <div class="metric"><div class="mv">${p.macros?.protein}g</div><div class="ml">Protein</div></div>
+    <div class="metric"><div class="mv">${p.macros?.carbs}g</div><div class="ml">Carbs</div></div>
+    <div class="metric"><div class="mv">${p.macros?.fat}g</div><div class="ml">Fat</div></div>
+  </div>
+  <h2>🍽️ 7-Day Meal Plan</h2>
+  <table><tr><th>Day</th><th>Meal</th><th>Food</th><th>Calories</th></tr>
+  ${(p.meals||[]).map(d=>d.meals.map((m,i)=>`<tr>${i===0?`<td rowspan="4" style="font-weight:bold;color:#006064;vertical-align:middle;">${d.day}</td>`:''}<td>${m.type}</td><td>${m.items}</td><td>${m.cals} kcal</td></tr>`).join('')).join('')}
+  </table>
+  <h2>💡 Lifestyle Tips</h2>
+  <div class="tips">${(p.tips||[]).map(t=>`<div class="tip"><b>${t.title}</b>${t.txt}</div>`).join('')}</div>
+  <footer>Physio Motion Analyzer · Dr. ${p.doctorName} · ${p.date}</footer>
+  <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

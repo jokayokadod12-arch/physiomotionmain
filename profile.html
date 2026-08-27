@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Profile — Physio Motion Analyzer</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    .section-divider {
+      font-family:'Playfair Display',monospace; font-size:10px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; color:rgba(90,122,98,.5);
+      margin:22px 0 12px; display:flex; align-items:center; gap:10px;
+    }
+    .section-divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(90,122,98,.2),transparent); }
+    .form-select {
+      width:100%; background:rgba(250,247,242,.7); border:1px solid rgba(90,122,98,.2);
+      border-radius:10px; color:#2C2C2C; font-family:'DM Sans',sans-serif;
+      font-size:15px; padding:12px 14px; outline:none; transition:border-color .2s;
+    }
+    .form-select:focus { border-color:rgba(90,122,98,.5); }
+    .form-select option { background:#FAF7F2; }
+    .specialty-badge {
+      display:inline-flex; align-items:center; gap:6px; margin-top:8px;
+      padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600;
+      background:rgba(90,122,98,.1); border:1px solid rgba(90,122,98,.2); color:#7A9E82;
+    }
+  </style>
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">👤</span> My Profile</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goHome()">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="profile-main">
+  <div class="profile-card">
+    <div class="page-title" style="margin-bottom:20px;">My Profile</div>
+    <div class="avatar" id="avatar">?</div>
+    <div class="info-strip">
+      <p><strong>Role:</strong> <span id="displayRole">—</span></p>
+      <p><strong>Email:</strong> <span id="displayEmail">—</span></p>
+    </div>
+
+    <!-- Common fields -->
+    <div class="section-divider">Basic Info</div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="nameInput" placeholder="Your full name">
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="tel" id="phoneInput" placeholder="Phone number">
+    </div>
+    <div class="form-group">
+      <label>Bio / About</label>
+      <textarea id="bioInput" rows="3" placeholder="Tell us about yourself…"></textarea>
+    </div>
+
+    <!-- Doctor-only fields -->
+    <div id="doctorFields" style="display:none;">
+      <div class="section-divider">Professional Info</div>
+      <div class="form-group">
+        <label>Specialty</label>
+        <select class="form-select" id="specialtySelect"></select>
+      </div>
+      <div class="form-group">
+        <label>Years of Experience</label>
+        <input type="number" id="yearsInput" placeholder="e.g. 8" min="0" max="60">
+      </div>
+      <div class="section-divider">Clinic / Workplace</div>
+      <div class="form-group">
+        <label>Clinic / Hospital Name</label>
+        <input type="text" id="clinicInput" placeholder="e.g. Cairo Physiotherapy Center">
+      </div>
+      <div class="form-group">
+        <label>Address / Location</label>
+        <input type="text" id="addressInput" placeholder="e.g. 5 Tahrir Square, Cairo">
+      </div>
+    </div>
+
+    <!-- Student-only fields -->
+    <div id="studentFields" style="display:none;">
+      <div class="section-divider">Student Info</div>
+      <div class="form-group">
+        <label>University / College</label>
+        <input type="text" id="universityInput" placeholder="e.g. Cairo University — Faculty of PT">
+      </div>
+      <div class="form-group">
+        <label>Year of Study</label>
+        <select class="form-select" id="yearStudyInput">
+          <option value="">— Select Year —</option>
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
+          <option value="5">Year 5 / Final Year</option>
+          <option value="intern">Internship</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn btn-primary" onclick="saveProfile()">💾 Save Changes</button>
+      <button class="btn btn-secondary" onclick="goHome()">← Back</button>
+      <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+  try {
+    var _FBCFG = {
+      apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+      authDomain:"physiowork-8976f.firebaseapp.com",
+      projectId:"physiowork-8976f",
+      storageBucket:"physiowork-8976f.firebasestorage.app",
+      messagingSenderId:"789519816056",
+      appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+    window._fbDb = firebase.firestore();
+    window._fbStorage = firebase.storage();
+    window.FIREBASE_ENABLED = true;
+  } catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script>requireAuth();</script>
+<script src="js/profile.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

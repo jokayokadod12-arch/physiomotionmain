@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Lifestyle Modification — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .wrap { max-width:860px; margin:0 auto; padding:24px 18px 80px; position:relative; z-index:1; width:100%; }
+
+    /* ── Section cards ── */
+    .sec { background:rgba(245,239,228,.8); border:1px solid rgba(90,122,98,.13); border-radius:16px; padding:22px 20px; margin-bottom:18px; }
+    .sec-title { font-family:'Playfair Display',monospace; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#7A9E82; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+    /* ── Form grid ── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media(max-width:560px){ .form-grid{ grid-template-columns:1fr; } }
+
+    .fld label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(90,122,98,.7); display:block; margin-bottom:6px; }
+    .fld input, .fld select {
+      width:100%; background:rgba(250,247,242,.8); border:1px solid rgba(90,122,98,.18);
+      border-radius:8px; padding:11px 13px; color:#2C2C2C;
+      font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:.2s;
+    }
+    .fld input:focus, .fld select:focus { border-color:#7A9E82; box-shadow:0 0 0 3px rgba(90,122,98,.08); }
+    .fld select option { background:#F5EFE4; }
+
+    /* ── Disease chips ── */
+    .disease-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip {
+      padding:7px 14px; border-radius:20px; cursor:pointer;
+      border:1px solid rgba(90,122,98,.2); background:rgba(250,247,242,.6);
+      color:var(--charcoal-mid); font-size:12px; font-weight:600;
+      transition:all .2s; user-select:none;
+    }
+    .chip:hover { border-color:rgba(90,122,98,.45); color:#2C2C2C; }
+    .chip.selected { border-color:#7A9E82; background:rgba(90,122,98,.1); color:#7A9E82; }
+
+    /* ── Goal buttons ── */
+    .goal-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .goal-btn {
+      flex:1; min-width:120px; padding:14px 10px; border-radius:12px;
+      border:1px solid rgba(90,122,98,.18); background:rgba(250,247,242,.6);
+      color:var(--charcoal-mid); font-family:'DM Sans',sans-serif;
+      font-size:13px; font-weight:700; cursor:pointer; text-align:center;
+      transition:all .2s; letter-spacing:.5px;
+    }
+    .goal-btn .g-icon { font-size:26px; display:block; margin-bottom:6px; }
+    .goal-btn:hover { border-color:rgba(90,122,98,.4); color:#2C2C2C; }
+    .goal-btn.selected { border-color:#7A9E82; background:rgba(90,122,98,.1); color:#7A9E82; }
+
+    /* ── Analyze button ── */
+    .btn-analyze {
+      width:100%; padding:16px; border:none; border-radius:12px;
+      background:linear-gradient(135deg,#5A7A62,#2D4A35);
+      color:#fff; font-family:'Playfair Display',monospace;
+      font-size:14px; font-weight:700; letter-spacing:2px;
+      cursor:pointer; transition:all .25s;
+      box-shadow:0 4px 20px rgba(45,74,53,.4);
+    }
+    .btn-analyze:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(90,122,98,.3); }
+    .btn-analyze:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+    /* ── Results ── */
+    #resultsSection { display:none; }
+
+    .metrics-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+    @media(max-width:480px){ .metrics-row{ grid-template-columns:1fr 1fr; } }
+    .metric-box { background:rgba(250,247,242,.7); border:1px solid rgba(90,122,98,.15); border-radius:12px; padding:14px 12px; text-align:center; }
+    .metric-val { font-family:'Playfair Display',monospace; font-size:20px; font-weight:700; color:#7A9E82; }
+    .metric-lbl { font-size:10px; color:var(--charcoal-mid); letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+    .metric-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+    /* Meal plan table */
+    .meal-day { background:rgba(250,247,242,.5); border:1px solid rgba(90,122,98,.1); border-radius:12px; margin-bottom:14px; overflow:hidden; }
+    .meal-day-header { background:rgba(45,74,53,.15); padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(90,122,98,.1); }
+    .meal-day-title { font-family:'Playfair Display',monospace; font-size:11px; font-weight:700; color:#7A9E82; letter-spacing:1.5px; }
+    .meal-day-cals { font-size:12px; color:var(--charcoal-mid); }
+    .meal-row { display:grid; grid-template-columns:100px 1fr auto; gap:10px; padding:10px 16px; border-bottom:1px solid rgba(90,122,98,.05); align-items:start; }
+    .meal-row:last-child { border-bottom:none; }
+    .meal-type { font-size:11px; font-weight:700; color:rgba(90,122,98,.7); letter-spacing:.8px; text-transform:uppercase; padding-top:2px; }
+    .meal-items { font-size:13px; color:#2C2C2C; line-height:1.6; }
+    .meal-cals { font-family:'Playfair Display',monospace; font-size:12px; color:#7A9E82; white-space:nowrap; padding-top:2px; }
+
+    /* Tips section */
+    .tips-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media(max-width:560px){ .tips-grid{ grid-template-columns:1fr; } }
+    .tip-card { background:rgba(250,247,242,.5); border:1px solid rgba(90,122,98,.1); border-radius:10px; padding:12px 14px; }
+    .tip-title { font-size:12px; font-weight:700; color:#7A9E82; margin-bottom:6px; }
+    .tip-txt { font-size:13px; color:var(--charcoal-mid); line-height:1.6; }
+
+    /* Action buttons */
+    .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+    .btn-action {
+      flex:1; min-width:140px; padding:12px 16px; border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700;
+      letter-spacing:.8px; cursor:pointer; text-align:center; transition:all .2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn-save { background:rgba(90,122,98,.1); border:1px solid rgba(90,122,98,.3); color:#7A9E82; }
+    .btn-save:hover { background:rgba(90,122,98,.18); }
+    .btn-send { background:linear-gradient(135deg,#5A7A62,#2D4A35); border:none; color:#fff; box-shadow:0 4px 14px rgba(45,74,53,.35); }
+    .btn-send:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(90,122,98,.3); }
+    .btn-pdf  { background:rgba(255,82,82,.1); border:1px solid rgba(255,82,82,.3); color:#ff8a80; }
+    .btn-pdf:hover { background:rgba(255,82,82,.18); }
+
+    /* Send to patient panel */
+    .send-panel { display:none; background:rgba(250,247,242,.7); border:1px solid rgba(90,122,98,.15); border-radius:12px; padding:16px; margin-top:14px; }
+    .send-panel.open { display:block; }
+    .patient-search-wrap { position:relative; }
+    .patient-dd { position:absolute; top:100%; left:0; right:0; background:rgba(4,25,48,.98); border:1px solid rgba(90,122,98,.2); border-radius:8px; z-index:50; max-height:200px; overflow-y:auto; display:none; }
+    .patient-dd.open { display:block; }
+    .pt-opt { padding:10px 14px; cursor:pointer; font-size:13px; color:#2C2C2C; border-bottom:1px solid rgba(90,122,98,.06); transition:.15s; }
+    .pt-opt:hover { background:rgba(90,122,98,.06); }
+    .pt-opt small { color:rgba(90,122,98,.5); display:block; font-size:11px; }
+    .selected-pt { display:none; background:rgba(45,74,53,.1); border:1px solid rgba(45,74,53,.3); border-radius:8px; padding:10px 14px; font-size:13px; color:#2C2C2C; margin-top:10px; justify-content:space-between; align-items:center; }
+    .selected-pt.show { display:flex; }
+
+    /* Loading spinner */
+    .spinner { display:inline-block; width:18px; height:18px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+
+    /* Warning banner */
+    .warn-banner { background:rgba(255,214,0,.08); border:1px solid rgba(255,214,0,.25); border-radius:10px; padding:12px 16px; font-size:13px; color:rgba(255,214,0,.8); line-height:1.6; margin-bottom:16px; display:flex; gap:10px; }
+
+    /* ══ MOBILE ═══════════════════════════════════════════ */
+    @media (max-width:600px) {
+      .wrap { padding:14px 12px 60px; }
+      .sec { padding:16px 14px; margin-bottom:12px; border-radius:12px; }
+      .sec-title { font-size:11px; margin-bottom:12px; }
+      .form-grid { grid-template-columns:1fr; gap:10px; }
+      .fld input, .fld select { padding:10px 12px; font-size:13px; }
+      .disease-grid { gap:6px; }
+      .chip { padding:6px 10px; font-size:11px; }
+      .goal-row { flex-direction:column; gap:8px; }
+      .goal-btn { min-width:unset; padding:12px 14px; flex-direction:row; justify-content:flex-start; gap:12px; }
+      .goal-btn .g-icon { font-size:22px; display:inline; margin:0; }
+      .btn-analyze { font-size:12px; padding:14px; letter-spacing:1px; }
+      .metrics-row { grid-template-columns:repeat(2,1fr); gap:8px; }
+      .metric-box { padding:10px 8px; }
+      .metric-val { font-size:15px; }
+      .metric-lbl { font-size:9px; }
+      .metric-sub { font-size:10px; display:none; }
+      .meal-row { grid-template-columns:72px 1fr; gap:6px; padding:8px 12px; }
+      .meal-cals { display:none; }
+      .meal-type { font-size:10px; }
+      .meal-items { font-size:12px; line-height:1.5; }
+      .meal-day-header { padding:9px 12px; }
+      .tips-grid { grid-template-columns:1fr; gap:8px; }
+      .tip-card { padding:10px 12px; }
+      .tip-title { font-size:11px; }
+      .tip-txt { font-size:12px; }
+      .action-row { flex-direction:column; gap:8px; }
+      .btn-action { min-width:unset; padding:12px; font-size:13px; }
+      .send-panel { padding:14px; }
+    }
+    @media (max-width:400px) {
+      .metrics-row { grid-template-columns:1fr 1fr; }
+      .metric-val { font-size:13px; }
+    }
+  </style>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🥗</span> Lifestyle Modification</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="window.location.href='chat.html'">💬 Chat</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
+  <div class="page-title">🥗 Lifestyle Modification</div>
+  <div class="page-subtitle">Personalized nutrition & calorie plan based on patient data</div>
+
+  <!-- ── Patient Info ── -->
+  <div class="sec">
+    <div class="sec-title">👤 Patient Information</div>
+    <div class="form-grid">
+      <div class="fld">
+        <label>Full Name</label>
+        <input type="text" id="ptName" placeholder="Patient full name">
+      </div>
+      <div class="fld">
+        <label>Age (years)</label>
+        <input type="number" id="ptAge" placeholder="e.g. 35" min="1" max="120">
+      </div>
+      <div class="fld">
+        <label>Gender</label>
+        <select id="ptGender">
+          <option value="">Select gender</option>
+          <option value="male">Male 👦</option>
+          <option value="female">Female 👧</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Weight (kg)</label>
+        <input type="number" id="ptWeight" placeholder="e.g. 85" min="20" max="300">
+      </div>
+      <div class="fld">
+        <label>Height (cm)</label>
+        <input type="number" id="ptHeight" placeholder="e.g. 170" min="100" max="250">
+      </div>
+      <div class="fld">
+        <label>Activity Level</label>
+        <select id="ptActivity">
+          <option value="">Select activity level</option>
+          <option value="1.2">Sedentary (desk job, no exercise)</option>
+          <option value="1.375">Lightly Active (1–3 days/week)</option>
+          <option value="1.55">Moderately Active (3–5 days/week)</option>
+          <option value="1.725">Very Active (6–7 days/week)</option>
+          <option value="1.9">Extra Active (athlete / physical job)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Medical Conditions ── -->
+  <div class="sec">
+    <div class="sec-title">🏥 Medical Conditions <span style="font-size:10px;color:var(--muted);font-family:Rajdhani,sans-serif;letter-spacing:0">(select all that apply)</span></div>
+    <div class="disease-grid" id="diseaseGrid">
+      <div class="chip" data-id="obesity"          onclick="toggleChip(this)">⚖️ Morbid Obesity</div>
+      <div class="chip" data-id="insulin"           onclick="toggleChip(this)">🩸 Insulin Resistance</div>
+      <div class="chip" data-id="hypertension"      onclick="toggleChip(this)">💊 High Blood Pressure</div>
+      <div class="chip" data-id="triglycerides"     onclick="toggleChip(this)">🔬 High Triglycerides</div>
+      <div class="chip" data-id="low_hdl"           onclick="toggleChip(this)">📉 Low HDL Cholesterol</div>
+      <div class="chip" data-id="cardiovascular"    onclick="toggleChip(this)">❤️ Cardiovascular Disease</div>
+      <div class="chip" data-id="diabetes"          onclick="toggleChip(this)">💉 Type 2 Diabetes</div>
+      <div class="chip" data-id="fatty_liver"       onclick="toggleChip(this)">🫀 Non-Alcoholic Fatty Liver</div>
+      <div class="chip" data-id="stroke"            onclick="toggleChip(this)">🧠 Stroke</div>
+      <div class="chip" data-id="none"              onclick="toggleChip(this)">✅ No conditions</div>
+    </div>
+  </div>
+
+  <!-- ── Goal ── -->
+  <div class="sec">
+    <div class="sec-title">🎯 Patient Goal</div>
+    <div class="goal-row">
+      <button class="goal-btn" data-goal="lose" onclick="selectGoal(this)">
+        <span class="g-icon">📉</span>Weight Loss
+      </button>
+      <button class="goal-btn" data-goal="maintain" onclick="selectGoal(this)">
+        <span class="g-icon">⚖️</span>Maintain Weight
+      </button>
+      <button class="goal-btn" data-goal="gain" onclick="selectGoal(this)">
+        <span class="g-icon">📈</span>Weight Gain
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Analyze button ── -->
+  <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">
+    🔬 &nbsp; Analyze & Generate Plan
+  </button>
+
+  <!-- ══ RESULTS ══════════════════════════════════════════════ -->
+  <div id="resultsSection">
+
+    <div class="warn-banner">
+      ⚠️ This plan is generated as a general guideline. Always consult a licensed dietitian before prescribing.
+    </div>
+
+    <!-- Metrics -->
+    <div class="sec">
+      <div class="sec-title">📊 Metabolic Calculations</div>
+      <div class="metrics-row">
+        <div class="metric-box">
+          <div class="metric-val" id="rBMR">—</div>
+          <div class="metric-lbl">BMR</div>
+          <div class="metric-sub">Basal Metabolic Rate</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="rTDEE">—</div>
+          <div class="metric-lbl">TDEE</div>
+          <div class="metric-sub">Total Daily Energy</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="rTarget">—</div>
+          <div class="metric-lbl">TARGET</div>
+          <div class="metric-sub">Daily Calories</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="rBMI">—</div>
+          <div class="metric-lbl">BMI</div>
+          <div class="metric-sub" id="rBMIcat">—</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="rProtein">—</div>
+          <div class="metric-lbl">PROTEIN</div>
+          <div class="metric-sub">grams/day</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="rCarbs">—</div>
+          <div class="metric-lbl">CARBS</div>
+          <div class="metric-sub">grams/day</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meal Plan -->
+    <div class="sec">
+      <div class="sec-title">🍽️ Weekly Meal Plan</div>
+      <div id="mealPlanOutput"></div>
+    </div>
+
+    <!-- Tips -->
+    <div class="sec">
+      <div class="sec-title">💡 Lifestyle Tips</div>
+      <div class="tips-grid" id="tipsOutput"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-row">
+      <button class="btn-action btn-save"  id="saveBtn"  onclick="savePlan()">💾 Save Plan</button>
+      <button class="btn-action btn-send"  id="sendBtn"  onclick="toggleSendPanel()">📤 Send to Patient</button>
+      <button class="btn-action btn-pdf"   id="pdfBtn"   onclick="printPDF()">🖨️ Print PDF</button>
+    </div>
+
+    <!-- Send to patient panel -->
+    <div class="send-panel" id="sendPanel">
+      <div class="sec-title" style="margin-bottom:12px;">📤 Send to Patient</div>
+      <div class="patient-search-wrap">
+        <input type="text" id="ptSearchInput" placeholder="Search patient name or email…"
+          oninput="searchPatients(this.value)" autocomplete="off"
+          style="width:100%;background:rgba(250,247,242,.8);border:1px solid rgba(90,122,98,.18);border-radius:8px;padding:11px 13px;color:#2C2C2C;font-family:Rajdhani,sans-serif;font-size:14px;outline:none;">
+        <div class="patient-dd" id="ptDropdown"></div>
+      </div>
+      <div class="selected-pt" id="selectedPtBox">
+        <span id="selectedPtName">—</span>
+        <button onclick="clearSelectedPt()" style="background:none;border:none;color:var(--charcoal-mid);cursor:pointer;font-size:18px;">×</button>
+      </div>
+      <button class="btn-action btn-send" style="margin-top:12px;width:100%;" onclick="sendToPatient()">
+        ✅ &nbsp; Confirm & Send
+      </button>
+    </div>
+
+  </div><!-- /resultsSection -->
+</div><!-- /wrap -->
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  var _FBCFG = {
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+  window._fbDb = firebase.firestore();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+//  LIFESTYLE MODIFICATION — Full Logic
+// ═══════════════════════════════════════════════════════════
+
+let currentDoctor = null;
+let currentPlan   = null; // generated plan object
+let allPatients   = [];
+let selectedPt    = null;
+let selectedDiseases = new Set();
+let selectedGoal  = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  currentDoctor = requireAuth('doctor');
+  if (!currentDoctor) return;
+  // Load patients for send feature
+  let users = [];
+  if (window.FIREBASE_ENABLED) {
+    try { users = await fbGetAllUsers(); } catch(e) {}
+  }
+  if (!users.length) users = getAllUsers();
+  allPatients = users.filter(u => u.role === 'patient');
+});
+
+// ── CHIP TOGGLE ───────────────────────────────────────────
+function toggleChip(el) {
+  const id = el.dataset.id;
+  if (id === 'none') {
+    // Deselect all others
+    selectedDiseases.clear();
+    document.querySelectorAll('#diseaseGrid .chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedDiseases.add('none');
+    return;
+  }
+  // Deselect "none" if selecting a real condition
+  selectedDiseases.delete('none');
+  document.querySelector('.chip[data-id="none"]')?.classList.remove('selected');
+
+  if (selectedDiseases.has(id)) {
+    selectedDiseases.delete(id);
+    el.classList.remove('selected');
+  } else {
+    selectedDiseases.add(id);
+    el.classList.add('selected');
+  }
+}
+
+function selectGoal(btn) {
+  document.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedGoal = btn.dataset.goal;
+}
+
+// ── CALCULATIONS ──────────────────────────────────────────
+function calcBMR(weight, height, age, gender) {
+  // Mifflin-St Jeor equation
+  if (gender === 'male')   return 10*weight + 6.25*height - 5*age + 5;
+  if (gender === 'female') return 10*weight + 6.25*height - 5*age - 161;
+  return 0;
+}
+
+function calcBMI(weight, height) {
+  const h = height / 100;
+  return weight / (h * h);
+}
+
+function bmiCategory(bmi) {
+  if (bmi < 18.5) return { cat:'Underweight', color:'#ffd600' };
+  if (bmi < 25)   return { cat:'Normal',      color:'#00e676' };
+  if (bmi < 30)   return { cat:'Overweight',  color:'#ffd600' };
+  if (bmi < 35)   return { cat:'Obese I',     color:'#ff7043' };
+  if (bmi < 40)   return { cat:'Obese II',    color:'#ff5252' };
+  return               { cat:'Obese III',    color:'#ff1744' };
+}
+
+function getTargetCalories(tdee, goal, diseases) {
+  if (goal === 'lose') {
+    // Bigger deficit for obesity/metabolic diseases
+    const aggressive = diseases.has('obesity') || diseases.has('diabetes') || diseases.has('fatty_liver');
+    return Math.round(tdee - (aggressive ? 600 : 500));
+  }
+  if (goal === 'gain') return Math.round(tdee + 400);
+  return Math.round(tdee); // maintain
+}
+
+function getMacros(targetCals, goal, diseases) {
+  // ── Evidence-based macro calculation ──────────────────────
+  // Protein: based on body weight not just % of calories
+  // This is called from generatePlan where weight is available
+  // We store weight in a closure via _lastWeight set before call
+  const weight = window._planWeight || 70; // kg
+
+  // PROTEIN — g/kg body weight (evidence-based ranges):
+  // Healthy maintain:  1.2–1.6 g/kg  → use 1.4
+  // Weight loss:       1.6–2.0 g/kg  → use 1.8 (preserve muscle)
+  // Weight gain:       1.8–2.2 g/kg  → use 2.0 (support hypertrophy)
+  // Kidney disease:    0.6–0.8 g/kg  → use 0.7
+  // Obesity:           1.8–2.4 g/kg  → use 2.0 (high protein for satiety)
+  let proteinPerKg = 1.4;
+  if (goal === 'lose')  proteinPerKg = 1.8;
+  if (goal === 'gain')  proteinPerKg = 2.0;
+  if (diseases.has('obesity'))                         proteinPerKg = 2.0;
+  if (diseases.has('kidney') || diseases.has('dialysis')) proteinPerKg = 0.7;
+  if (diseases.has('diabetes'))                        proteinPerKg = 1.6;
+
+  const proteinG = Math.round(weight * proteinPerKg);
+  const proteinCals = proteinG * 4;
+
+  // FAT — minimum 20% of total calories (essential fat acids)
+  // Cardiovascular: limit to 25–30%, focus on unsaturated
+  // Standard: 25–35%
+  let fatPct = 0.28;
+  if (diseases.has('cardiovascular') || diseases.has('hypertension')) fatPct = 0.25;
+  if (diseases.has('fatty_liver') || diseases.has('triglycerides'))   fatPct = 0.22;
+  if (goal === 'gain')   fatPct = 0.30;
+  // Ensure fat calories don't exceed remaining budget
+  const fatCals = Math.round(targetCals * fatPct);
+  const fatG    = Math.round(fatCals / 9);
+
+  // CARBS — remaining calories after protein + fat
+  const remainingCals = targetCals - proteinCals - fatCals;
+  const carbsG = Math.max(0, Math.round(remainingCals / 4));
+
+  // LOW CARB override for diabetes/insulin resistance
+  if (diseases.has('diabetes') || diseases.has('insulin')) {
+    // Max 40% carbs for diabetics (instead of remainder)
+    const maxCarbCals = Math.round(targetCals * 0.40);
+    const diabCarbsG  = Math.round(maxCarbCals / 4);
+    const diabFatCals = targetCals - proteinCals - maxCarbCals;
+    return {
+      protein: proteinG,
+      carbs:   Math.min(carbsG, diabCarbsG),
+      fat:     Math.max(fatG, Math.round(diabFatCals / 9)),
+    };
+  }
+
+  return {
+    protein: proteinG,
+    carbs:   carbsG,
+    fat:     fatG,
+  };
+}
+
+// ── MEAL PLAN GENERATOR ───────────────────────────────────
+function buildMealPlan(targetCals, gender, diseases, goal, macros) {
+  const dis = diseases;
+
+  // Adjust food choices based on conditions
+  const lowSodium   = dis.has('hypertension') || dis.has('cardiovascular') || dis.has('stroke');
+  const lowCarb     = dis.has('diabetes') || dis.has('insulin');
+  const lowFat      = dis.has('fatty_liver') || dis.has('triglycerides');
+  const highProtein = dis.has('obesity') || goal === 'gain';
+  const heartSafe   = dis.has('cardiovascular') || dis.has('stroke');
+
+  const breakfastOptions = lowCarb
+    ? ['3 scrambled eggs + avocado half + cucumber slices', '2 eggs + smoked salmon + spinach leaves', 'Greek yogurt (full fat) + walnuts + chia seeds']
+    : heartSafe
+    ? ['Oatmeal with berries + 1 tbsp flaxseed', 'Whole grain toast + avocado + 2 poached eggs', 'Quinoa porridge + almond milk + banana']
+    : ['2 eggs + whole grain toast + tomato', 'Oatmeal + banana + 1 tbsp peanut butter', 'Yogurt parfait + granola + mixed berries'];
+
+  const lunchOptions = lowSodium
+    ? ['Grilled chicken breast 150g + brown rice 80g + steamed broccoli', 'Tuna salad (no salt) + quinoa + olive oil dressing', 'Turkey wrap in whole wheat + lettuce + tomato + no-salt dressing']
+    : lowFat
+    ? ['Grilled white fish 150g + sweet potato + green salad', 'Skinless chicken 150g + lentils 80g + roasted vegetables', 'Shrimp stir-fry with zucchini + brown rice 60g']
+    : ['Grilled chicken 150g + brown rice 80g + mixed salad', 'Salmon fillet 150g + quinoa 80g + grilled asparagus', 'Lean beef stir-fry + noodles 60g + bell peppers + broccoli'];
+
+  const dinnerOptions = lowCarb
+    ? ['Grilled salmon + cauliflower rice + green beans', 'Baked chicken thigh + roasted zucchini + mushrooms', 'Minced turkey lettuce wraps + cucumber salad']
+    : heartSafe
+    ? ['Baked cod + lentil soup + whole grain bread 1 slice', 'Grilled chicken + roasted sweet potato + steamed spinach', 'Vegetable curry + brown rice 60g + side salad']
+    : ['Grilled fish 150g + steamed vegetables + small potato', 'Chicken soup + whole grain bread 1 slice', 'Stir-fried tofu + vegetables + rice 60g'];
+
+  const snackOptions = dis.has('diabetes') || dis.has('insulin')
+    ? ['Small handful almonds (20g) + celery sticks', 'Hard boiled egg + cucumber slices', 'Cheese slice + apple (small)']
+    : dis.has('triglycerides') || dis.has('low_hdl')
+    ? ['Walnuts 20g + 1 medium apple', 'Hummus 2 tbsp + carrot sticks', 'Mixed berries 100g + chia seeds']
+    : ['Apple + 1 tbsp almond butter', 'Mixed nuts 25g + green tea', 'Banana + low-fat yogurt'];
+
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const bf = Math.round(targetCals * 0.25);
+  const lu = Math.round(targetCals * 0.35);
+  const di = Math.round(targetCals * 0.30);
+  const sn = Math.round(targetCals * 0.10);
+
+  return days.map((day, i) => ({
+    day,
+    totalCals: targetCals,
+    meals: [
+      { type:'Breakfast', items: breakfastOptions[i % breakfastOptions.length], cals: bf },
+      { type:'Snack',     items: snackOptions[i % snackOptions.length],          cals: sn },
+      { type:'Lunch',     items: lunchOptions[i % lunchOptions.length],           cals: lu },
+      { type:'Dinner',    items: dinnerOptions[i % dinnerOptions.length],          cals: di },
+    ]
+  }));
+}
+
+function buildTips(diseases, goal, gender) {
+  const tips = [];
+  const dis = diseases;
+
+  if (dis.has('hypertension')) tips.push({ title:'🧂 Sodium Control', txt:'Limit sodium to &lt;2,300mg/day. Avoid processed foods, canned soups, and fast food. Cook with herbs instead of salt.' });
+  if (dis.has('diabetes') || dis.has('insulin')) tips.push({ title:'🩸 Blood Sugar Management', txt:'Eat every 3–4 hours to stabilize glucose. Avoid refined carbs & sugary drinks. Pair carbs with protein/fat.' });
+  if (dis.has('cardiovascular') || dis.has('stroke')) tips.push({ title:'❤️ Heart Health', txt:'Eat fatty fish 2x/week (omega-3). Choose olive oil. Include soluble fiber (oats, beans). Avoid trans fats.' });
+  if (dis.has('fatty_liver')) tips.push({ title:'🫀 Liver Support', txt:'Avoid alcohol completely. Reduce fructose (no fruit juice). Eat cruciferous vegetables daily (broccoli, cauliflower).' });
+  if (dis.has('triglycerides')) tips.push({ title:'🔬 Reduce Triglycerides', txt:'Cut sugar & refined carbs sharply. Eat omega-3 rich foods. Limit fruit juice. Avoid alcohol. Regular aerobic exercise.' });
+  if (dis.has('obesity')) tips.push({ title:'⚖️ Weight Management', txt:'Eat slowly — take 20 mins per meal. Use smaller plates. High protein meals reduce hunger. Track meals if possible.' });
+  if (dis.has('low_hdl')) tips.push({ title:'📈 Raise HDL Cholesterol', txt:'Exercise 30 min daily raises HDL. Eat healthy fats: avocado, olive oil, nuts. Avoid trans fats. Quit smoking.' });
+
+  // Always add these
+  tips.push({ title:'💧 Hydration', txt:'Drink 8–10 glasses of water daily. Start each meal with a glass of water. Avoid sugary drinks and limit caffeine to 2 cups/day.' });
+  tips.push({ title:'🏃 Physical Activity', txt:'30 min of moderate exercise 5 days/week. Mix cardio and strength training. Start slowly and increase gradually.' });
+  tips.push({ title:'😴 Sleep & Stress', txt:'7–9 hours of sleep supports metabolism and hormone balance. High stress increases cortisol which promotes fat storage.' });
+
+  if (goal === 'lose') tips.push({ title:'📉 Healthy Weight Loss', txt:'Target 0.5–1 kg loss per week. Faster loss causes muscle loss. Protein intake is critical to preserve muscle mass.' });
+  if (goal === 'gain') tips.push({ title:'📈 Healthy Weight Gain', txt:'Surplus of 300–500 cal/day. Focus on protein & complex carbs. Strength training is essential to gain muscle, not fat.' });
+
+  return tips.slice(0, 6);
+}
+
+// ── MAIN ANALYZE FUNCTION ─────────────────────────────────
+function analyze() {
+  const name     = document.getElementById('ptName').value.trim();
+  const age      = parseFloat(document.getElementById('ptAge').value);
+  const gender   = document.getElementById('ptGender').value;
+  const weight   = parseFloat(document.getElementById('ptWeight').value);
+  const height   = parseFloat(document.getElementById('ptHeight').value);
+  const activity = parseFloat(document.getElementById('ptActivity').value);
+
+  if (!name)                          { alert('Please enter patient name.'); return; }
+  if (!age || age < 1 || age > 120)   { alert('Please enter a valid age.'); return; }
+  if (!gender)                        { alert('Please select gender.'); return; }
+  if (!weight || weight < 20)         { alert('Please enter a valid weight.'); return; }
+  if (!height || height < 100)        { alert('Please enter a valid height.'); return; }
+  if (!activity)                      { alert('Please select activity level.'); return; }
+  if (!selectedGoal)                  { alert('Please select a goal.'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> &nbsp; Analyzing…';
+
+  setTimeout(() => {
+    const bmr    = Math.round(calcBMR(weight, height, age, gender));
+    const tdee   = Math.round(bmr * activity);
+    const bmi    = calcBMI(weight, height);
+    const bmiCat = bmiCategory(bmi);
+    const target = getTargetCalories(tdee, selectedGoal, selectedDiseases);
+    window._planWeight = weight; // store for protein calculation
+    const macros = getMacros(target, selectedGoal, selectedDiseases);
+    const meals  = buildMealPlan(target, gender, selectedDiseases, selectedGoal, macros);
+    const tips   = buildTips(selectedDiseases, selectedGoal, gender);
+
+    // Store plan
+    currentPlan = {
+      id:         Date.now(),
+      patientName: name,
+      doctorName:  currentDoctor.name,
+      doctorEmail: currentDoctor.email,
+      date:        new Date().toLocaleString(),
+      gender, age, weight, height, activity,
+      diseases: [...selectedDiseases],
+      goal: selectedGoal,
+      bmr, tdee, target, bmi: bmi.toFixed(1), bmiCat: bmiCat.cat,
+      macros, meals, tips,
+    };
+
+    // Render results
+    document.getElementById('rBMR').textContent    = bmr + ' kcal';
+    document.getElementById('rTDEE').textContent   = tdee + ' kcal';
+    document.getElementById('rTarget').textContent = target + ' kcal';
+    document.getElementById('rBMI').textContent    = bmi.toFixed(1);
+    document.getElementById('rBMIcat').textContent = bmiCat.cat;
+    document.getElementById('rBMIcat').style.color = bmiCat.color;
+    document.getElementById('rProtein').textContent = macros.protein + 'g';
+    document.getElementById('rCarbs').textContent   = macros.carbs + 'g';
+
+    // Meal plan
+    document.getElementById('mealPlanOutput').innerHTML = meals.map(d => `
+      <div class="meal-day">
+        <div class="meal-day-header">
+          <div class="meal-day-title">${d.day}</div>
+          <div class="meal-day-cals">${d.totalCals} kcal/day</div>
+        </div>
+        ${d.meals.map(m => `
+          <div class="meal-row">
+            <div class="meal-type">${m.type}</div>
+            <div class="meal-items">${m.items}</div>
+            <div class="meal-cals">${m.cals} kcal</div>
+          </div>`).join('')}
+      </div>`).join('');
+
+    // Tips
+    document.getElementById('tipsOutput').innerHTML = tips.map(t => `
+      <div class="tip-card">
+        <div class="tip-title">${t.title}</div>
+        <div class="tip-txt">${t.txt}</div>
+      </div>`).join('');
+
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('resultsSection').scrollIntoView({ behavior:'smooth', block:'start' });
+
+    btn.disabled = false;
+    btn.innerHTML = '🔄 &nbsp; Re-Analyze';
+  }, 600);
+}
+
+// ── SAVE PLAN (doctor's own records) ─────────────────────
+async function savePlan() {
+  if (!currentPlan) return;
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+
+  try {
+    const updated = await asyncGetUser(currentDoctor.email) || currentDoctor;
+    if (!Array.isArray(updated.lifestylePlans)) updated.lifestylePlans = [];
+    updated.lifestylePlans.push(currentPlan);
+    await asyncSaveUser(updated);
+    currentDoctor = updated;
+    updateCurrentUser(updated);
+    btn.textContent = '✅ Saved!';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '💾 Save Plan'; }, 2000);
+  } catch(e) {
+    alert('Error saving. Please try again.');
+    btn.disabled = false; btn.textContent = '💾 Save Plan';
+  }
+}
+
+// ── SEND TO PATIENT ───────────────────────────────────────
+function toggleSendPanel() {
+  const p = document.getElementById('sendPanel');
+  p.classList.toggle('open');
+}
+
+function searchPatients(q) {
+  const dd = document.getElementById('ptDropdown');
+  if (!q.trim()) { dd.classList.remove('open'); return; }
+  const found = allPatients.filter(p =>
+    p.name.toLowerCase().includes(q.toLowerCase()) ||
+    p.email.toLowerCase().includes(q.toLowerCase())
+  );
+  dd.innerHTML = found.length
+    ? found.map(p => `<div class="pt-opt" onclick="pickPatient('${esc(p.email)}')">
+        ${esc(p.name)}<small>${esc(p.email)}</small>
+      </div>`).join('')
+    : '<div class="pt-opt" style="color:var(--muted);">No patients found</div>';
+  dd.classList.add('open');
+}
+
+function pickPatient(email) {
+  selectedPt = allPatients.find(p => p.email === email);
+  if (!selectedPt) return;
+  document.getElementById('ptDropdown').classList.remove('open');
+  document.getElementById('ptSearchInput').value = '';
+  document.getElementById('selectedPtName').textContent = `${selectedPt.name} (${selectedPt.email})`;
+  document.getElementById('selectedPtBox').classList.add('show');
+}
+
+function clearSelectedPt() {
+  selectedPt = null;
+  document.getElementById('selectedPtBox').classList.remove('show');
+}
+
+async function sendToPatient() {
+  if (!currentPlan || !selectedPt) { alert('Please select a patient first.'); return; }
+  const btn = document.querySelector('#sendPanel .btn-send');
+  btn.disabled = true; btn.textContent = '⏳ Sending…';
+
+  try {
+    const patient = await asyncGetUser(selectedPt.email) || selectedPt;
+    if (!Array.isArray(patient.lifestylePlans)) patient.lifestylePlans = [];
+    const planToSend = { ...currentPlan, sentTo: selectedPt.email, sentToName: selectedPt.name, sentDate: new Date().toLocaleString() };
+    patient.lifestylePlans.push(planToSend);
+    await asyncSaveUser(patient);
+
+    btn.textContent = '✅ Sent!';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '✅ &nbsp; Confirm & Send';
+      document.getElementById('sendPanel').classList.remove('open');
+      clearSelectedPt();
+    }, 2000);
+  } catch(e) {
+    alert('Error sending. Please try again.');
+    btn.disabled = false; btn.innerHTML = '✅ &nbsp; Confirm & Send';
+  }
+}
+
+// ── PRINT PDF ─────────────────────────────────────────────
+function printPDF() {
+  if (!currentPlan) return;
+  const p = currentPlan;
+  const printWin = window.open('', '_blank');
+  printWin.document.write(`<!DOCTYPE html><html><head>
+    <title>Lifestyle Plan — ${p.patientName}</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; color: #222; }
+      h1 { color: #5A7A62; font-size: 22px; margin-bottom: 4px; }
+      h2 { color: #2D4A35; font-size: 15px; border-bottom: 2px solid #5A7A62; padding-bottom: 6px; margin-top: 24px; }
+      h3 { font-size: 13px; color: #333; margin: 0 0 4px; }
+      .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+      .header-info { font-size: 13px; color: #555; }
+      .metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 12px 0; }
+      .metric { background: #f0fdff; border: 1px solid #b2ebf2; border-radius: 8px; padding: 10px; text-align: center; }
+      .metric-val { font-size: 18px; font-weight: bold; color: #5A7A62; }
+      .metric-lbl { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+      .meal-table { width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12px; }
+      .meal-table th { background:#5A7A62; color:#fff; padding:8px 10px; text-align:left; font-size:11px; }
+      .meal-table td { padding:8px 10px; border-bottom:1px solid #2C2C2C; vertical-align:top; }
+      .meal-table tr:nth-child(even) { background:#f0fdff; }
+      .day-header { background:#e0f2f1; font-weight:bold; color:#006064; padding:8px 10px; }
+      .tips { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+      .tip { background:#f0fdff; border-left:3px solid #5A7A62; padding:8px 10px; font-size:12px; }
+      .tip h3 { color:#2D4A35; font-size:12px; margin-bottom:3px; }
+      .footer { margin-top:30px; font-size:11px; color:#888; text-align:center; border-top:1px solid #ccc; padding-top:12px; }
+      .warn { background:#fff8e1; border:1px solid #ffc107; border-radius:6px; padding:10px 14px; font-size:12px; color:#795548; margin-bottom:16px; }
+      @media print { body { padding: 15px; } }
+    </style></head><body>
+    <div class="header">
+      <div>
+        <h1>🥗 Lifestyle Modification Plan</h1>
+        <div class="header-info">
+          <b>Patient:</b> ${p.patientName} &nbsp;|&nbsp;
+          <b>Age:</b> ${p.age} yrs &nbsp;|&nbsp;
+          <b>Gender:</b> ${p.gender} &nbsp;|&nbsp;
+          <b>Weight:</b> ${p.weight}kg &nbsp;|&nbsp;
+          <b>Height:</b> ${p.height}cm<br>
+          <b>Goal:</b> ${p.goal === 'lose' ? 'Weight Loss' : p.goal === 'gain' ? 'Weight Gain' : 'Maintain Weight'} &nbsp;|&nbsp;
+          <b>BMI:</b> ${p.bmi} (${p.bmiCat}) &nbsp;|&nbsp;
+          <b>Conditions:</b> ${p.diseases.join(', ') || 'None'}<br>
+          <b>Prepared by Dr.</b> ${p.doctorName} &nbsp;|&nbsp; <b>Date:</b> ${p.date}
+        </div>
+      </div>
+    </div>
+    <div class="warn">⚠️ This is a general nutritional guideline. Individual needs may vary. Consult a licensed dietitian.</div>
+    <h2>📊 Metabolic Analysis</h2>
+    <div class="metrics">
+      <div class="metric"><div class="metric-val">${p.bmr} kcal</div><div class="metric-lbl">BMR</div></div>
+      <div class="metric"><div class="metric-val">${p.tdee} kcal</div><div class="metric-lbl">TDEE</div></div>
+      <div class="metric"><div class="metric-val">${p.target} kcal</div><div class="metric-lbl">Daily Target</div></div>
+      <div class="metric"><div class="metric-val">${p.macros.protein}g</div><div class="metric-lbl">Protein</div></div>
+      <div class="metric"><div class="metric-val">${p.macros.carbs}g</div><div class="metric-lbl">Carbs</div></div>
+      <div class="metric"><div class="metric-val">${p.macros.fat}g</div><div class="metric-lbl">Fat</div></div>
+    </div>
+    <h2>🍽️ 7-Day Meal Plan</h2>
+    <table class="meal-table">
+      <tr><th>Day</th><th>Meal</th><th>Food</th><th>Calories</th></tr>
+      ${p.meals.map(d => d.meals.map((m,i) => `
+        <tr>${i===0?`<td rowspan="4" style="font-weight:bold;color:#006064;vertical-align:middle;">${d.day}</td>`:''}
+          <td>${m.type}</td><td>${m.items}</td><td>${m.cals} kcal</td>
+        </tr>`).join('')).join('')}
+    </table>
+    <h2>💡 Lifestyle Tips</h2>
+    <div class="tips">
+      ${p.tips.map(t => `<div class="tip"><h3>${t.title}</h3>${t.txt}</div>`).join('')}
+    </div>
+    <div class="footer">Physio Motion Analyzer &nbsp;·&nbsp; Generated by Dr. ${p.doctorName} &nbsp;·&nbsp; ${p.date}</div>
+    <script>window.onload=()=>{ window.print(); }<\/script>
+  </body></html>`);
+  printWin.document.close();
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

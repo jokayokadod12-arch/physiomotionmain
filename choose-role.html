@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Patient Dashboard — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ── WELCOME HERO ── */
+.dash-hero {
+  position:relative; z-index:1;
+  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, var(--sage) 100%);
+  padding: 36px 24px 52px; overflow: hidden;
+}
+.dash-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 50%, rgba(90,122,98,.3) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 90% 20%, rgba(184,148,63,.15) 0%, transparent 55%);
+}
+.dash-hero::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, transparent, var(--sage-pale), var(--gold-light), var(--sage-pale), transparent);
+}
+.hero-inner {
+  max-width:900px; margin:0 auto; position:relative; z-index:1;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+}
+.hw-left { flex:1; }
+.hw-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 14px; border-radius:100px;
+  background:rgba(250,247,242,.1); border:1px solid rgba(250,247,242,.2);
+  font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:rgba(250,247,242,.7); margin-bottom:14px;
+}
+.hw-pulse {
+  width:6px; height:6px; border-radius:50%; background:var(--sage-pale);
+  animation: hwblink 2s ease-in-out infinite;
+}
+@keyframes hwblink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+.hw-name {
+  font-family:'Playfair Display', serif;
+  font-size: clamp(20px, 3.5vw, 32px); font-weight:700;
+  color:#FAF7F2; letter-spacing:-.5px; margin-bottom:6px; line-height:1.2;
+}
+.hw-sub { font-size:13px; color:rgba(250,247,242,.45); }
+.hw-right { display:flex; gap:16px; flex-wrap:wrap; }
+.hw-stat {
+  text-align:center; padding:14px 20px;
+  background:rgba(250,247,242,.08); border:1px solid rgba(250,247,242,.12); border-radius:14px;
+}
+.hw-stat-n {
+  font-family:'Playfair Display', serif;
+  font-size:24px; font-weight:700; color:#FAF7F2; display:block; letter-spacing:-.5px;
+}
+.hw-stat-l {
+  font-size:10px; font-weight:600; text-transform:uppercase;
+  letter-spacing:1px; color:rgba(250,247,242,.75); display:block; margin-top:3px;
+}
+
+/* ── MAIN ── */
+.dash-main {
+  flex:1; max-width:900px; margin:0 auto; width:100%;
+  padding:36px 24px 80px; position:relative; z-index:1;
+}
+
+/* ── SECTION LABEL ── */
+.sec-lbl {
+  font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--sage); margin-bottom:16px;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-lbl::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
+
+/* ── DASHBOARD CARDS ── */
+.cards-row {
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:32px;
+}
+@media(max-width:680px) { .cards-row { grid-template-columns: 1fr 1fr; } }
+@media(max-width:380px) { .cards-row { grid-template-columns: 1fr 1fr; gap:10px; } }
+
+.dash-card {
+  background: white; border:1px solid var(--border); border-radius:20px;
+  display:flex; flex-direction:column; align-items:center;
+  padding:28px 18px 22px; gap:12px; cursor:pointer;
+  transition:all .28s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden; text-align:center;
+  box-shadow: var(--shadow-sm);
+}
+.dash-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background: var(--dc, var(--sage)); opacity:0; transition:opacity .28s;
+  border-radius:20px 20px 0 0;
+}
+.dash-card::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(90,122,98,.04), transparent);
+  opacity:0; transition:opacity .28s;
+}
+.dash-card:hover::before, .dash-card:hover::after { opacity:1; }
+.dash-card:hover {
+  transform:translateY(-6px);
+  border-color: rgba(90,122,98,.25);
+  box-shadow: 0 16px 50px rgba(44,44,44,.11);
+}
+.dc-icon {
+  width:64px; height:64px; border-radius:18px;
+  background:var(--bg-warm, #F5EFE4); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; transition:all .28s; position:relative; z-index:1;
+}
+.dash-card:hover .dc-icon { transform:scale(1.08); box-shadow:0 4px 16px rgba(44,44,44,.1); }
+.dc-title {
+  font-family:'Playfair Display', serif;
+  font-size:14px; font-weight:700; color:var(--forest);
+  position:relative; z-index:1; letter-spacing:-.1px;
+}
+.dc-desc { font-size:11px; color:var(--muted); line-height:1.55; position:relative; z-index:1; }
+.dc-arrow { font-size:16px; color:rgba(90,122,98,.2); transition:.28s; position:relative; z-index:1; }
+.dash-card:hover .dc-arrow { color:var(--dc, var(--sage)); transform:translateX(3px); }
+
+/* ── TIP CARD ── */
+.tip-card {
+  background:linear-gradient(135deg, var(--forest-deep), var(--forest));
+  border-radius:20px; padding:24px 28px;
+  display:flex; align-items:center; gap:18px;
+  box-shadow: var(--shadow);
+}
+.tip-icon { font-size:36px; flex-shrink:0; }
+.tip-text h4 {
+  font-family:'Playfair Display', serif;
+  font-size:16px; font-weight:700; color:#FAF7F2; margin-bottom:5px;
+}
+.tip-text p { font-size:13px; color:rgba(250,247,242,.55); line-height:1.65; }
+
+@media(max-width:420px) {
+  .dash-card { padding:18px 12px 15px; border-radius:16px; gap:8px; }
+  .dc-icon { width:50px; height:50px; font-size:22px; }
+  .dc-title { font-size:12px; }
+  .dc-desc { display:none; }
+  .dash-main { padding:22px 14px 70px; }
+  .dash-hero { padding:28px 16px 44px; }
+  .tip-card { flex-direction:column; gap:12px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='chat.html'" style="position:relative;">
+      💬 Chat
+      <span id="chatBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#C84A4A;color:#fff;border-radius:8px;font-size:9px;font-weight:700;padding:1px 5px;"></span>
+    </button>
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="doLogout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="dash-hero">
+  <div class="hero-inner">
+    <div class="hw-left">
+      <div class="hw-badge"><span class="hw-pulse"></span>Patient Dashboard</div>
+      <h2 class="hw-name">Welcome back, <span id="patientName">—</span> 👋</h2>
+      <p class="hw-sub">What would you like to work on today?</p>
+    </div>
+    <div class="hw-right">
+      <div class="hw-stat">
+        <span class="hw-stat-n" id="statExPlans">—</span>
+        <span class="hw-stat-l">Exercise Plans</span>
+      </div>
+      <div class="hw-stat">
+        <span class="hw-stat-n" id="statNutrPlans">—</span>
+        <span class="hw-stat-l">Nutrition Plans</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="dash-main">
+  <div class="sec-lbl">Your Health Modules</div>
+
+  <div class="cards-row">
+
+    <div class="dash-card" style="--dc:#C84A4A" onclick="window.location.href='pain-helper.html'">
+      <div class="dc-icon">🩹</div>
+      <div class="dc-title">Pain Helper</div>
+      <div class="dc-desc">Report your pain &amp; get guidance from a doctor</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:var(--sage)" onclick="window.location.href='my-exercises.html'">
+      <div class="dc-icon">📋</div>
+      <div class="dc-title">Exercise Plans</div>
+      <div class="dc-desc">View and complete your prescribed exercises</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:#3D8B5B" onclick="window.location.href='my-lifestyle.html'">
+      <div class="dc-icon">🥗</div>
+      <div class="dc-title">Nutrition Plans</div>
+      <div class="dc-desc">Your personalised nutrition programme</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:var(--gold)" onclick="window.location.href='progress.html'">
+      <div class="dc-icon">📈</div>
+      <div class="dc-title">My Progress</div>
+      <div class="dc-desc">Track your rehabilitation journey</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:#9B59B6" onclick="window.location.href='find-doctor.html'">
+      <div class="dc-icon">🔍</div>
+      <div class="dc-title">Find a Doctor</div>
+      <div class="dc-desc">Search &amp; book with physiotherapists</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:#2980B9" onclick="window.location.href='my-appointments.html'">
+      <div class="dc-icon">📅</div>
+      <div class="dc-title">My Appointments</div>
+      <div class="dc-desc">View, manage and track your bookings</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+  </div>
+
+  <div class="tip-card" id="tipCard">
+    <div class="tip-icon" id="tipIcon">💡</div>
+    <div class="tip-text">
+      <h4 id="tipTitle">Recovery Tip</h4>
+      <p id="tipBody">Loading tip...</p>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const TIPS = [
+      {icon:'💡', title:'Consistency Wins', text:'Small daily efforts beat occasional intense sessions. Aim for 15–20 minutes of your prescribed exercises every day for the best recovery results.'},
+      {icon:'💧', title:'Stay Hydrated', text:'Drink at least 8 glasses of water daily. Proper hydration keeps your joints lubricated and muscles flexible during recovery.'},
+      {icon:'😴', title:'Sleep is Medicine', text:'Your body heals during sleep. Aim for 7–9 hours per night — growth hormone released during deep sleep accelerates tissue repair.'},
+      {icon:'🧊', title:'Ice for Acute Pain', text:'Apply ice (wrapped in cloth) for 15–20 minutes after activity if you have acute swelling or sharp pain. Never apply ice directly to skin.'},
+      {icon:'🔥', title:'Heat Before Exercise', text:'Warm muscles respond better to stretching. Apply a warm compress for 10 minutes before your exercises to improve flexibility and reduce injury risk.'},
+      {icon:'🧘', title:'Breathe Through It', text:'Controlled breathing reduces perceived pain. Inhale before effort, exhale during exertion. This also activates your core stabilisers.'},
+      {icon:'📈', title:'Track Your Progress', text:'Progress can be invisible day-to-day. Use the Progress section weekly — seeing objective improvement is one of the strongest motivators.'},
+      {icon:'🚶', title:'Walk Daily', text:'Even a 10-minute walk improves circulation, reduces stiffness, and lifts your mood. Movement is medicine — don\'t let rest mean stillness.'},
+      {icon:'🥗', title:'Eat for Recovery', text:'Prioritise protein (chicken, eggs, legumes) and anti-inflammatory foods (berries, omega-3 fish, olive oil) to fuel tissue repair.'},
+      {icon:'📵', title:'Limit Screen Time', text:'Extended screen time causes postural strain. Every 30 minutes, stand, do 5 chin tucks, and roll your shoulders back 10 times.'},
+      {icon:'🏆', title:'Celebrate Small Wins', text:'Did you complete your exercises today? That\'s a win. Recovery is a series of small victories — acknowledge each one to stay motivated.'},
+      {icon:'⚠️', title:'Know Your Limits', text:'Pain that\'s sharp, sudden, or radiating is a red flag — stop and rest. Mild muscle soreness is normal; joint pain is not.'},
+      {icon:'🧠', title:'Mindset Matters', text:'Patients who believe they will recover, do recover faster. Positive expectation activates real physiological healing pathways.'},
+      {icon:'👟', title:'Footwear Matters', text:'Worn-out shoes alter your gait and strain knees, hips, and your back. Supportive footwear is an often-overlooked part of recovery.'},
+      {icon:'🌡️', title:'Contrast Therapy', text:'Alternating warm and cold water on an injured area (1 min warm, 30 sec cold, repeat 4x) reduces swelling and boosts circulation.'},
+      {icon:'📅', title:'Keep Appointments', text:'Attending every physiotherapy session is the single biggest predictor of a successful outcome. Consistency with your therapist compounds results.'},
+      {icon:'🤸', title:'Warm Up First', text:'Never start exercises cold. A 3-minute warm-up (walking in place, arm circles) increases blood flow to muscles and prevents re-injury.'},
+      {icon:'🪑', title:'Posture Check', text:'Every hour, do a posture reset: feet flat, knees at 90°, back supported, screen at eye level. Poor posture cancels out your exercise gains.'},
+      {icon:'🧲', title:'Use Both Sides', text:'Even if only one side is injured, train both. This prevents compensation patterns and maintains strength in your healthy limb.'},
+      {icon:'📖', title:'Understand Your Injury', text:'Ask your physiotherapist to explain your diagnosis. Patients who understand their condition are more compliant and heal faster.'},
+      {icon:'🌿', title:'Reduce Inflammation Naturally', text:'Turmeric, ginger, and omega-3 fatty acids have clinically proven anti-inflammatory effects. Include them in your daily diet.'},
+      {icon:'🌬️', title:'Diaphragmatic Breathing', text:'Place one hand on your belly. Breathe so only your belly rises (not your chest). 5 minutes of this daily retrains your core and calms your nervous system.'},
+      {icon:'💪', title:'Strength = Protection', text:'Strong muscles protect weak joints. Every exercise your physiotherapist prescribes is building an armour of muscle around vulnerable areas.'},
+      {icon:'🤝', title:'You\'re Not Alone', text:'Your physiotherapist is your recovery partner. Don\'t hesitate to message them with questions — open communication leads to better, faster results.'},
+      {icon:'🎯', title:'Set a Recovery Goal', text:'Having a clear goal — walking without pain, returning to sport, picking up your child — gives your recovery purpose and keeps you consistent.'}
+    ];
+    let idx = Math.floor(Math.random() * TIPS.length);
+    function showTip(t, animate) {
+      const card = document.getElementById('tipCard');
+      const icon = document.getElementById('tipIcon');
+      const title = document.getElementById('tipTitle');
+      const body = document.getElementById('tipBody');
+      if (animate) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(8px)';
+        setTimeout(() => {
+          icon.textContent = t.icon;
+          title.textContent = t.title;
+          body.textContent = t.text;
+          card.style.transition = 'opacity .5s ease, transform .5s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 300);
+      } else {
+        icon.textContent = t.icon;
+        title.textContent = t.title;
+        body.textContent = t.text;
+        card.style.transition = 'opacity .5s ease, transform .5s ease';
+      }
+    }
+    showTip(TIPS[idx], false);
+    setInterval(() => {
+      idx = (idx + 1) % TIPS.length;
+      showTip(TIPS[idx], true);
+    }, 10000);
+  })();
+  </script>
+</main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  if (!firebase.apps.length) firebase.initializeApp({
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  });
+  window._fbDb = firebase.firestore();
+  window._fbStorage = firebase.storage();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script src="js/pwa.js"></script>
+<!-- ORIGINAL LOGIC — unchanged from v9 -->
+<script>
+  const user = requireAuth('patient');
+  if (user) document.getElementById('patientName').textContent = user.name || user.email;
+  function goProfile() { window.location.href = 'profile.html'; }
+  function doLogout() {
+    if (confirm('Logout?')) {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'login.html';
+    }
+  }
+
+  // Populate dashboard stats - runs immediately and refreshes every 10s
+  async function loadStats() {
+    if (!window.FIREBASE_ENABLED || !window._fbDb) return;
+    try {
+      // Upcoming appointments — try targeted query first, fallback to full scan
+      let allBookings = [];
+      try {
+        const snap = await window._fbDb.collection('bookings')
+          .where('patientEmail', '==', user.email).get();
+        allBookings = snap.docs.map(d => d.data());
+      } catch {
+        // Fallback: load all and filter client-side
+        const snap2 = await window._fbDb.collection('bookings').get();
+        allBookings = snap2.docs.map(d => d.data())
+          .filter(b => (b.patientEmail || '').toLowerCase() === (user.email || '').toLowerCase());
+      }
+      const now = new Date();
+      const upcoming = allBookings.filter(b => {
+        if (b.status !== 'confirmed') return false;
+        try {
+          // Support both "2026-04-23T09:00" and separate date+time fields
+          const dtStr = b.datetime || (b.date && b.time ? b.date + 'T' + b.time : null);
+          if (!dtStr) return false;
+          return new Date(dtStr) > now;
+        } catch { return false; }
+      });
+      document.getElementById('statAppts').textContent = upcoming.length;
+    } catch {}
+
+    try {
+      // Exercise plans: counted from each doctor's sentExercises (have patientEmail field)
+      const doctorsSnap = await window._fbDb.collection('users')
+        .where('role', '==', 'doctor').get();
+      let exCount = 0;
+      doctorsSnap.docs.forEach(d => {
+        const data = d.data();
+        const sent = data.sentExercises || [];
+        exCount += sent.filter(e => e.patientEmail === user.email).length;
+      });
+      document.getElementById('statExPlans').textContent = exCount || 0;
+    } catch {}
+
+    try {
+      // Nutrition plans: stored directly in the patient's own record (lifestylePlans array)
+      const patSnap = await window._fbDb.collection('users').doc(user.email).get();
+      const patData = patSnap.exists ? patSnap.data() : {};
+      const nutrCount = (patData.lifestylePlans || []).length;
+      document.getElementById('statNutrPlans').textContent = nutrCount || 0;
+    } catch {}
+  }
+  loadStats();
+  setInterval(loadStats, 10000);
+</script>
+<script>
+if (window.Notification && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+</script>
+<script>
+(function() {
+  const user = getCurrentUser();
+  if (!user) return;
+  function updateBadge() {
+    const list = JSON.parse(localStorage.getItem('physio_notifs_' + user.email) || '[]');
+    const n = list.filter(x => !x.read).length;
+    const b = document.getElementById('chatBadge');
+    if (b) { if (n > 0) { b.textContent = n; b.style.display = 'block'; } else b.style.display = 'none'; }
+  }
+  updateBadge();
+  setInterval(updateBadge, 4000);
+})();
+</script>
+</body>
+</html>

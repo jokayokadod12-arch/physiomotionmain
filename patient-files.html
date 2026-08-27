@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Patient Files — Physio Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/mobile.css">
+<style>
+body{display:flex;flex-direction:column;min-height:100vh;}
+.pw{max-width:960px;margin:0 auto;padding:22px 16px 100px;width:100%;position:relative;z-index:1;}
+
+/* ── top bar ── */
+.tools-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.search-box{flex:1;min-width:220px;background:rgba(255,255,255,.7);border:1px solid var(--border);border-radius:12px;padding:11px 15px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-primary);outline:none;transition:.18s;}
+.search-box:focus{border-color:var(--sage-light);}
+.btn-new{padding:11px 20px;border-radius:12px;background:linear-gradient(135deg,var(--sage),var(--forest));color:#fff;border:none;font-family:'Playfair Display',monospace;font-size:12px;letter-spacing:.8px;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sage);transition:.18s;}
+.btn-new:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(90,122,98,.28);}
+
+.stats-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+
+/* ── patient card grid ── */
+.pf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.pf-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:.2s;position:relative;overflow:hidden;box-shadow:var(--shadow-sm);}
+.pf-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--sage-light),var(--gold));opacity:0;transition:.2s;}
+.pf-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-sage);border-color:var(--sage-pale);}
+.pf-card:hover::before{opacity:1;}
+.pf-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.pf-av{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--sage-dim),var(--gold-pale));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:14px;font-weight:700;color:var(--sage);flex-shrink:0;}
+.pf-name{font-size:14px;font-weight:700;color:var(--forest);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pf-sub{font-size:11px;color:var(--muted);}
+.pf-meta{display:flex;gap:14px;font-size:11px;color:var(--charcoal-mid);margin-bottom:12px;flex-wrap:wrap;}
+.pf-meta b{color:var(--text-primary);}
+.pf-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.pf-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:9px;letter-spacing:.3px;}
+.pf-badge.ex{background:rgba(184,148,63,.12);color:var(--gold);}
+.pf-badge.nu{background:rgba(61,139,91,.12);color:var(--success);}
+.pf-badge.rm{background:rgba(41,128,185,.12);color:#2980B9;}
+.pf-updated{position:absolute;bottom:10px;right:14px;font-size:10px;color:var(--muted-light);}
+
+.empty{text-align:center;padding:70px 20px;color:var(--muted);}
+.empty span{font-size:52px;display:block;margin-bottom:14px;}
+.loading{text-align:center;padding:60px;font-family:'Playfair Display',monospace;font-size:11px;color:rgba(90,122,98,.4);letter-spacing:2px;}
+
+/* ══════ MODALS (shared shell) ══════ */
+.overlay{display:none;position:fixed;inset:0;z-index:220;background:rgba(20,30,22,.72);backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding:26px 16px;overflow-y:auto;}
+.overlay.open{display:flex;}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:560px;padding:26px 24px 30px;position:relative;box-shadow:var(--shadow-lg);margin-bottom:40px;}
+.modal.wide{max-width:820px;}
+.modal-close{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--charcoal-mid);font-size:20px;cursor:pointer;line-height:1;}
+.m-h{font-family:'Playfair Display',monospace;font-size:15px;color:var(--forest);margin-bottom:3px;}
+.m-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
+
+.f-lbl{font-family:'Playfair Display',monospace;font-size:10px;letter-spacing:1.3px;color:rgba(90,122,98,.6);margin-bottom:7px;margin-top:14px;}
+.f-lbl:first-of-type{margin-top:0;}
+select.f-input,input.f-input,textarea.f-input{width:100%;background:var(--bg-warm);border:1px solid var(--border);border-radius:10px;color:var(--text-primary);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 13px;outline:none;transition:border-color .18s;}
+select.f-input:focus,input.f-input:focus,textarea.f-input:focus{border-color:var(--sage-light);}
+textarea.f-input{resize:vertical;min-height:70px;line-height:1.6;}
+.f-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.f-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:480px){.f-row3{grid-template-columns:1fr 1fr;}}
+
+.combo-wrap{position:relative;}
+.combo-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);max-height:200px;overflow-y:auto;z-index:30;display:none;}
+.combo-list.show{display:block;}
+.combo-item{padding:9px 13px;font-size:13px;cursor:pointer;border-bottom:1px solid rgba(90,122,98,.06);}
+.combo-item:last-child{border-bottom:none;}
+.combo-item:hover{background:var(--sage-dim);}
+.combo-item small{color:var(--muted);display:block;font-size:10.5px;margin-top:1px;}
+
+.btn-confirm{width:100%;margin-top:20px;padding:12px;background:linear-gradient(135deg,var(--sage),var(--forest));border:none;color:#fff;font-family:'Playfair Display',monospace;font-size:12px;letter-spacing:1px;border-radius:10px;cursor:pointer;transition:.18s;}
+.btn-confirm:hover:not(:disabled){box-shadow:0 8px 24px rgba(90,122,98,.3);transform:translateY(-1px);}
+.btn-confirm:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ══════ DETAIL VIEW ══════ */
+.detail-head{display:flex;align-items:center;gap:16px;margin-bottom:6px;flex-wrap:wrap;}
+.d-av{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--sage-dim),var(--gold-pale));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',monospace;font-size:20px;font-weight:700;color:var(--sage);flex-shrink:0;}
+.d-name{font-family:'Playfair Display',monospace;font-size:18px;color:var(--forest);}
+.d-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.d-stats{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 6px;}
+.d-stat{background:rgba(90,122,98,.06);border:1px solid var(--border);border-radius:10px;padding:8px 14px;text-align:center;min-width:78px;}
+.d-stat b{display:block;font-family:'Playfair Display',monospace;font-size:15px;color:var(--forest);}
+.d-stat span{font-size:9.5px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+
+.tabs2{display:flex;gap:6px;margin:20px 0 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:10px;}
+.tab2{padding:7px 14px;border-radius:18px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.5);color:rgba(90,122,98,.65);transition:.16s;}
+.tab2.on{background:var(--sage);border-color:var(--sage);color:#fff;}
+
+.tab-panel{display:none;}
+.tab-panel.on{display:block;}
+
+/* overview */
+.chart-card{background:rgba(255,255,255,.6);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;}
+.chart-title{font-family:'Playfair Display',monospace;font-size:12px;color:var(--forest);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.chart-empty{text-align:center;padding:30px;color:var(--muted);font-size:12px;}
+.mini-select{background:var(--bg-warm);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:11.5px;color:var(--text-primary);outline:none;}
+
+/* notes timeline */
+.note-add-row{display:flex;gap:8px;margin-bottom:16px;}
+.note-add-row textarea{flex:1;min-height:52px;}
+.note-add-row button{padding:0 18px;border-radius:10px;background:var(--sage);border:none;color:#fff;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap;}
+.note-item{background:rgba(255,255,255,.6);border:1px solid var(--border);border-left:3px solid var(--sage-light);border-radius:0 12px 12px 0;padding:12px 14px;margin-bottom:10px;}
+.note-time{font-size:10.5px;color:var(--muted);margin-bottom:5px;font-family:'DM Sans',sans-serif;letter-spacing:.3px;}
+.note-text{font-size:13px;color:var(--text-primary);line-height:1.65;white-space:pre-wrap;}
+.note-del{float:right;color:var(--danger);cursor:pointer;font-size:11px;opacity:.6;}
+.note-del:hover{opacity:1;}
+
+/* history */
+.hist-box textarea{min-height:150px;}
+.hist-saved{font-size:11px;color:var(--muted);margin-top:8px;}
+
+/* linked lists */
+.link-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.btn-link-add{padding:7px 14px;border-radius:9px;background:rgba(90,122,98,.1);border:1px solid var(--border);color:var(--sage);font-size:12px;font-weight:700;cursor:pointer;transition:.16s;}
+.btn-link-add:hover{background:rgba(90,122,98,.2);}
+.linked-item{background:rgba(255,255,255,.6);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-bottom:10px;}
+.li-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.li-title{font-size:13px;font-weight:700;color:var(--forest);}
+.li-date{font-size:10.5px;color:var(--muted);}
+.li-unlink{color:var(--danger);font-size:11px;cursor:pointer;white-space:nowrap;}
+.li-body{font-size:12px;color:var(--charcoal-mid);line-height:1.6;}
+.li-progress-track{height:7px;border-radius:4px;background:rgba(90,122,98,.1);overflow:hidden;margin-top:8px;}
+.li-progress-fill{height:100%;border-radius:4px;background:var(--sage);}
+
+/* picker modal list */
+.pick-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.16s;}
+.pick-item:hover{border-color:var(--sage-light);background:var(--sage-dim);}
+.pick-item.linked{opacity:.4;cursor:not-allowed;}
+.pick-info b{display:block;font-size:12.5px;color:var(--forest);}
+.pick-info span{font-size:11px;color:var(--muted);}
+.pick-add{font-size:11px;font-weight:700;color:var(--sage);white-space:nowrap;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--forest);color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.25s;z-index:400;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.btn-danger-outline{padding:8px 14px;border-radius:9px;background:rgba(200,74,74,.08);border:1px solid rgba(200,74,74,.28);color:var(--danger);font-size:11.5px;font-weight:700;cursor:pointer;}
+.btn-danger-outline:hover{background:rgba(200,74,74,.16);}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🗂️</span> Patient Files</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="window.location.href='chat.html'">💬 Chat</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="pw">
+
+  <!-- ══════ LIST VIEW ══════ -->
+  <div id="listView">
+    <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
+    <div class="page-title">🗂️ Patient Files</div>
+    <div class="page-subtitle">Organized records — vitals, history, notes and linked plans in one place</div>
+
+    <div class="stats-mini" id="statsMini"></div>
+
+    <div class="tools-row">
+      <input class="search-box" id="searchInput" type="text" placeholder="🔍 Search by patient name or email…" oninput="renderList()">
+      <button class="btn-new" onclick="openNewFile()">＋ New Patient File</button>
+    </div>
+
+    <div id="pfGrid"><div class="loading">LOADING…</div></div>
+  </div>
+
+  <!-- ══════ DETAIL VIEW ══════ -->
+  <div id="detailView" style="display:none;">
+    <button class="btn-back" onclick="closeDetail()">← All Files</button>
+
+    <div class="detail-head">
+      <div class="d-av" id="dAvatar">?</div>
+      <div>
+        <div class="d-name" id="dName">—</div>
+        <div class="d-sub" id="dSub">—</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn-danger-outline" onclick="deleteCurrentFile()">🗑 Delete File</button>
+      </div>
+    </div>
+
+    <div class="d-stats" id="dStats"></div>
+
+    <div class="tabs2">
+      <div class="tab2 on" data-t="overview" onclick="setDetailTab('overview',this)">📊 Overview</div>
+      <div class="tab2" data-t="notes" onclick="setDetailTab('notes',this)">📝 Notes</div>
+      <div class="tab2" data-t="history" onclick="setDetailTab('history',this)">🩺 History</div>
+      <div class="tab2" data-t="exercises" onclick="setDetailTab('exercises',this)">🏋️ Exercises</div>
+      <div class="tab2" data-t="nutrition" onclick="setDetailTab('nutrition',this)">🥗 Nutrition</div>
+      <div class="tab2" data-t="rom" onclick="setDetailTab('rom',this)">📐 ROM</div>
+    </div>
+
+    <!-- Overview -->
+    <div class="tab-panel on" id="panel-overview">
+      <div class="chart-card">
+        <div class="chart-title">
+          <span>⚖️ Weight Progress</span>
+          <button class="btn-link-add" onclick="openWeightUpdate()">＋ Log New Weight</button>
+        </div>
+        <div id="weightChartWrap"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">
+          <span>📐 ROM Progress</span>
+          <select class="mini-select" id="romJointSelect" onchange="renderRomChart()"></select>
+        </div>
+        <div id="romChartWrap"></div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="tab-panel" id="panel-notes">
+      <div class="note-add-row">
+        <textarea class="f-input" id="newNoteInput" placeholder="Write a note about this patient's visit, progress, or plan…"></textarea>
+        <button onclick="addNote()">＋ Add</button>
+      </div>
+      <div id="notesList"></div>
+    </div>
+
+    <!-- History -->
+    <div class="tab-panel" id="panel-history">
+      <div class="hist-box">
+        <div class="f-lbl">Medical History — chronic conditions, past injuries, surgeries…</div>
+        <textarea class="f-input" id="historyInput" placeholder="e.g. Previous ACL reconstruction (2022), hypertension, no known allergies…"></textarea>
+        <button class="btn-confirm" onclick="saveHistory()" style="max-width:220px;">💾 Save History</button>
+        <div class="hist-saved" id="histSavedNote"></div>
+      </div>
+    </div>
+
+    <!-- Exercises -->
+    <div class="tab-panel" id="panel-exercises">
+      <div class="link-head">
+        <div class="m-sub" style="margin:0;">Exercise plans linked to this patient's file</div>
+        <button class="btn-link-add" onclick="openLinkPicker('exercises')">＋ Link Exercise Plan</button>
+      </div>
+      <div id="exList"></div>
+    </div>
+
+    <!-- Nutrition -->
+    <div class="tab-panel" id="panel-nutrition">
+      <div class="link-head">
+        <div class="m-sub" style="margin:0;">Nutrition plans linked to this patient's file</div>
+        <button class="btn-link-add" onclick="openLinkPicker('nutrition')">＋ Link Nutrition Plan</button>
+      </div>
+      <div id="nuList"></div>
+    </div>
+
+    <!-- ROM -->
+    <div class="tab-panel" id="panel-rom">
+      <div class="link-head">
+        <div class="m-sub" style="margin:0;">ROM analysis sessions linked to this patient's file</div>
+        <button class="btn-link-add" onclick="openLinkPicker('rom')">＋ Link ROM Session</button>
+      </div>
+      <div id="romList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ NEW FILE MODAL ══════════════ -->
+<div class="overlay" id="newFileOverlay" onclick="if(event.target===this)closeModal('newFileOverlay')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('newFileOverlay')">✕</button>
+    <div class="m-h">🗂️ New Patient File</div>
+    <div class="m-sub">Create an organized record for a patient</div>
+
+    <div class="f-lbl">Patient name</div>
+    <div class="combo-wrap">
+      <input class="f-input" id="pfPatientName" type="text" placeholder="Search registered patients or type a new name…"
+        oninput="onPatientNameInput()" onfocus="onPatientNameInput()" autocomplete="off">
+      <div class="combo-list" id="patientCombo"></div>
+    </div>
+    <input type="hidden" id="pfPatientEmail" value="">
+
+    <div class="f-row3">
+      <div>
+        <div class="f-lbl">Age</div>
+        <input class="f-input" id="pfAge" type="number" min="0" max="120" placeholder="Years">
+      </div>
+      <div>
+        <div class="f-lbl">Gender</div>
+        <select class="f-input" id="pfGender">
+          <option value="">—</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div>
+        <div class="f-lbl">Weight (kg)</div>
+        <input class="f-input" id="pfWeight" type="number" min="0" placeholder="kg">
+      </div>
+    </div>
+    <div class="f-lbl">Height (cm)</div>
+    <input class="f-input" id="pfHeight" type="number" min="0" placeholder="cm">
+
+    <div class="f-lbl">Medical history (optional)</div>
+    <textarea class="f-input" id="pfHistory" placeholder="Chronic conditions, previous injuries, surgeries…"></textarea>
+
+    <div class="f-lbl">Initial note (optional)</div>
+    <textarea class="f-input" id="pfNote" placeholder="First consultation notes…"></textarea>
+
+    <button class="btn-confirm" id="pfSaveBtn" onclick="saveNewFile()">✅ Create Patient File</button>
+  </div>
+</div>
+
+<!-- ══════════════ WEIGHT UPDATE MODAL ══════════════ -->
+<div class="overlay" id="weightOverlay" onclick="if(event.target===this)closeModal('weightOverlay')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('weightOverlay')">✕</button>
+    <div class="m-h">⚖️ Log New Weight</div>
+    <div class="m-sub">Adds a new point to the weight progress chart</div>
+    <div class="f-lbl">Weight (kg)</div>
+    <input class="f-input" id="newWeightInput" type="number" min="0" step="0.1" placeholder="kg">
+    <button class="btn-confirm" onclick="saveWeightUpdate()">✅ Save</button>
+  </div>
+</div>
+
+<!-- ══════════════ LINK PICKER MODAL ══════════════ -->
+<div class="overlay" id="pickerOverlay" onclick="if(event.target===this)closeModal('pickerOverlay')">
+  <div class="modal wide">
+    <button class="modal-close" onclick="closeModal('pickerOverlay')">✕</button>
+    <div class="m-h" id="pickerTitle">Link Plan</div>
+    <div class="m-sub" id="pickerSub">Choose an existing plan to attach to this patient's file</div>
+    <div id="pickerList"><div class="chart-empty">Loading…</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+try {
+  const cfg={apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"};
+  if(!firebase.apps.length)firebase.initializeApp(cfg);
+  window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;
+}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script>
+'use strict';
+
+let ME = null;
+let allFiles = [];
+let allPatients = [];      // registered patients (role=patient)
+let activeFile = null;     // currently opened patient file
+let curDetailTab = 'overview';
+
+const ROM_LABELS = {
+  elbowL:'Elbow — Left', elbowR:'Elbow — Right',
+  shoulderFlexL:'Shoulder Flexion — Left', shoulderFlexR:'Shoulder Flexion — Right',
+  shoulderAbdL:'Shoulder Abduction — Left', shoulderAbdR:'Shoulder Abduction — Right',
+  shoulderExtL:'Shoulder Extension — Left', shoulderExtR:'Shoulder Extension — Right',
+  kneeL:'Knee — Left', kneeR:'Knee — Right',
+  hipFlexL:'Hip Flexion — Left', hipFlexR:'Hip Flexion — Right',
+};
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function initials(name){return(name||'?').split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+function fmtDate(ts){
+  if(!ts) return '';
+  return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtDateTime(ts){
+  if(!ts) return '';
+  return new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async ()=>{
+  ME = requireAuth('doctor');
+  if(!ME) return;
+  await loadPatients();
+  await loadFiles();
+});
+
+async function loadPatients(){
+  try{
+    const users = await asyncGetAllUsers();
+    allPatients = users.filter(u=>u.role==='patient');
+  }catch(e){ allPatients = []; }
+}
+
+async function loadFiles(){
+  try{ allFiles = await dbGetDoctorPatientFiles(ME.email); }
+  catch(e){ allFiles = []; }
+  allFiles.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  renderStatsMini();
+  renderList();
+}
+
+function renderStatsMini(){
+  const total = allFiles.length;
+  const withHistory = allFiles.filter(f=>f.history && f.history.trim()).length;
+  const linkedTotal = allFiles.reduce((s,f)=>s+(f.linkedExercises||[]).length+(f.linkedNutrition||[]).length+(f.linkedRom||[]).length,0);
+  document.getElementById('statsMini').innerHTML = `
+    <div class="stat-card"><h3>${total}</h3><p>Patient Files</p></div>
+    <div class="stat-card"><h3>${withHistory}</h3><p>With Medical History</p></div>
+    <div class="stat-card"><h3>${linkedTotal}</h3><p>Linked Plans &amp; Sessions</p></div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIST VIEW
+// ─────────────────────────────────────────────────────────────────────────────
+function renderList(){
+  const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  let list = allFiles.filter(f=>{
+    if(!q) return true;
+    return (f.patientName||'').toLowerCase().includes(q) || (f.patientEmail||'').toLowerCase().includes(q);
+  });
+
+  const grid = document.getElementById('pfGrid');
+  if(!list.length){
+    grid.innerHTML = allFiles.length
+      ? `<div class="empty"><span>🔍</span><p>No files match your search.</p></div>`
+      : `<div class="empty"><span>🗂️</span><p>No patient files yet.<br>Create your first organized patient record.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(f=>{
+    const wLog = f.weightLog||[];
+    const latestW = wLog.length ? wLog[wLog.length-1].weight : (f.weight||'—');
+    const exCnt = (f.linkedExercises||[]).length;
+    const nuCnt = (f.linkedNutrition||[]).length;
+    const rmCnt = (f.linkedRom||[]).length;
+    return `<div class="pf-card" onclick="openDetail('${esc(f.id)}')">
+      <div class="pf-top">
+        <div class="pf-av">${initials(f.patientName)}</div>
+        <div style="min-width:0;">
+          <div class="pf-name">${esc(f.patientName)}</div>
+          <div class="pf-sub">${esc(f.patientEmail||'Unregistered patient')}</div>
+        </div>
+      </div>
+      <div class="pf-meta">
+        <span>🎂 <b>${esc(f.age||'—')}</b> yrs</span>
+        <span>⚖️ <b>${esc(latestW)}</b> kg</span>
+        <span>📏 <b>${esc(f.height||'—')}</b> cm</span>
+      </div>
+      <div class="pf-badges">
+        ${exCnt ? `<span class="pf-badge ex">🏋️ ${exCnt} Exercise${exCnt>1?'s':''}</span>` : ''}
+        ${nuCnt ? `<span class="pf-badge nu">🥗 ${nuCnt} Nutrition</span>` : ''}
+        ${rmCnt ? `<span class="pf-badge rm">📐 ${rmCnt} ROM</span>` : ''}
+        ${!exCnt && !nuCnt && !rmCnt ? `<span class="pf-badge" style="background:rgba(138,138,138,.1);color:var(--muted);">No linked plans yet</span>` : ''}
+      </div>
+      <div class="pf-updated">Updated ${fmtDate(f.updatedAt)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NEW FILE MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function openNewFile(){
+  document.getElementById('pfPatientName').value = '';
+  document.getElementById('pfPatientEmail').value = '';
+  document.getElementById('pfAge').value = '';
+  document.getElementById('pfGender').value = '';
+  document.getElementById('pfWeight').value = '';
+  document.getElementById('pfHeight').value = '';
+  document.getElementById('pfHistory').value = '';
+  document.getElementById('pfNote').value = '';
+  document.getElementById('patientCombo').classList.remove('show');
+  document.getElementById('newFileOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function onPatientNameInput(){
+  const q = document.getElementById('pfPatientName').value.toLowerCase().trim();
+  document.getElementById('pfPatientEmail').value = ''; // typing invalidates a previous selection
+  const combo = document.getElementById('patientCombo');
+  const matches = allPatients.filter(p=>
+    (p.name||'').toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q)
+  ).slice(0,8);
+
+  if(!matches.length){ combo.classList.remove('show'); combo.innerHTML=''; return; }
+  combo.innerHTML = matches.map(p=>
+    `<div class="combo-item" onclick="pickComboPatient('${esc(p.email)}','${esc(p.name)}')">
+      ${esc(p.name)}<small>${esc(p.email)}</small>
+    </div>`).join('');
+  combo.classList.add('show');
+}
+function pickComboPatient(email,name){
+  document.getElementById('pfPatientName').value = name;
+  document.getElementById('pfPatientEmail').value = email;
+  document.getElementById('patientCombo').classList.remove('show');
+  // auto-fill age/gender if the registered patient has a profile with these fields
+  const p = allPatients.find(x=>x.email===email);
+  if(p?.profile?.age) document.getElementById('pfAge').value = p.profile.age;
+  if(p?.profile?.gender) document.getElementById('pfGender').value = p.profile.gender;
+}
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.combo-wrap')) document.getElementById('patientCombo')?.classList.remove('show');
+});
+
+async function saveNewFile(){
+  const name = document.getElementById('pfPatientName').value.trim();
+  if(!name){ showToast('⚠️ Please enter a patient name.'); return; }
+
+  const btn = document.getElementById('pfSaveBtn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+
+  const now = Date.now();
+  const weight = parseFloat(document.getElementById('pfWeight').value) || null;
+  const noteText = document.getElementById('pfNote').value.trim();
+
+  const file = {
+    id: 'pf_' + now,
+    doctorEmail: ME.email,
+    patientName: name,
+    patientEmail: document.getElementById('pfPatientEmail').value || '',
+    age: document.getElementById('pfAge').value || '',
+    gender: document.getElementById('pfGender').value || '',
+    height: document.getElementById('pfHeight').value || '',
+    weightLog: weight ? [{ weight, ts: now }] : [],
+    history: document.getElementById('pfHistory').value.trim(),
+    notes: noteText ? [{ text: noteText, ts: now }] : [],
+    linkedExercises: [],
+    linkedNutrition: [],
+    linkedRom: [],
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  try{
+    await dbSavePatientFile(file);
+    allFiles.unshift(file);
+    renderStatsMini();
+    renderList();
+    closeModal('newFileOverlay');
+    showToast('✅ Patient file created');
+  }catch(e){
+    console.warn(e);
+    showToast('⚠️ Could not create file. Please try again.');
+  }
+  btn.disabled = false; btn.textContent = '✅ Create Patient File';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DETAIL VIEW
+// ─────────────────────────────────────────────────────────────────────────────
+function openDetail(id){
+  activeFile = allFiles.find(f=>f.id===id);
+  if(!activeFile) return;
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+
+  document.getElementById('dAvatar').textContent = initials(activeFile.patientName);
+  document.getElementById('dName').textContent = activeFile.patientName;
+  document.getElementById('dSub').textContent = activeFile.patientEmail || 'Unregistered patient';
+
+  renderDetailStats();
+  setDetailTab('overview', document.querySelector('.tab2[data-t="overview"]'));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeDetail(){
+  activeFile = null;
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+  loadFiles();
+}
+
+function renderDetailStats(){
+  const f = activeFile;
+  const wLog = f.weightLog||[];
+  const latestW = wLog.length ? wLog[wLog.length-1].weight : (f.weight||'—');
+  let bmi = '—';
+  if(latestW !== '—' && f.height){
+    const h = f.height/100;
+    bmi = (latestW / (h*h)).toFixed(1);
+  }
+  document.getElementById('dStats').innerHTML = `
+    <div class="d-stat"><b>${esc(f.age||'—')}</b><span>Age</span></div>
+    <div class="d-stat"><b>${esc(f.gender==='male'?'M':f.gender==='female'?'F':'—')}</b><span>Gender</span></div>
+    <div class="d-stat"><b>${esc(f.height||'—')}</b><span>Height (cm)</span></div>
+    <div class="d-stat"><b>${esc(latestW)}</b><span>Weight (kg)</span></div>
+    <div class="d-stat"><b>${bmi}</b><span>BMI</span></div>`;
+}
+
+function setDetailTab(t, el){
+  curDetailTab = t;
+  document.querySelectorAll('.tab2').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('on'));
+  document.getElementById('panel-'+t).classList.add('on');
+
+  if(t==='overview'){ renderWeightChart(); refreshRomOverview(); }
+  else if(t==='notes'){ renderNotes(); }
+  else if(t==='history'){ renderHistory(); }
+  else if(t==='exercises'){ renderLinkedExercises(); }
+  else if(t==='nutrition'){ renderLinkedNutrition(); }
+  else if(t==='rom'){ renderLinkedRom(); }
+}
+
+// ── lightweight inline SVG line chart (no external library) ──
+function buildLineChartSVG(points, opts){
+  opts = opts || {};
+  const w = 640, h = 180, padL = 38, padR = 16, padT = 16, padB = 28;
+  const color = opts.color || '#5A7A62';
+  const unit = opts.unit || '';
+
+  if(!points.length){
+    return `<div class="chart-empty">No data points yet — ${opts.emptyMsg||'add some to see the trend'}.</div>`;
+  }
+  if(points.length === 1){
+    return `<div class="chart-empty">Only one data point (${points[0].y}${unit}) — add another to see a trend line.</div>`;
+  }
+
+  const ys = points.map(p=>p.y);
+  let minY = Math.min(...ys), maxY = Math.max(...ys);
+  if(minY === maxY){ minY -= 5; maxY += 5; }
+  const pad = (maxY-minY)*0.15;
+  minY -= pad; maxY += pad;
+
+  const innerW = w - padL - padR, innerH = h - padT - padB;
+  const xStep = innerW / (points.length-1);
+  const xy = points.map((p,i)=>({
+    x: padL + i*xStep,
+    y: padT + innerH - ((p.y-minY)/(maxY-minY))*innerH
+  }));
+
+  const linePath = xy.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const areaPath = linePath + ` L${xy[xy.length-1].x.toFixed(1)},${(padT+innerH).toFixed(1)} L${xy[0].x.toFixed(1)},${(padT+innerH).toFixed(1)} Z`;
+
+  const gridLines = [0,0.5,1].map(f=>{
+    const gy = padT + innerH*f;
+    const val = (maxY - (maxY-minY)*f).toFixed(1);
+    return `<line x1="${padL}" y1="${gy}" x2="${w-padR}" y2="${gy}" stroke="rgba(90,122,98,.12)" stroke-width="1"/>
+      <text x="${padL-6}" y="${gy+3}" font-size="9" fill="#8A8A8A" text-anchor="end" font-family="DM Sans">${val}</text>`;
+  }).join('');
+
+  const dots = xy.map((p,i)=>
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${color}" stroke="#fff" stroke-width="1.5">
+      <title>${esc(points[i].label)}: ${points[i].y}${unit}</title>
+    </circle>`).join('');
+
+  // show first / last / mid x labels only to avoid clutter
+  const labelIdxs = new Set([0, points.length-1]);
+  if(points.length>2) labelIdxs.add(Math.floor((points.length-1)/2));
+  const xLabels = xy.map((p,i)=> labelIdxs.has(i)
+    ? `<text x="${p.x.toFixed(1)}" y="${h-8}" font-size="9" fill="#8A8A8A" text-anchor="middle" font-family="DM Sans">${esc(points[i].label)}</text>`
+    : '').join('');
+
+  const first = points[0].y, last = points[points.length-1].y;
+  const delta = (last-first);
+  const deltaTxt = delta===0 ? 'No change' : (delta>0?'+':'') + delta.toFixed(1) + unit + ' since first entry';
+  const deltaColor = delta===0 ? '#8A8A8A' : (opts.higherIsBetter===false ? (delta<0?'#3D8B5B':'#C84A4A') : (delta>0?'#3D8B5B':'#C84A4A'));
+
+  return `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">
+      <defs>
+        <linearGradient id="grad-${opts.id||'x'}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${gridLines}
+      <path d="${areaPath}" fill="url(#grad-${opts.id||'x'})"/>
+      <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      ${xLabels}
+    </svg>
+    <div style="text-align:right;font-size:11px;color:${deltaColor};font-weight:700;margin-top:2px;">${deltaTxt}</div>`;
+}
+
+function renderWeightChart(){
+  const wLog = (activeFile.weightLog||[]).slice().sort((a,b)=>a.ts-b.ts);
+  const points = wLog.map(w=>({y: w.weight, label: fmtDate(w.ts)}));
+  document.getElementById('weightChartWrap').innerHTML = buildLineChartSVG(points, {
+    color:'#B8943F', unit:'kg', id:'weight', emptyMsg:'log this patient\'s weight to start tracking'
+  });
+}
+
+function buildRomJointSelect(){
+  const sel = document.getElementById('romJointSelect');
+  const sessions = getLinkedRomSessions();
+  const jointsPresent = new Set();
+  sessions.forEach(s=> Object.keys(s.angles||{}).forEach(k=>{ if(s.angles[k]!=null) jointsPresent.add(k); }));
+
+  if(!jointsPresent.size){
+    sel.innerHTML = `<option value="">No linked ROM sessions</option>`;
+    return;
+  }
+  const prev = sel.value;
+  sel.innerHTML = [...jointsPresent].map(k=>`<option value="${k}">${ROM_LABELS[k]||k}</option>`).join('');
+  if(prev && jointsPresent.has(prev)) sel.value = prev;
+}
+
+async function refreshRomOverview(){
+  await getAllRomSessions(); // warms _romCache so getLinkedRomSessions() below is accurate
+  buildRomJointSelect();
+  renderRomChart();
+}
+
+function renderRomChart(){
+  const jt = document.getElementById('romJointSelect').value;
+  const sessions = getLinkedRomSessions().slice().sort((a,b)=>a.id-b.id);
+  if(!jt || !sessions.length){
+    document.getElementById('romChartWrap').innerHTML = `<div class="chart-empty">Link ROM sessions to this patient to compare progress over time.</div>`;
+    return;
+  }
+  const points = sessions
+    .filter(s=> s.angles && s.angles[jt] != null)
+    .map(s=>({ y: s.angles[jt], label: fmtDate(s.id) }));
+
+  document.getElementById('romChartWrap').innerHTML = buildLineChartSVG(points, {
+    color:'#2980B9', unit:'°', id:'rom', emptyMsg:'no readings yet for this joint'
+  });
+}
+
+// ── notes ──
+function renderNotes(){
+  const notes = (activeFile.notes||[]).slice().sort((a,b)=>b.ts-a.ts);
+  const wrap = document.getElementById('notesList');
+  if(!notes.length){
+    wrap.innerHTML = `<div class="chart-empty">No notes yet. Add your first note above.</div>`;
+    return;
+  }
+  wrap.innerHTML = notes.map(n=>`
+    <div class="note-item">
+      <div class="note-time">🕐 ${fmtDateTime(n.ts)} <span class="note-del" onclick="deleteNote(${n.ts})">✕ remove</span></div>
+      <div class="note-text">${esc(n.text)}</div>
+    </div>`).join('');
+}
+async function addNote(){
+  const input = document.getElementById('newNoteInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const note = { text, ts: Date.now() };
+  activeFile.notes = activeFile.notes || [];
+  activeFile.notes.push(note);
+  activeFile.updatedAt = Date.now();
+  input.value = '';
+  renderNotes();
+  try{ await dbUpdatePatientFile(activeFile.id, { notes: activeFile.notes, updatedAt: activeFile.updatedAt }); }
+  catch(e){ showToast('⚠️ Could not save note.'); }
+}
+async function deleteNote(ts){
+  activeFile.notes = (activeFile.notes||[]).filter(n=>n.ts!==ts);
+  activeFile.updatedAt = Date.now();
+  renderNotes();
+  try{ await dbUpdatePatientFile(activeFile.id, { notes: activeFile.notes, updatedAt: activeFile.updatedAt }); }
+  catch(e){ showToast('⚠️ Could not remove note.'); }
+}
+
+// ── history ──
+function renderHistory(){
+  document.getElementById('historyInput').value = activeFile.history || '';
+  document.getElementById('histSavedNote').textContent = activeFile.historyUpdatedAt
+    ? 'Last updated ' + fmtDateTime(activeFile.historyUpdatedAt) : '';
+}
+async function saveHistory(){
+  const text = document.getElementById('historyInput').value.trim();
+  activeFile.history = text;
+  activeFile.historyUpdatedAt = Date.now();
+  activeFile.updatedAt = Date.now();
+  try{
+    await dbUpdatePatientFile(activeFile.id, { history: text, historyUpdatedAt: activeFile.historyUpdatedAt, updatedAt: activeFile.updatedAt });
+    showToast('✅ Medical history saved');
+    renderHistory();
+  }catch(e){ showToast('⚠️ Could not save history.'); }
+}
+
+// ── weight update ──
+function openWeightUpdate(){
+  document.getElementById('newWeightInput').value = '';
+  document.getElementById('weightOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+async function saveWeightUpdate(){
+  const val = parseFloat(document.getElementById('newWeightInput').value);
+  if(!val || val<=0){ showToast('⚠️ Enter a valid weight.'); return; }
+  activeFile.weightLog = activeFile.weightLog || [];
+  activeFile.weightLog.push({ weight: val, ts: Date.now() });
+  activeFile.updatedAt = Date.now();
+  try{
+    await dbUpdatePatientFile(activeFile.id, { weightLog: activeFile.weightLog, updatedAt: activeFile.updatedAt });
+    closeModal('weightOverlay');
+    renderDetailStats();
+    renderWeightChart();
+    showToast('✅ Weight logged');
+  }catch(e){ showToast('⚠️ Could not log weight.'); }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LINKED DATA — exercises / nutrition / rom
+// ─────────────────────────────────────────────────────────────────────────────
+function matchesPatient(entryName, entryEmail){
+  const fn = (activeFile.patientName||'').toLowerCase().trim();
+  const fe = (activeFile.patientEmail||'').toLowerCase().trim();
+  if(fe && entryEmail && entryEmail.toLowerCase()===fe) return true;
+  if(entryName && entryName.toLowerCase().trim()===fn) return true;
+  return false;
+}
+
+function getSentExercises(){ return (ME.sentExercises || []); }
+function getLifestylePlans(){ return (ME.lifestylePlans || []); }
+let _romCache = null;
+async function getAllRomSessions(){
+  if(_romCache) return _romCache;
+  try{ _romCache = await fbGetSessions(ME.email); }catch(e){ _romCache = []; }
+  return _romCache;
+}
+
+async function renderLinkedExercises(){
+  const linked = activeFile.linkedExercises||[];
+  const all = getSentExercises();
+  const items = linked.map(l => all.find(a=>String(a.id)===String(l.refId))).filter(Boolean);
+  const wrap = document.getElementById('exList');
+  if(!items.length){
+    wrap.innerHTML = `<div class="chart-empty">No exercise plans linked yet.</div>`;
+    return;
+  }
+  // Pull the patient's live record so completion status reflects what the
+  // patient has actually marked done — the doctor's own sentExercises copy
+  // never gets updated when the patient taps "Complete".
+  let livePatient = allPatients.find(p=>p.email===activeFile.patientEmail) || null;
+  if(window.FIREBASE_ENABLED && activeFile.patientEmail){
+    try{ const fresh = await asyncGetUser(activeFile.patientEmail); if(fresh) livePatient = fresh; }catch(e){}
+  }
+  const liveExercisesFor = (assignmentId) => {
+    const patAssign = livePatient?.exercises?.find(a=>String(a.id)===String(assignmentId));
+    return patAssign?.exercises || null;
+  };
+  wrap.innerHTML = items.map(a=>{
+    const liveEx = liveExercisesFor(a.id);
+    const exList = liveEx || a.exercises || [];
+    const t = exList.length;
+    const d = exList.filter(e=>e.status==='completed').length;
+    const pct = t ? Math.round(d/t*100) : 0;
+    return `<div class="linked-item">
+      <div class="li-top">
+        <div class="li-title">🏋️ ${esc(a.department||'Exercise Plan')}</div>
+        <div class="li-unlink" onclick="unlink('exercises','${esc(a.id)}')">✕ Unlink</div>
+      </div>
+      <div class="li-date">Assigned ${esc(a.date||'')}</div>
+      <div class="li-body">${d} of ${t} exercises completed</div>
+      <div class="li-progress-track"><div class="li-progress-fill" style="width:${pct}%;"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderLinkedNutrition(){
+  const linked = activeFile.linkedNutrition||[];
+  const all = getLifestylePlans();
+  const items = linked.map(l => all.find(p=>String(p.id)===String(l.refId))).filter(Boolean);
+  const wrap = document.getElementById('nuList');
+  if(!items.length){
+    wrap.innerHTML = `<div class="chart-empty">No nutrition plans linked yet.</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(p=>`
+    <div class="linked-item">
+      <div class="li-top">
+        <div class="li-title">🥗 ${p.goal==='lose'?'Weight Loss':p.goal==='gain'?'Weight Gain':'Maintenance'} Plan</div>
+        <div class="li-unlink" onclick="unlink('nutrition','${esc(p.id)}')">✕ Unlink</div>
+      </div>
+      <div class="li-date">Created ${esc(p.date||'')}</div>
+      <div class="li-body">Target: ${esc(p.target||'—')} kcal/day · BMI ${esc(p.bmi||'—')} (${esc(p.bmiCat||'—')})</div>
+    </div>`).join('');
+}
+
+async function renderLinkedRom(){
+  const linked = activeFile.linkedRom||[];
+  const all = await getAllRomSessions();
+  const items = linked.map(l => all.find(s=>String(s.id)===String(l.refId))).filter(Boolean)
+    .sort((a,b)=>b.id-a.id);
+  const wrap = document.getElementById('romList');
+  if(!items.length){
+    wrap.innerHTML = `<div class="chart-empty">No ROM sessions linked yet.</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(s=>{
+    const angles = Object.entries(s.angles||{}).filter(([k,v])=>v!=null)
+      .map(([k,v])=>`${ROM_LABELS[k]||k}: <b>${v}°</b>`).join(' &nbsp;·&nbsp; ');
+    return `<div class="linked-item">
+      <div class="li-top">
+        <div class="li-title">📐 ROM Session</div>
+        <div class="li-unlink" onclick="unlink('rom','${esc(s.id)}')">✕ Unlink</div>
+      </div>
+      <div class="li-date">${esc(s.date||fmtDate(s.id))}</div>
+      <div class="li-body">${angles || 'No angle data recorded'}</div>
+    </div>`;
+  }).join('');
+}
+
+function getLinkedRomSessions(){
+  // Synchronous helper used by chart render (relies on _romCache already warmed)
+  const linked = activeFile.linkedRom||[];
+  const all = _romCache || [];
+  return linked.map(l => all.find(s=>String(s.id)===String(l.refId))).filter(Boolean);
+}
+
+async function unlink(type, refId){
+  const key = type==='exercises' ? 'linkedExercises' : type==='nutrition' ? 'linkedNutrition' : 'linkedRom';
+  activeFile[key] = (activeFile[key]||[]).filter(l=>String(l.refId)!==String(refId));
+  activeFile.updatedAt = Date.now();
+  try{
+    await dbUpdatePatientFile(activeFile.id, { [key]: activeFile[key], updatedAt: activeFile.updatedAt });
+  }catch(e){ showToast('⚠️ Could not unlink.'); }
+  if(type==='exercises') renderLinkedExercises();
+  else if(type==='nutrition') renderLinkedNutrition();
+  else { renderLinkedRom(); buildRomJointSelect(); renderRomChart(); }
+}
+
+// ── link picker ──
+let pickerType = null;
+async function openLinkPicker(type){
+  pickerType = type;
+  const titleMap = { exercises:'🏋️ Link Exercise Plan', nutrition:'🥗 Link Nutrition Plan', rom:'📐 Link ROM Session' };
+  document.getElementById('pickerTitle').textContent = titleMap[type];
+  document.getElementById('pickerSub').textContent = `Showing plans matching "${activeFile.patientName}". Click one to attach it to this file.`;
+  document.getElementById('pickerList').innerHTML = `<div class="chart-empty">Loading…</div>`;
+  document.getElementById('pickerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  let candidates = [];
+  let linkedIds = [];
+  if(type==='exercises'){
+    candidates = getSentExercises().filter(a=>matchesPatient(a.patientName, a.patientEmail));
+    linkedIds = (activeFile.linkedExercises||[]).map(l=>String(l.refId));
+  } else if(type==='nutrition'){
+    candidates = getLifestylePlans().filter(p=>matchesPatient(p.patientName, null));
+    linkedIds = (activeFile.linkedNutrition||[]).map(l=>String(l.refId));
+  } else {
+    const all = await getAllRomSessions();
+    candidates = all.filter(s=>matchesPatient(s.patient?.name, null));
+    linkedIds = (activeFile.linkedRom||[]).map(l=>String(l.refId));
+  }
+  renderPickerList(candidates, linkedIds);
+}
+
+function renderPickerList(candidates, linkedIds){
+  const wrap = document.getElementById('pickerList');
+  if(!candidates.length){
+    wrap.innerHTML = `<div class="chart-empty">No matching plans found for "${esc(activeFile.patientName)}".<br>Make sure the patient name matches exactly in that section.</div>`;
+    return;
+  }
+  wrap.innerHTML = candidates.map(c=>{
+    const id = String(c.id);
+    const isLinked = linkedIds.includes(id);
+    let title='', sub='';
+    if(pickerType==='exercises'){
+      title = '🏋️ ' + (c.department||'Exercise Plan');
+      sub = `${(c.exercises||[]).length} exercises · Assigned ${c.date||''}`;
+    } else if(pickerType==='nutrition'){
+      title = '🥗 ' + (c.goal==='lose'?'Weight Loss':c.goal==='gain'?'Weight Gain':'Maintenance') + ' Plan';
+      sub = `${c.target||'—'} kcal/day · ${c.date||''}`;
+    } else {
+      title = '📐 ROM Session';
+      const angleCount = Object.values(c.angles||{}).filter(v=>v!=null).length;
+      sub = `${angleCount} joint readings · ${c.date||fmtDate(c.id)}`;
+    }
+    return `<div class="pick-item ${isLinked?'linked':''}" onclick="${isLinked?'':`confirmLink('${id}')`}">
+      <div class="pick-info"><b>${title}</b><span>${esc(sub)}</span></div>
+      <div class="pick-add">${isLinked?'✓ Already linked':'＋ Attach'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function confirmLink(refId){
+  const key = pickerType==='exercises' ? 'linkedExercises' : pickerType==='nutrition' ? 'linkedNutrition' : 'linkedRom';
+  activeFile[key] = activeFile[key] || [];
+  if(activeFile[key].some(l=>String(l.refId)===String(refId))) return;
+  activeFile[key].push({ refId, linkedAt: Date.now() });
+  activeFile.updatedAt = Date.now();
+  try{
+    await dbUpdatePatientFile(activeFile.id, { [key]: activeFile[key], updatedAt: activeFile.updatedAt });
+    showToast('✅ Attached to patient file');
+  }catch(e){ showToast('⚠️ Could not link.'); }
+
+  closeModal('pickerOverlay');
+  if(pickerType==='exercises') renderLinkedExercises();
+  else if(pickerType==='nutrition') renderLinkedNutrition();
+  else { renderLinkedRom(); buildRomJointSelect(); renderRomChart(); }
+}
+
+// ── delete file ──
+async function deleteCurrentFile(){
+  if(!activeFile) return;
+  if(!confirm(`Delete the patient file for "${activeFile.patientName}"? This cannot be undone.`)) return;
+  try{
+    await dbDeletePatientFile(activeFile.id);
+    allFiles = allFiles.filter(f=>f.id!==activeFile.id);
+    showToast('🗑 Patient file deleted');
+    closeDetail();
+  }catch(e){ showToast('⚠️ Could not delete file.'); }
+}
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

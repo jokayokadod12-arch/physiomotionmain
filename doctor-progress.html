@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Patient Reports — Physio Motion Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/doctor-progress.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📈</span> Patient Reports</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="window.location.href='chat.html'">💬 Chat</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="page-container">
+  <button class="btn-back" onclick="window.location.href='plans.html'">← Plans</button>
+
+  <div class="page-title">Patient Reports</div>
+  <div class="page-subtitle">Monitor completion rates and patient progress</div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><h3 id="statPatients">0</h3><p>Total Patients</p></div>
+    <div class="stat-card"><h3 id="statAssignments">0</h3><p>Total Assignments</p></div>
+    <div class="stat-card"><h3 id="statAvg">0%</h3><p>Avg Completion</p></div>
+    <div class="stat-card success"><h3 id="statFull">0</h3><p>Fully Completed</p></div>
+  </div>
+
+  <div class="filter-row">
+    <input type="text" id="searchInput" placeholder="Search patient name or email…" oninput="filterPatients()">
+    <select id="statusFilter" onchange="filterPatients()">
+      <option value="all">All Patients</option>
+      <option value="excellent">Excellent (&gt;80%)</option>
+      <option value="good">Good (50–80%)</option>
+      <option value="low">Needs Work (&lt;50%)</option>
+    </select>
+  </div>
+
+  <div id="patientsContainer"></div>
+</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    try {
+      var _FBCFG = {
+        apiKey:            "AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+        authDomain:        "physiowork-8976f.firebaseapp.com",
+        projectId:         "physiowork-8976f",
+        storageBucket:     "physiowork-8976f.firebasestorage.app",
+        messagingSenderId: "789519816056",
+        appId:             "1:789519816056:web:c2c8d82c83f8149fd1a48d"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+      window._fbDb      = firebase.firestore();
+      window._fbStorage = firebase.storage();
+      window.FIREBASE_ENABLED = true;
+    } catch(e) {
+      console.warn('Firebase init failed:', e);
+      window.FIREBASE_ENABLED = false;
+    }
+  </script>
+<script src="js/utils.js"></script>
+<script>requireAuth('doctor');</script>
+<script src="js/doctor-progress.js"></script>
+
+<script src="js/pwa.js"></script>
+</body>
+</html>

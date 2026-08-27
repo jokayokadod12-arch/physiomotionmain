@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>My Nutrition Plans — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .wrap { max-width:860px; margin:0 auto; padding:24px 18px 80px; position:relative; z-index:1; width:100%; }
+
+    .plan-card {
+      background:rgba(245,239,228,.8); border:1px solid rgba(90,122,98,.13);
+      border-radius:16px; margin-bottom:20px; overflow:hidden;
+    }
+    .plan-head {
+      padding:16px 20px; display:flex; justify-content:space-between; align-items:flex-start;
+      background:rgba(90,122,98,.04); border-bottom:1px solid rgba(90,122,98,.08); flex-wrap:wrap; gap:10px;
+    }
+    .plan-head-info h3 { font-family:'Playfair Display',monospace; font-size:13px; font-weight:700; color:#7A9E82; margin-bottom:4px; }
+    .plan-head-info p  { font-size:12px; color:var(--charcoal-mid); }
+    .plan-head-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+    .btn-sm {
+      padding:7px 14px; border-radius:8px; font-family:'DM Sans',sans-serif;
+      font-size:12px; font-weight:700; letter-spacing:.5px; cursor:pointer; transition:.2s;
+    }
+    .btn-expand { background:rgba(90,122,98,.08); border:1px solid rgba(90,122,98,.25); color:#7A9E82; }
+    .btn-expand:hover { background:rgba(90,122,98,.16); }
+    .btn-print  { background:rgba(45,74,53,.2); border:1px solid rgba(45,74,53,.4); color:#64b5f6; }
+    .btn-print:hover { background:rgba(45,74,53,.35); }
+    .btn-delete { background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.25); color:rgba(255,82,82,.7); }
+    .btn-delete:hover { background:rgba(255,82,82,.18); }
+
+    /* Metrics */
+    .metrics-mini { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:14px 20px; border-bottom:1px solid rgba(90,122,98,.06); }
+    @media(max-width:480px){ .metrics-mini{ grid-template-columns:repeat(2,1fr); } }
+    .mm-box { background:rgba(250,247,242,.5); border:1px solid rgba(90,122,98,.1); border-radius:8px; padding:10px; text-align:center; }
+    .mm-val { font-family:'Playfair Display',monospace; font-size:15px; font-weight:700; color:#7A9E82; }
+    .mm-lbl { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+
+    /* Expanded content */
+    .plan-body { display:none; padding:16px 20px 20px; }
+    .plan-body.open { display:block; }
+
+    .meal-day { background:rgba(250,247,242,.5); border:1px solid rgba(90,122,98,.08); border-radius:10px; margin-bottom:10px; overflow:hidden; }
+    .mday-head { background:rgba(45,74,53,.12); padding:9px 14px; display:flex; justify-content:space-between; }
+    .mday-title { font-family:'Playfair Display',monospace; font-size:10px; color:#7A9E82; letter-spacing:1.5px; }
+    .mday-cals  { font-size:11px; color:var(--charcoal-mid); }
+    .meal-row { display:grid; grid-template-columns:90px 1fr auto; gap:8px; padding:8px 14px; border-bottom:1px solid rgba(90,122,98,.04); font-size:13px; align-items:start; }
+    .meal-row:last-child { border-bottom:none; }
+    .meal-type { font-size:10px; font-weight:700; color:rgba(90,122,98,.6); text-transform:uppercase; letter-spacing:.8px; padding-top:2px; }
+    .meal-items { color:#2C2C2C; line-height:1.5; }
+    .meal-cals  { font-family:'Playfair Display',monospace; font-size:11px; color:#7A9E82; white-space:nowrap; padding-top:2px; }
+    @media(max-width:480px){ .meal-row{ grid-template-columns:70px 1fr; } .meal-cals{ display:none; } }
+
+    .tips-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    @media(max-width:560px){ .tips-grid{ grid-template-columns:1fr; } }
+    .tip-card { background:rgba(250,247,242,.4); border:1px solid rgba(90,122,98,.08); border-radius:8px; padding:10px 12px; }
+    .tip-title { font-size:12px; font-weight:700; color:#7A9E82; margin-bottom:4px; }
+    .tip-txt   { font-size:12px; color:var(--charcoal-mid); line-height:1.6; }
+
+    .empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
+    .empty-state span { font-size:56px; display:block; margin-bottom:14px; }
+    .empty-state p { font-size:14px; line-height:1.8; }
+  
+    </style>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🥗</span> My Nutrition Plans</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-role.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" id="mutePageBtn" onclick="togglePageMute()" title="Mute notifications for this section">🔔</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+<script>
+(function(){
+  const pageKey = 'physio_mute_page_my-lifestyle.html'.replace('.html','');
+  const user = JSON.parse(localStorage.getItem('currentUser')||'null');
+  if(!user) return;
+  const muteKey = 'physio_page_muted_'+user.email;
+  const muted = JSON.parse(localStorage.getItem(muteKey)||'[]');
+  const btn = document.getElementById('mutePageBtn');
+  if(btn){ btn.textContent = muted.includes(pageKey)?'🔕':'🔔'; btn.title = muted.includes(pageKey)?'Unmute notifications':'Mute notifications'; }
+  window.togglePageMute = function(){
+    const m2 = JSON.parse(localStorage.getItem(muteKey)||'[]');
+    const i = m2.indexOf(pageKey);
+    if(i===-1) m2.push(pageKey); else m2.splice(i,1);
+    localStorage.setItem(muteKey,JSON.stringify(m2));
+    if(btn){ btn.textContent=m2.includes(pageKey)?'🔕':'🔔'; btn.title=m2.includes(pageKey)?'Unmute notifications':'Mute notifications'; }
+  };
+})();
+</script>
+</div>
+
+
+<div class="wrap">
+  <button class="btn-back" onclick="window.location.href='choose-role.html'">← Dashboard</button>
+  <div class="page-title">🥗 My Nutrition Plans</div>
+  <div class="page-subtitle">Nutrition plans sent to you by your physiotherapist</div>
+
+  <div id="plansContainer">
+    <div class="empty-state"><span>⏳</span><p>Loading your plans…</p></div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  var _FBCFG = {
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+  window._fbDb = firebase.firestore();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script>
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  currentUser = requireAuth('patient');
+  if (!currentUser) return;
+
+  // Try Firebase with timeout — fallback to localStorage data
+  if (window.FIREBASE_ENABLED) {
+    try {
+      const fresh = await Promise.race([
+        fbGetUser(currentUser.email),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+      ]);
+      if (fresh) { currentUser = fresh; updateCurrentUser(fresh); }
+    } catch (e) {
+      console.warn('Firebase fetch skipped, using cached data:', e.message);
+      // currentUser already has localStorage data — proceed
+    }
+  }
+  render();
+});
+
+function render() {
+  const plans = currentUser.lifestylePlans || [];
+  const container = document.getElementById('plansContainer');
+
+  if (!plans.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span>🥗</span>
+        <p>No nutrition plans yet.<br>Your doctor will send you a personalized plan.</p>
+      </div>`;
+    return;
+  }
+
+  const sorted = [...plans].sort((a,b) => (b.id||0)-(a.id||0));
+  container.innerHTML = sorted.map((p, idx) => {
+    const realIdx = plans.findIndex(x => x.id === p.id);
+    const goalLabel = p.goal==='lose'?'📉 Weight Loss': p.goal==='gain'?'📈 Weight Gain':'⚖️ Maintain';
+    const diseases = (p.diseases||[]).filter(d => d !== 'none').join(', ') || 'No conditions';
+
+    return `
+      <div class="plan-card" id="planCard-${p.id}">
+        <div class="plan-head">
+          <div class="plan-head-info">
+            <h3>🥗 Nutrition Plan — ${esc(p.patientName||currentUser.name)}</h3>
+            <p>👨‍⚕️ Dr. ${esc(p.doctorName||'Unknown')} &nbsp;·&nbsp; ${esc(p.date||'')} &nbsp;·&nbsp; ${goalLabel}</p>
+            <p style="margin-top:3px;">${esc(diseases)}</p>
+          </div>
+          <div class="plan-head-actions">
+            <button class="btn-sm btn-expand" onclick="togglePlan(${p.id})">👁 View</button>
+            <button class="btn-sm btn-print"  onclick="printPlan(${realIdx})">🖨️ PDF</button>
+            <button class="btn-sm btn-delete" onclick="deletePlan(${realIdx})">🗑 Delete</button>
+          </div>
+        </div>
+
+        <!-- Mini metrics -->
+        <div class="metrics-mini">
+          <div class="mm-box"><div class="mm-val">${p.target||'—'} kcal</div><div class="mm-lbl">Daily Target</div></div>
+          <div class="mm-box"><div class="mm-val">${p.bmr||'—'} kcal</div><div class="mm-lbl">BMR</div></div>
+          <div class="mm-box"><div class="mm-val">${p.bmi||'—'}</div><div class="mm-lbl">BMI (${esc(p.bmiCat||'')})</div></div>
+          <div class="mm-box"><div class="mm-val">${p.macros?.protein||'—'}g</div><div class="mm-lbl">Protein/day</div></div>
+          <div class="mm-box"><div class="mm-val">${p.macros?.carbs||'—'}g</div><div class="mm-lbl">Carbs/day</div></div>
+          <div class="mm-box"><div class="mm-val">${p.macros?.fat||'—'}g</div><div class="mm-lbl">Fat/day</div></div>
+        </div>
+
+        <!-- Expandable meal plan -->
+        <div class="plan-body" id="planBody-${p.id}">
+          <div style="font-family:'Playfair Display',monospace;font-size:11px;color:#7A9E82;letter-spacing:2px;margin-bottom:12px;">🍽️ 7-DAY MEAL PLAN</div>
+          ${(p.meals||[]).map(d => `
+            <div class="meal-day">
+              <div class="mday-head">
+                <div class="mday-title">${d.day}</div>
+                <div class="mday-cals">${d.totalCals} kcal</div>
+              </div>
+              ${d.meals.map(m => `
+                <div class="meal-row">
+                  <div class="meal-type">${m.type}</div>
+                  <div class="meal-items">${m.items}</div>
+                  <div class="meal-cals">${m.cals} kcal</div>
+                </div>`).join('')}
+            </div>`).join('')}
+
+          <div style="font-family:'Playfair Display',monospace;font-size:11px;color:#7A9E82;letter-spacing:2px;margin:14px 0 10px;">💡 LIFESTYLE TIPS</div>
+          <div class="tips-grid">
+            ${(p.tips||[]).map(t => `
+              <div class="tip-card">
+                <div class="tip-title">${t.title}</div>
+                <div class="tip-txt">${t.txt}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function togglePlan(id) {
+  const body = document.getElementById(`planBody-${id}`);
+  const btn  = body.previousElementSibling?.previousElementSibling?.querySelector('.btn-expand');
+  if (!body) return;
+  body.classList.toggle('open');
+  if (btn) btn.textContent = body.classList.contains('open') ? '▲ Hide' : '👁 View';
+}
+
+async function deletePlan(idx) {
+  if (!confirm('Delete this nutrition plan from your records?')) return;
+  currentUser.lifestylePlans = (currentUser.lifestylePlans||[]).filter((_,i) => i !== idx);
+  await asyncSaveUser(currentUser).catch(() => {});
+  updateCurrentUser(currentUser);
+  render();
+}
+
+function printPlan(idx) {
+  const p = (currentUser.lifestylePlans||[])[idx];
+  if (!p) return;
+
+  const goalLabel = p.goal==='lose'?'Weight Loss':p.goal==='gain'?'Weight Gain':'Maintain Weight';
+  const conditions = (p.diseases||[]).join(', ')||'None';
+
+  const mealRows = (p.meals||[]).map(d =>
+    d.meals.map((m,i) => {
+      const dayCell = i===0 ? '<td rowspan="4" style="font-weight:bold;color:#006064;vertical-align:middle;">' + d.day + '</td>' : '';
+      return '<tr>' + dayCell + '<td>' + m.type + '</td><td>' + m.items + '</td><td>' + m.cals + ' kcal</td></tr>';
+    }).join('')
+  ).join('');
+
+  const tipCards = (p.tips||[]).map(t =>
+    '<div class="tip"><b>' + t.title + '</b>' + t.txt + '</div>'
+  ).join('');
+
+  const css = [
+    'body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:30px;color:#222;}',
+    'h1{color:#5A7A62;font-size:22px;}',
+    'h2{color:#2D4A35;border-bottom:2px solid #5A7A62;padding-bottom:5px;margin-top:22px;}',
+    '.meta{font-size:13px;color:#555;margin-bottom:16px;}',
+    '.warn{background:#fff8e1;border:1px solid #ffc107;border-radius:6px;padding:10px;font-size:12px;color:#795548;margin-bottom:16px;}',
+    '.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}',
+    '.metric{background:#f0fdff;border:1px solid #b2ebf2;border-radius:8px;padding:10px;text-align:center;}',
+    '.metric-val{font-size:17px;font-weight:bold;color:#5A7A62;}',
+    '.metric-lbl{font-size:10px;color:#666;text-transform:uppercase;}',
+    'table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;}',
+    'th{background:#5A7A62;color:#fff;padding:8px;text-align:left;font-size:11px;}',
+    'td{padding:7px 8px;border-bottom:1px solid #2C2C2C;vertical-align:top;}',
+    'tr:nth-child(even){background:#f0fdff;}',
+    '.tips{display:grid;grid-template-columns:1fr 1fr;gap:8px;}',
+    '.tip{background:#f0fdff;border-left:3px solid #5A7A62;padding:8px;font-size:12px;}',
+    '.tip b{color:#2D4A35;display:block;margin-bottom:2px;}',
+    'footer{text-align:center;font-size:11px;color:#888;margin-top:24px;border-top:1px solid #ccc;padding-top:10px;}',
+    '@media print{body{padding:15px;}}'
+  ].join('');
+
+  const html = '<!DOCTYPE html><html><head>'
+    + '<meta charset="UTF-8">'
+    + '<title>Nutrition Plan</title>'
+    + '<style>' + css + '</style>'
+    + '</head><body>'
+    + '<h1>🥗 Personalized Nutrition Plan</h1>'
+    + '<div class="meta">'
+    + '<b>Patient:</b> ' + (p.patientName||'') + ' &nbsp;|&nbsp; '
+    + '<b>Age:</b> ' + p.age + ' yrs &nbsp;|&nbsp; '
+    + '<b>Gender:</b> ' + p.gender + ' &nbsp;|&nbsp; '
+    + '<b>Weight:</b> ' + p.weight + 'kg &nbsp;|&nbsp; '
+    + '<b>Height:</b> ' + p.height + 'cm<br>'
+    + '<b>Goal:</b> ' + goalLabel + ' &nbsp;|&nbsp; '
+    + '<b>BMI:</b> ' + p.bmi + ' (' + (p.bmiCat||'') + ') &nbsp;|&nbsp; '
+    + '<b>Conditions:</b> ' + conditions + '<br>'
+    + '<b>Prepared by Dr.</b> ' + (p.doctorName||'') + ' &nbsp;|&nbsp; '
+    + '<b>Date:</b> ' + (p.date||'')
+    + '</div>'
+    + '<div class="warn">⚠️ This is a general nutritional guideline. Consult a licensed dietitian for personalised advice.</div>'
+    + '<h2>📊 Metabolic Analysis</h2>'
+    + '<div class="metrics">'
+    + '<div class="metric"><div class="metric-val">' + p.bmr + ' kcal</div><div class="metric-lbl">BMR</div></div>'
+    + '<div class="metric"><div class="metric-val">' + p.tdee + ' kcal</div><div class="metric-lbl">TDEE</div></div>'
+    + '<div class="metric"><div class="metric-val">' + p.target + ' kcal</div><div class="metric-lbl">Daily Target</div></div>'
+    + '<div class="metric"><div class="metric-val">' + (p.macros?.protein||'—') + 'g</div><div class="metric-lbl">Protein</div></div>'
+    + '<div class="metric"><div class="metric-val">' + (p.macros?.carbs||'—') + 'g</div><div class="metric-lbl">Carbs</div></div>'
+    + '<div class="metric"><div class="metric-val">' + (p.macros?.fat||'—') + 'g</div><div class="metric-lbl">Fat</div></div>'
+    + '</div>'
+    + '<h2>🍽️ 7-Day Meal Plan</h2>'
+    + '<table><tr><th>Day</th><th>Meal</th><th>Food</th><th>Calories</th></tr>'
+    + mealRows
+    + '</table>'
+    + '<h2>💡 Tips</h2>'
+    + '<div class="tips">' + tipCards + '</div>'
+    + '<footer>Physio Motion Analyzer · Generated by Dr. ' + (p.doctorName||'') + ' · ' + (p.date||'') + '</footer>'
+    + '</body></html>';
+
+  // Use Blob URL to safely open print window without any script tag conflicts
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (win) {
+    win.addEventListener('load', () => { win.print(); URL.revokeObjectURL(url); });
+  }
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+<script src="js/pwa.js"></script>
+
+<script>
+(function(){
+  function updateBadge(){
+    var user = JSON.parse(localStorage.getItem('currentUser')||'null');
+    if(!user) return;
+    var list = JSON.parse(localStorage.getItem('physio_notifs_'+user.email)||'[]');
+    var n = list.filter(function(x){return !x.read;}).length;
+    // show unread count somewhere visible if needed
+  }
+  updateBadge();
+  setInterval(updateBadge, 5000);
+  // Request browser notification permission
+  if(window.Notification && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+})();
+</script>
+</body>
+</html>

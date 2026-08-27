@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Therapeutic Exercises — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    body{display:flex;flex-direction:column;min-height:100vh;}
+    .ex-main{flex:1;max-width:960px;margin:0 auto;padding:24px 18px 60px;position:relative;z-index:1;width:100%;}
+
+    /* ── STEP BAR ── */
+    .step-bar{display:flex;align-items:center;gap:0;margin-bottom:24px;background:rgba(245,239,228,.65);border:1px solid rgba(90,122,98,.1);border-radius:10px;overflow:hidden;}
+    .step-item{flex:1;padding:11px 8px;text-align:center;font-family:'Playfair Display',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(90,122,98,.45);border-right:1px solid rgba(90,122,98,.08);transition:.2s;cursor:default;}
+    .step-item:last-child{border-right:none;}
+    .step-item.active{background:rgba(90,122,98,.12);color:#7A9E82;}
+    .step-item.done{color:rgba(90,122,98,.45);cursor:pointer;}
+    .step-item.done:hover{background:rgba(90,122,98,.06);}
+    .step-num{display:block;font-size:15px;margin-bottom:2px;}
+
+    /* ── SELECTION SUMMARY ── */
+    .sel-summary{display:none;background:rgba(90,122,98,.06);border:1px solid rgba(90,122,98,.18);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .sel-chip{background:rgba(90,122,98,.12);border:1px solid rgba(90,122,98,.25);border-radius:20px;padding:4px 14px;font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;color:#7A9E82;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+    .sel-chip .rm{cursor:pointer;opacity:.5;margin-left:4px;font-size:12px;}
+    .sel-chip .rm:hover{opacity:1;}
+
+    /* ── CATEGORY LABEL ── */
+    .cat-label{font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(90,122,98,.55);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .cat-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(90,122,98,.18),transparent);}
+
+    /* ── CATEGORY GRID ── */
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:11px;margin-bottom:24px;}
+    @media(max-width:480px){.cat-grid{grid-template-columns:repeat(2,1fr);gap:8px;}}
+
+    .cat-card{background:rgba(245,239,228,.72);border:1.5px solid rgba(90,122,98,.1);border-radius:13px;padding:18px 13px;cursor:pointer;text-align:center;transition:all .2s;position:relative;}
+    .cat-card:hover{border-color:rgba(90,122,98,.35);background:rgba(90,122,98,.08);transform:translateY(-3px);}
+    .cat-card.selected{border-color:#7A9E82;background:rgba(90,122,98,.12);box-shadow:0 0 16px rgba(90,122,98,.15);}
+    .cat-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;font-size:11px;color:#7A9E82;font-weight:900;}
+    .cat-icon{font-size:28px;margin-bottom:8px;display:block;}
+    .cat-name{font-family:'Playfair Display',monospace;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--forest);line-height:1.4;}
+
+    /* ── GO BUTTON ── */
+    .go-btn{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#1e88e5,#5A7A62);color:#fff;font-family:'Playfair Display',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(90,122,98,.35);transition:.2s;display:none;}
+    .go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(90,122,98,.5);}
+    .go-btn.show{display:block;}
+
+    /* ── BACK BETWEEN STEPS ── */
+    .step-back-btn{display:none;align-items:center;gap:6px;padding:8px 16px;background:rgba(245,239,228,.7);border:1px solid rgba(90,122,98,.2);border-radius:8px;color:#7A9E82;font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:.18s;margin-bottom:16px;}
+    .step-back-btn:hover{background:rgba(90,122,98,.1);}
+    .step-back-btn.show{display:flex;}
+  </style>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🏋️</span> Therapeutic Exercises</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goProfile()">👤 Profile</button>
+    <button class="btn btn-header" onclick="window.location.href='chat.html'">💬 Chat</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="ex-main">
+  <!-- Back to assessments — always visible -->
+  <button class="btn-back" id="mainBackBtn" onclick="handleMainBack()">← Back</button>
+
+  <div class="page-title">🏋️ Therapeutic Exercises</div>
+  <div class="page-subtitle" id="pageSubtitle">Step 1 — Select exercise category</div>
+
+  <!-- Step bar — clickable when done -->
+  <div class="step-bar">
+    <div class="step-item active" id="step1" onclick="goToStep(1)"><span class="step-num">①</span>Exercise Type</div>
+    <div class="step-item"        id="step2" onclick="goToStep(2)"><span class="step-num">②</span>Body Part</div>
+    <div class="step-item"        id="step3"                      ><span class="step-num">③</span>View Exercises</div>
+  </div>
+
+  <!-- Selection chips -->
+  <div class="sel-summary" id="selSummary"></div>
+
+  <!-- Step back between steps -->
+  <button class="step-back-btn" id="stepBackBtn" onclick="stepBack()">← Previous Step</button>
+
+  <!-- STEP 1: Exercise Type -->
+  <div id="panelType">
+    <div class="cat-label">📌 Main Exercise Categories</div>
+    <div class="cat-grid" id="typeGrid"></div>
+  </div>
+
+  <!-- STEP 2: Body Part -->
+  <div id="panelPart" style="display:none;">
+    <div class="cat-label">🦴 Target Body Part</div>
+    <div class="cat-grid" id="partGrid"></div>
+  </div>
+
+  <!-- GO button -->
+  <button class="go-btn" id="goBtn" onclick="goToExercises()">View Exercises & Assign →</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>try{if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"});window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;}catch(e){window.FIREBASE_ENABLED=false;}</script>
+<script src="js/utils.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+requireAuth('doctor');
+
+const TYPES = [
+  {id:'pain-relief',  name:'Pain Relief',  icon:'😌'},
+  {id:'strengthening',name:'Strengthening',icon:'💪'},
+  {id:'flexibility',  name:'Flexibility',  icon:'🤸'},
+  {id:'mobility',     name:'Mobility',     icon:'🚶'},
+  {id:'balance',      name:'Balance',      icon:'⚖️'},
+  {id:'coordination', name:'Coordination', icon:'🎯'},
+  {id:'endurance',    name:'Endurance',    icon:'🏃'},
+  {id:'breathing',    name:'Breathing',    icon:'🌬️'},
+];
+const PARTS = [
+  {id:'neck',       name:'Neck',        icon:'🦒'},
+  {id:'shoulder',   name:'Shoulder',    icon:'🤷'},
+  {id:'elbow',      name:'Elbow',       icon:'💪'},
+  {id:'wrist-hand', name:'Wrist & Hand',icon:'🤚'},
+  {id:'back',       name:'Back',        icon:'🦴'},
+  {id:'hip',        name:'Hip',         icon:'🦵'},
+  {id:'knee',       name:'Knee',        icon:'🦿'},
+  {id:'ankle-foot', name:'Ankle & Foot',icon:'🦶'},
+];
+
+let selType = null, selPart = null, currentStep = 1;
+
+// ── Render grids ──
+function renderTypes() {
+  document.getElementById('typeGrid').innerHTML = TYPES.map(t => `
+    <div class="cat-card${selType===t.id?' selected':''}" onclick="selectType('${t.id}','${t.name}')">
+      <span class="cat-icon">${t.icon}</span>
+      <div class="cat-name">${t.name}</div>
+    </div>`).join('');
+}
+
+function renderParts() {
+  document.getElementById('partGrid').innerHTML = PARTS.map(p => `
+    <div class="cat-card${selPart===p.id?' selected':''}" onclick="selectPart('${p.id}','${p.name}')">
+      <span class="cat-icon">${p.icon}</span>
+      <div class="cat-name">${p.name}</div>
+    </div>`).join('');
+}
+
+// ── Selection ──
+function selectType(id, name) {
+  selType = id;
+  updateChips();
+  // Move to step 2
+  goToStep(2);
+}
+
+function selectPart(id, name) {
+  selPart = id;
+  updateChips();
+  document.getElementById('goBtn').classList.add('show');
+  renderParts();
+}
+
+// ── Chips / summary ──
+function updateChips() {
+  const s = document.getElementById('selSummary');
+  let html = '';
+  if (selType) {
+    const t = TYPES.find(x=>x.id===selType);
+    html += `<div class="sel-chip">${t.icon} ${t.name}<span class="rm" onclick="clearType()">✕</span></div>`;
+  }
+  if (selPart) {
+    const p = PARTS.find(x=>x.id===selPart);
+    html += `<div class="sel-chip">${p.icon} ${p.name}<span class="rm" onclick="clearPart()">✕</span></div>`;
+  }
+  s.innerHTML = html;
+  s.style.display = html ? 'flex' : 'none';
+}
+
+function clearType() { selType=null; selPart=null; goToStep(1); }
+function clearPart()  { selPart=null; document.getElementById('goBtn').classList.remove('show'); updateChips(); renderParts(); }
+
+// ── Step navigation ──
+function goToStep(n) {
+  if (n === 1) {
+    currentStep = 1;
+    document.getElementById('panelType').style.display = '';
+    document.getElementById('panelPart').style.display = 'none';
+    document.getElementById('goBtn').classList.remove('show');
+    document.getElementById('step1').className = 'step-item active';
+    document.getElementById('step2').className = 'step-item';
+    document.getElementById('step3').className = 'step-item';
+    document.getElementById('stepBackBtn').classList.remove('show');
+    document.getElementById('pageSubtitle').textContent = 'Step 1 — Select exercise category';
+    renderTypes();
+  } else if (n === 2) {
+    if (!selType) return;
+    currentStep = 2;
+    document.getElementById('panelType').style.display = 'none';
+    document.getElementById('panelPart').style.display = '';
+    document.getElementById('step1').className = 'step-item done';
+    document.getElementById('step2').className = 'step-item active';
+    document.getElementById('step3').className = 'step-item';
+    document.getElementById('stepBackBtn').classList.add('show');
+    const t = TYPES.find(x=>x.id===selType);
+    document.getElementById('pageSubtitle').textContent = `Step 2 — Choose body part for ${t.name}`;
+    renderParts();
+    updateChips();
+  }
+}
+
+function stepBack() {
+  if (currentStep === 2) goToStep(1);
+}
+
+function handleMainBack() {
+  if (currentStep === 2) { goToStep(1); }
+  else { window.location.href = 'choose-year.html'; }
+}
+
+function goToExercises() {
+  if (!selType || !selPart) return;
+  window.location.href = `exercises-videos.html?type=${selType}&part=${selPart}`;
+}
+
+function goProfile(){window.location.href='profile.html';}
+function logout(){if(confirm('Logout?')){localStorage.removeItem('currentUser');window.location.href='login.html';}}
+
+// Init
+renderTypes();
+</script>
+</body>
+</html>

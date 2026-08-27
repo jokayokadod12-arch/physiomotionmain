@@ -1,0 +1,59 @@
+/* ═══════════════════════════════════════════════
+   PHYSIO MOTION v10 — MOBILE OVERRIDES
+   Organic Medical Luxury · Warm Cream × Sage
+═══════════════════════════════════════════════ */
+
+/* Safe area support */
+@supports (padding: env(safe-area-inset-top)) {
+  .site-header {
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+  }
+}
+
+/* Tap highlight removal */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Better touch targets */
+@media (max-width: 768px) {
+  .btn { min-height: 40px; }
+  .btn-back { min-height: 38px; }
+  input, select, textarea { font-size: 16px !important; /* prevents iOS zoom */ }
+}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-warm, #F5EFE4); }
+::-webkit-scrollbar-thumb { background: var(--sage-pale, #C8DAC9); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sage-light, #7A9E82); }
+
+/* ── FOCUS STYLES ── */
+:focus-visible {
+  outline: 2px solid var(--sage, #5A7A62);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── SELECTION ── */
+::selection { background: rgba(90,122,98,.2); color: var(--forest, #2D4A35); }
+
+/* ── BOTTOM NAV SPACING ── */
+@media (max-width: 480px) {
+  main, .dash-main, .doc-main, .plans-main {
+    padding-bottom: 80px !important;
+  }
+}
+
+/* ── CARD TOUCH FEEDBACK ── */
+@media (hover: none) {
+  .dc:active, .mc:active, .fc:active, .hub-card:active, .feat-card:active {
+    transform: scale(.97) !important;
+    opacity: .85;
+  }
+}
+
+/* ── FULL WIDTH BUTTONS ON MOBILE ── */
+@media (max-width: 420px) {
+  .hero-cta, .cta-group { flex-direction: column; }
+  .bh1, .bh2, .bh3 { width: 100%; justify-content: center; }
+}

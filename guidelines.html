@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Clinical Guidelines — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .guide-main { flex:1; max-width:980px; margin:0 auto; padding:22px 18px 60px; position:relative; z-index:1; width:100%; }
+
+    /* ── CATEGORY TABS ── */
+    .cat-tabs {
+      display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;
+    }
+    .cat-tab {
+      padding:8px 16px; border-radius:20px; cursor:pointer;
+      font-family:'Playfair Display',monospace; font-size:10px; font-weight:700;
+      letter-spacing:.8px; text-transform:uppercase;
+      border:1px solid rgba(90,122,98,.2);
+      background:rgba(245,239,228,.7); color:#3a3a3a;
+      transition:all .2s; white-space:nowrap;
+    }
+    .cat-tab:hover { border-color:rgba(90,122,98,.4); color:#1a1a1a; }
+    .cat-tab.active {
+      background:rgba(90,122,98,.15); color:#2D4A35;
+      border-color:#7A9E82;
+      box-shadow:0 0 12px rgba(90,122,98,.15);
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-box {
+      background:rgba(245,239,228,.78); border:1px solid rgba(90,122,98,.16);
+      border-radius:14px; padding:18px 20px; margin-bottom:22px;
+      position:relative; overflow:hidden;
+    }
+    .search-box::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#7A9E82,transparent); }
+    .search-row { display:flex; gap:10px; }
+    .search-row input { flex:1; }
+    .search-btn {
+      padding:11px 22px; background:linear-gradient(135deg,#1e88e5,#5A7A62);
+      color:var(--forest); border:none; border-radius:8px;
+      font-family:'Playfair Display',monospace; font-size:11px; font-weight:700;
+      letter-spacing:1px; cursor:pointer; transition:.2s; white-space:nowrap;
+    }
+    .search-btn:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(90,122,98,.4); }
+    .search-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+    /* ── CATEGORY SECTION ── */
+    .cat-section { margin-bottom:28px; }
+    .cat-section-title {
+      font-family:'Playfair Display',monospace; font-size:11px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      color:rgba(90,122,98,.6); margin-bottom:12px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .cat-section-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(90,122,98,.18),transparent); }
+
+    /* ── SOURCE CARDS GRID ── */
+    .sources-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:12px; margin-bottom:6px;
+    }
+    .source-card {
+      background:rgba(245,239,228,.72); border:1px solid rgba(90,122,98,.12);
+      border-radius:12px; padding:16px 18px; cursor:pointer;
+      transition:all .2s; display:flex; align-items:flex-start; gap:13px;
+      text-decoration:none;
+    }
+    .source-card:hover {
+      border-color:var(--sc,rgba(90,122,98,.4));
+      transform:translateY(-3px);
+      box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 16px rgba(90,122,98,.08);
+    }
+    .sc-icon {
+      width:44px; height:44px; border-radius:10px; flex-shrink:0;
+      background:rgba(90,122,98,.08); border:1px solid rgba(90,122,98,.15);
+      display:flex; align-items:center; justify-content:center; font-size:22px;
+    }
+    .sc-body { flex:1; min-width:0; }
+    .sc-name { font-family:'Playfair Display',monospace; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--forest); margin-bottom:4px; }
+    .sc-desc { font-size:12px; color:#1a1a1a !important; line-height:1.5; font-weight:500; }
+    .sc-badge {
+      display:inline-block; margin-top:7px; padding:2px 9px; border-radius:20px;
+      font-size:9px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+      background:rgba(90,122,98,.1); color:#7A9E82; border:1px solid rgba(90,122,98,.2);
+    }
+
+    /* ── AI SEARCH RESULTS ── */
+    .results-area { margin-top:4px; }
+    .result-card {
+      background:rgba(245,239,228,.72); border:1px solid rgba(90,122,98,.12);
+      border-radius:12px; padding:18px 20px; margin-bottom:12px; transition:.2s;
+    }
+    .result-card:hover { border-color:rgba(90,122,98,.28); }
+    .rc-top { display:flex; gap:10px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    .rc-type {
+      padding:3px 10px; border-radius:20px; font-size:9px; font-weight:700;
+      letter-spacing:.5px; text-transform:uppercase;
+    }
+    .rc-year { font-size:11px; color:#1a1a1a; font-weight:500; }
+    .rc-evid { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:rgba(76,175,80,.1); color:#4caf50; border:1px solid rgba(76,175,80,.2); }
+    .rc-title { font-family:'Playfair Display',monospace; font-size:12px; font-weight:700; color:var(--forest); margin-bottom:8px; line-height:1.4; letter-spacing:.3px; }
+    .rc-summary { font-size:13px; color:#1a1a1a !important; line-height:1.7; font-weight:400; }
+    .rc-points { margin-top:10px; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:5px; }
+    .rc-points li { font-size:12px; color:#1a1a1a !important; display:flex; gap:8px; align-items:flex-start; }
+    .rc-points li::before { content:'›'; color:#7A9E82; font-size:14px; flex-shrink:0; }
+    .rc-links { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+    .rc-link {
+      padding:5px 12px; border-radius:8px; font-size:10px; font-weight:700;
+      cursor:pointer; transition:.18s; border:none; text-decoration:none;
+      display:inline-flex; align-items:center; gap:5px;
+    }
+    .rc-link-blue { background:rgba(90,122,98,.1); color:#7A9E82; border:1px solid rgba(90,122,98,.22); }
+    .rc-link-blue:hover { background:rgba(90,122,98,.2); }
+
+    /* ── LOADING DOTS ── */
+    .loading-wrap { text-align:center; padding:40px 20px; }
+    .ldots { display:inline-flex; gap:7px; }
+    .ldots span { width:9px; height:9px; border-radius:50%; background:#7A9E82; animation:ldBounce 1.2s ease-in-out infinite; }
+    .ldots span:nth-child(2){animation-delay:.2s;} .ldots span:nth-child(3){animation-delay:.4s;}
+    @keyframes ldBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-10px);}}
+    .loading-txt { font-size:12px; color:rgba(255,255,255,.28); margin-top:12px; letter-spacing:.5px; }
+
+    /* ── EMPTY ── */
+
+    .slink {
+      display:flex; align-items:center; gap:12px;
+      background:rgba(245,239,228,.72); border:1px solid rgba(90,122,98,.12);
+      border-radius:12px; padding:13px 15px;
+      text-decoration:none; transition:all .2s; cursor:pointer;
+    }
+    .slink:hover {
+      border-color:rgba(90,122,98,.35);
+      background:rgba(90,122,98,.08);
+      transform:translateY(-2px);
+    }
+    .sl-icon { font-size:20px; flex-shrink:0; }
+    .sl-name { font-family:'Playfair Display',monospace; font-size:11px; font-weight:700; color:var(--forest); margin-bottom:3px; }
+    .sl-q    { font-size:10px; color:#444444; font-weight:500; }
+    .sl-arr  { margin-left:auto; font-size:14px; color:rgba(90,122,98,.25); flex-shrink:0; }
+    .slink:hover .sl-arr { color:#7A9E82; }
+    .slinks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; margin-bottom:18px; }
+    .slinks-label { font-family:'Playfair Display',monospace; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(90,122,98,.5); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .slinks-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,rgba(90,122,98,.15),transparent); }
+    @media(max-width:600px) {
+      .slinks-grid { grid-template-columns:1fr !important; }
+      .slink { padding:11px 13px; }
+    }
+    .empty-state { text-align:center; padding:48px 20px; color:rgba(255,255,255,.22); }
+    .empty-state span { font-size:48px; display:block; margin-bottom:12px; }
+    .empty-state p { font-size:13px; line-height:1.7; }
+
+    /* ── MOBILE ── */
+    @media(max-width:600px) {
+      .sources-grid { grid-template-columns:1fr; gap:9px; }
+      .source-card { padding:13px 14px; gap:10px; }
+      .sc-icon { width:38px; height:38px; font-size:18px; }
+      .cat-tabs { gap:6px; }
+      .cat-tab { padding:6px 12px; font-size:9px; }
+      .search-row { flex-direction:column; gap:8px; }
+      .search-btn { width:100%; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📚</span> Clinical Guidelines</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="guide-main">
+  <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
+  <div class="page-title">📚 Clinical Guidelines</div>
+  <div class="page-subtitle">Evidence-based research, clinical databases and physiotherapy guidelines</div>
+
+  <!-- ── CATEGORY TABS ── -->
+  <div class="cat-tabs">
+    <div class="cat-tab active" onclick="showCat('all',this)">🌐 All Sources</div>
+    <div class="cat-tab" onclick="showCat('evidence',this)">🔬 Evidence Databases</div>
+    <div class="cat-tab" onclick="showCat('guidelines',this)">📋 Clinical Guidelines</div>
+    <div class="cat-tab" onclick="showCat('journals',this)">📰 Journals</div>
+    <div class="cat-tab" onclick="showCat('orgs',this)">🏛️ Professional Orgs</div>
+    <div class="cat-tab" onclick="showCat('search',this)">🤖 AI Search</div>
+  </div>
+
+  <!-- ── AI SEARCH BOX ── -->
+  <div class="search-box" id="aiSearchBox">
+    <div class="search-row">
+      <input type="text" id="searchQ" placeholder="Search: ACL rehab, rotator cuff, stroke recovery, chronic pain…"
+             onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="search-btn" id="searchBtn" onclick="doSearch()">🔍 AI Search</button>
+    </div>
+  </div>
+
+  <!-- ── AI RESULTS ── -->
+  <div id="aiResults"></div>
+
+  <!-- ── SOURCE SECTIONS ── -->
+  <div id="sourceSections">
+
+    <!-- EVIDENCE DATABASES -->
+    <div class="cat-section" data-cat="evidence">
+      <div class="cat-section-title">🔬 Evidence-Based Databases</div>
+      <div class="sources-grid">
+        <a class="source-card" href="https://pubmed.ncbi.nlm.nih.gov/?term=physiotherapy" target="_blank" style="--sc:#7A9E82">
+          <div class="sc-icon">🧬</div>
+          <div class="sc-body">
+            <div class="sc-name">PubMed / MEDLINE</div>
+            <div class="sc-desc">Over 35 million biomedical citations. The primary database for peer-reviewed research.</div>
+            <span class="sc-badge">FREE · NLM</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.pedro.org.au" target="_blank" style="--sc:#00bcd4">
+          <div class="sc-icon">⚖️</div>
+          <div class="sc-body">
+            <div class="sc-name">PEDro</div>
+            <div class="sc-desc">Physiotherapy Evidence Database — RCTs, systematic reviews with quality ratings specific to physiotherapy.</div>
+            <span class="sc-badge">FREE · PHYSIOTHERAPY</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.cochranelibrary.com" target="_blank" style="--sc:#4caf50">
+          <div class="sc-icon">📊</div>
+          <div class="sc-body">
+            <div class="sc-name">Cochrane Library</div>
+            <div class="sc-desc">Gold standard systematic reviews and meta-analyses. Highest level of evidence for clinical decisions.</div>
+            <span class="sc-badge">SYSTEMATIC REVIEWS</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.embase.com" target="_blank" style="--sc:#9c27b0">
+          <div class="sc-icon">🔭</div>
+          <div class="sc-body">
+            <div class="sc-name">Embase</div>
+            <div class="sc-desc">Biomedical and pharmacological database with strong European coverage and drug research.</div>
+            <span class="sc-badge">BIOMEDICAL</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://scholar.google.com" target="_blank" style="--sc:#ff9800">
+          <div class="sc-icon">🎓</div>
+          <div class="sc-body">
+            <div class="sc-name">Google Scholar</div>
+            <div class="sc-desc">Broad academic search across journals, theses, books and conference papers.</div>
+            <span class="sc-badge">FREE · BROAD</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.clinicalkey.com" target="_blank" style="--sc:#7A9E82">
+          <div class="sc-icon">🗝️</div>
+          <div class="sc-body">
+            <div class="sc-name">ClinicalKey</div>
+            <div class="sc-desc">Elsevier's clinical decision support with textbooks, journals and drug information.</div>
+            <span class="sc-badge">CLINICAL DECISION</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- CLINICAL GUIDELINES -->
+    <div class="cat-section" data-cat="guidelines">
+      <div class="cat-section-title">📋 Clinical Practice Guidelines</div>
+      <div class="sources-grid">
+        <a class="source-card" href="https://www.nice.org.uk/guidance" target="_blank" style="--sc:#7A9E82">
+          <div class="sc-icon">🇬🇧</div>
+          <div class="sc-body">
+            <div class="sc-name">NICE Guidelines</div>
+            <div class="sc-desc">UK National Institute for Health and Care Excellence — comprehensive clinical guidelines for all conditions.</div>
+            <span class="sc-badge">UK · OFFICIAL</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.apta.org/patient-care/evidence-based-practice-resources/clinical-practice-guidelines" target="_blank" style="--sc:#00bcd4">
+          <div class="sc-icon">🇺🇸</div>
+          <div class="sc-body">
+            <div class="sc-name">APTA Clinical Guidelines</div>
+            <div class="sc-desc">American Physical Therapy Association evidence-based clinical practice guidelines by condition.</div>
+            <span class="sc-badge">APTA · USA</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.who.int/publications/i/item/9789241550536" target="_blank" style="--sc:#ff9800">
+          <div class="sc-icon">🏥</div>
+          <div class="sc-body">
+            <div class="sc-name">WHO Rehabilitation Guidelines</div>
+            <div class="sc-desc">World Health Organization rehabilitation and disability guidelines for clinical practice worldwide.</div>
+            <span class="sc-badge">WHO · GLOBAL</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://jospt.org" target="_blank" style="--sc:#9c27b0">
+          <div class="sc-icon">📐</div>
+          <div class="sc-body">
+            <div class="sc-name">JOSPT Guidelines</div>
+            <div class="sc-desc">Journal of Orthopaedic & Sports Physical Therapy — clinical practice guidelines for MSK conditions.</div>
+            <span class="sc-badge">ORTHOPEDIC · SPORTS</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- JOURNALS -->
+    <div class="cat-section" data-cat="journals">
+      <div class="cat-section-title">📰 Key Physiotherapy Journals</div>
+      <div class="sources-grid">
+        <a class="source-card" href="https://www.physiotherapyjournal.com" target="_blank" style="--sc:#7A9E82">
+          <div class="sc-icon">📖</div>
+          <div class="sc-body">
+            <div class="sc-name">Physiotherapy Journal</div>
+            <div class="sc-desc">Official journal of the Chartered Society of Physiotherapy. Research, reviews and clinical reports.</div>
+            <span class="sc-badge">CSP OFFICIAL</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://jospt.org" target="_blank" style="--sc:#00bcd4">
+          <div class="sc-icon">🏃</div>
+          <div class="sc-body">
+            <div class="sc-name">JOSPT</div>
+            <div class="sc-desc">Journal of Orthopaedic & Sports Physical Therapy — leading journal for MSK and sports rehabilitation.</div>
+            <span class="sc-badge">ORTHOPEDIC · SPORTS</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://bjsm.bmj.com" target="_blank" style="--sc:#4caf50">
+          <div class="sc-icon">⚽</div>
+          <div class="sc-body">
+            <div class="sc-name">BJSM — British Journal of Sports Medicine</div>
+            <div class="sc-desc">High-impact journal covering sports medicine, exercise science and musculoskeletal health.</div>
+            <span class="sc-badge">HIGH IMPACT</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.archives-pmr.org" target="_blank" style="--sc:#9c27b0">
+          <div class="sc-icon">🧠</div>
+          <div class="sc-body">
+            <div class="sc-name">Archives of PM&R</div>
+            <div class="sc-desc">Archives of Physical Medicine and Rehabilitation — neurology, stroke, spinal cord and disability rehab.</div>
+            <span class="sc-badge">NEURO · REHAB</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.thelancet.com/journals/lanrhe/home" target="_blank" style="--sc:#7A9E82">
+          <div class="sc-icon">🔬</div>
+          <div class="sc-body">
+            <div class="sc-name">The Lancet Rheumatology</div>
+            <div class="sc-desc">Cutting-edge research in rheumatology, musculoskeletal disease and inflammatory conditions.</div>
+            <span class="sc-badge">RHEUMATOLOGY</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PROFESSIONAL ORGS -->
+    <div class="cat-section" data-cat="orgs">
+      <div class="cat-section-title">🏛️ Professional Organizations & Resources</div>
+      <div class="sources-grid">
+        <a class="source-card" href="https://www.apta.org" target="_blank" style="--sc:#7A9E82">
+          <div class="sc-icon">🇺🇸</div>
+          <div class="sc-body">
+            <div class="sc-name">APTA — American Physical Therapy Association</div>
+            <div class="sc-desc">Leading professional organization for PTs. Clinical resources, continuing education and practice guidelines.</div>
+            <span class="sc-badge">USA · CPD</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.csp.org.uk" target="_blank" style="--sc:#00bcd4">
+          <div class="sc-icon">🇬🇧</div>
+          <div class="sc-body">
+            <div class="sc-name">CSP — Chartered Society of Physiotherapy</div>
+            <div class="sc-desc">UK professional body for physiotherapy. Practice standards, research and career development.</div>
+            <span class="sc-badge">UK STANDARDS</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.efpt.eu" target="_blank" style="--sc:#4caf50">
+          <div class="sc-icon">🇪🇺</div>
+          <div class="sc-body">
+            <div class="sc-name">EFPT — European Federation of PT Students</div>
+            <div class="sc-desc">European physiotherapy network — education, research exchange and clinical resources.</div>
+            <span class="sc-badge">EUROPE</span>
+          </div>
+        </a>
+        <a class="source-card" href="https://www.ifompt.org" target="_blank" style="--sc:#ff9800">
+          <div class="sc-icon">🌐</div>
+          <div class="sc-body">
+            <div class="sc-name">IFOMPT — Orthopaedic Manual PT</div>
+            <div class="sc-desc">International Federation of Orthopaedic Manipulative Physical Therapists — manual therapy standards.</div>
+            <span class="sc-badge">MANUAL THERAPY</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div><!-- end sourceSections -->
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  try{if(!firebase.apps.length)firebase.initializeApp({apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",authDomain:"physiowork-8976f.firebaseapp.com",projectId:"physiowork-8976f",storageBucket:"physiowork-8976f.firebasestorage.app",messagingSenderId:"789519816056",appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"});window._fbDb=firebase.firestore();window.FIREBASE_ENABLED=true;}catch(e){window.FIREBASE_ENABLED=false;}
+</script>
+<script src="js/utils.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+requireAuth('doctor');
+
+// ── CATEGORY FILTER ──
+function showCat(cat, el) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  const sections = document.querySelectorAll('.cat-section');
+  const aiBox    = document.getElementById('aiSearchBox');
+  const aiRes    = document.getElementById('aiResults');
+
+  if (cat === 'search') {
+    // Show only AI search
+    sections.forEach(s => s.style.display = 'none');
+    aiBox.style.display = 'block';
+    aiRes.innerHTML = aiRes.innerHTML || `<div class="empty-state"><span>🤖</span><p>Type a condition or treatment above<br>and get AI-summarized clinical evidence</p></div>`;
+    document.getElementById('searchQ').focus();
+    return;
+  }
+
+  aiBox.style.display = 'block';
+  aiRes.innerHTML = '';
+
+  if (cat === 'all') {
+    sections.forEach(s => s.style.display = 'block');
+  } else {
+    sections.forEach(s => {
+      s.style.display = s.dataset.cat === cat ? 'block' : 'none';
+    });
+  }
+}
+
+// ── AI SEARCH ──
+async function doSearch() {
+  const q = document.getElementById('searchQ').value.trim();
+  if (!q) return;
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true; btn.textContent = 'Searching…';
+
+  document.getElementById('aiResults').innerHTML = `
+    <div class="loading-wrap">
+      <div class="ldots"><span></span><span></span><span></span></div>
+      <div class="loading-txt">Searching clinical databases for "${q}"…</div>
+    </div>`;
+
+  // Hide source sections while showing results
+  document.querySelectorAll('.cat-section').forEach(s => s.style.display = 'none');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1200,
+        system:`You are a physiotherapy clinical research assistant. Provide exactly 4 evidence-based results for the given query.
+Return ONLY a valid JSON array, no markdown fences, no extra text:
+[{
+  "title": "specific clinical title",
+  "type": "Systematic Review|RCT|Clinical Guideline|Cohort Study|Meta-Analysis",
+  "year": "20XX",
+  "evidenceLevel": "Level I|Level II|Level III|Level IV",
+  "journal": "journal name",
+  "summary": "2-3 sentence clinical summary with key findings and effect sizes where known",
+  "keyPoints": ["clinical recommendation 1", "evidence finding 2", "practical application 3"],
+  "pubmedQuery": "short search query for PubMed"
+}]`,
+        messages:[{role:'user', content:`Clinical physiotherapy evidence for: "${q}". Focus on exercise protocols, outcome measures, evidence levels and clinical recommendations for physiotherapists.`}]
+      })
+    });
+
+    const data = await res.json();
+    const text = (data.content?.[0]?.text || '').replace(/```json|```/g,'').trim();
+    let results;
+    try { results = JSON.parse(text); } catch { results = []; }
+    renderResults(results, q);
+  } catch(e) {
+    renderFallback(q);
+  }
+
+  btn.disabled = false; btn.textContent = '🔍 AI Search';
+}
+
+function renderResults(results, q) {
+  const el = document.getElementById('aiResults');
+  if (!results.length) { renderFallback(q); return; }
+
+  const typeColors = {
+    'Systematic Review': {bg:'#7A9E8222',color:'#7A9E82'},
+    'Meta-Analysis':     {bg:'#00bcd422',color:'#00bcd4'},
+    'RCT':               {bg:'#4caf5022',color:'#4caf50'},
+    'Clinical Guideline':{bg:'#ff980022',color:'#ffb74d'},
+    'Cohort Study':      {bg:'#9c27b022',color:'#ce93d8'},
+  };
+
+  el.innerHTML = `
+    <div style="font-family:'Playfair Display',monospace;font-size:10px;color:rgba(90,122,98,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">
+      🤖 AI Results — ${results.length} studies found for "${q}"
+    </div>
+    ${results.map(r => {
+      const tc = typeColors[r.type] || {bg:'#7A9E8222',color:'#7A9E82'};
+      const pm = encodeURIComponent(r.pubmedQuery || r.title || q);
+      return `
+        <div class="result-card">
+          <div class="rc-top">
+            <span class="rc-type" style="background:${tc.bg};color:${tc.color};border:1px solid ${tc.color}44">${r.type||'Research'}</span>
+            <span class="rc-year">${r.year||'Recent'}</span>
+            ${r.evidenceLevel ? `<span class="rc-evid">${r.evidenceLevel}</span>` : ''}
+            ${r.journal ? `<span style="font-size:10px;color:#555555;font-style:italic">${r.journal}</span>` : ''}
+          </div>
+          <div class="rc-title">${r.title||'Clinical Evidence'}</div>
+          <div class="rc-summary">${r.summary||''}</div>
+          ${r.keyPoints?.length ? `
+            <ul class="rc-points">
+              ${r.keyPoints.map(p=>`<li>${p}</li>`).join('')}
+            </ul>` : ''}
+          <div class="rc-links">
+            <a class="rc-link rc-link-blue" href="https://pubmed.ncbi.nlm.nih.gov/?term=${pm}" target="_blank">📄 PubMed</a>
+            <a class="rc-link rc-link-blue" href="https://www.pedro.org.au/english/search/?search_terms=${encodeURIComponent(q)}" target="_blank">⚖️ PEDro</a>
+            <a class="rc-link rc-link-blue" href="https://scholar.google.com/scholar?q=${pm}" target="_blank">🎓 Scholar</a>
+            <a class="rc-link rc-link-blue" href="https://www.cochranelibrary.com/search?searchBy=6&searchText=${encodeURIComponent(q)}" target="_blank">📊 Cochrane</a>
+          </div>
+        </div>`;
+    }).join('')}
+    <div style="text-align:right;margin-top:8px;">
+      <span style="font-size:10px;color:#666666">AI-generated summaries — always verify with original sources</span>
+    </div>
+    <div style="margin-top:22px;">
+      <div style="font-family:'Playfair Display',monospace;font-size:10px;color:rgba(90,122,98,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">🔗 Search This Topic Directly</div>
+      \${buildSearchLinks(q)}
+    </div>`;
+}
+
+function buildSearchLinks(q) {
+  const pm   = encodeURIComponent(q + ' physiotherapy');
+  const qe   = encodeURIComponent(q);
+  return `
+    <div class="slinks-label">🔬 Evidence Databases</div>
+    <div class="slinks-grid">
+      <a class="slink" href="https://pubmed.ncbi.nlm.nih.gov/?term=${pm}" target="_blank">
+        <span class="sl-icon">📄</span><div><div class="sl-name">PubMed / MEDLINE</div><div class="sl-q">35M+ biomedical citations</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://www.pedro.org.au/english/search/?search_terms=${qe}" target="_blank">
+        <span class="sl-icon">⚖️</span><div><div class="sl-name">PEDro Database</div><div class="sl-q">Physiotherapy RCTs & reviews</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://www.cochranelibrary.com/search?searchBy=6&searchText=${qe}" target="_blank">
+        <span class="sl-icon">📊</span><div><div class="sl-name">Cochrane Library</div><div class="sl-q">Systematic reviews & meta-analyses</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://scholar.google.com/scholar?q=${pm}" target="_blank">
+        <span class="sl-icon">🎓</span><div><div class="sl-name">Google Scholar</div><div class="sl-q">Academic papers & theses</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://www.semanticscholar.org/search?q=${pm}&sort=Relevance" target="_blank">
+        <span class="sl-icon">🧠</span><div><div class="sl-name">Semantic Scholar</div><div class="sl-q">AI-powered research search</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://europepmc.org/search?query=${pm}" target="_blank">
+        <span class="sl-icon">🇪🇺</span><div><div class="sl-name">Europe PMC</div><div class="sl-q">European life sciences database</div></div><span class="sl-arr">↗</span>
+      </a>
+    </div>
+    <div class="slinks-label">📰 Key Journals</div>
+    <div class="slinks-grid">
+      <a class="slink" href="https://jospt.org/search#q=${qe}&t=Website" target="_blank">
+        <span class="sl-icon">🏃</span><div><div class="sl-name">JOSPT</div><div class="sl-q">Orthopaedic & Sports PT Journal</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://bjsm.bmj.com/search/1?fulltext=${qe}&submit=yes" target="_blank">
+        <span class="sl-icon">⚽</span><div><div class="sl-name">BJSM</div><div class="sl-q">British Journal of Sports Medicine</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://pubmed.ncbi.nlm.nih.gov/?term=${qe}+AND+(physiotherapy[Title%2FAbstract]+OR+rehabilitation[Title%2FAbstract])" target="_blank">
+        <span class="sl-icon">📖</span><div><div class="sl-name">Physiotherapy Journals</div><div class="sl-q">PT-focused PubMed filter</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://www.archives-pmr.org/search?query=${qe}" target="_blank">
+        <span class="sl-icon">🏥</span><div><div class="sl-name">Archives PM&R</div><div class="sl-q">Physical Medicine & Rehabilitation</div></div><span class="sl-arr">↗</span>
+      </a>
+    </div>
+    <div class="slinks-label">📋 Guidelines & Standards</div>
+    <div class="slinks-grid">
+      <a class="slink" href="https://www.nice.org.uk/search#q=${qe}&ndt=Guidance" target="_blank">
+        <span class="sl-icon">🇬🇧</span><div><div class="sl-name">NICE Guidelines</div><div class="sl-q">UK national clinical guidelines</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://www.apta.org/search#q=${qe}" target="_blank">
+        <span class="sl-icon">🇺🇸</span><div><div class="sl-name">APTA Resources</div><div class="sl-q">American PT Association</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://www.who.int/search?query=${qe}" target="_blank">
+        <span class="sl-icon">🌍</span><div><div class="sl-name">WHO Guidelines</div><div class="sl-q">World Health Organization</div></div><span class="sl-arr">↗</span>
+      </a>
+      <a class="slink" href="https://rehabmeasures.sralab.org/Search.aspx?q=${qe}" target="_blank">
+        <span class="sl-icon">📏</span><div><div class="sl-name">Rehab Measures DB</div><div class="sl-q">Outcome measures database</div></div><span class="sl-arr">↗</span>
+      </a>
+    </div>`;
+}
+
+function renderFallback(q) {
+  document.getElementById('aiResults').innerHTML =
+    '<div style="font-family:\'Orbitron\',monospace;font-size:10px;color:rgba(90,122,98,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">🔗 Search Databases for: \'' + q + '\'</div>' +
+    buildSearchLinks(q);
+}
+
+function logout(){if(confirm('Logout?')){localStorage.removeItem('currentUser');window.location.href='login.html';}}
+</script>
+</body>
+</html>

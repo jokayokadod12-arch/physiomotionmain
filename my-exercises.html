@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>My Exercises — Physio Motion Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/my-exercises.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📋</span> My Exercises</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='choose-role.html'">🏠 Dashboard</button>
+    <button class="btn btn-header" id="mutePageBtn" onclick="togglePageMute()" title="Mute notifications for this section">🔔</button>
+    <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+<script>
+(function(){
+  const pageKey = 'physio_mute_page_my-exercises.html'.replace('.html','');
+  const user = JSON.parse(localStorage.getItem('currentUser')||'null');
+  if(!user) return;
+  const muteKey = 'physio_page_muted_'+user.email;
+  const muted = JSON.parse(localStorage.getItem(muteKey)||'[]');
+  const btn = document.getElementById('mutePageBtn');
+  if(btn){ btn.textContent = muted.includes(pageKey)?'🔕':'🔔'; btn.title = muted.includes(pageKey)?'Unmute notifications':'Mute notifications'; }
+  window.togglePageMute = function(){
+    const m2 = JSON.parse(localStorage.getItem(muteKey)||'[]');
+    const i = m2.indexOf(pageKey);
+    if(i===-1) m2.push(pageKey); else m2.splice(i,1);
+    localStorage.setItem(muteKey,JSON.stringify(m2));
+    if(btn){ btn.textContent=m2.includes(pageKey)?'🔕':'🔔'; btn.title=m2.includes(pageKey)?'Unmute notifications':'Mute notifications'; }
+  };
+})();
+</script>
+</div>
+
+
+<div class="page-container">
+  <button class="btn-back" onclick="window.location.href='choose-role.html'">← Dashboard</button>
+  <div class="page-title">My Exercises</div>
+  <div class="page-subtitle">Complete your prescribed physiotherapy programme</div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><h3 id="statTotal">0</h3><p>Total Assigned</p></div>
+    <div class="stat-card success"><h3 id="statDone">0</h3><p>Completed</p></div>
+    <div class="stat-card"><h3 id="statRate">0%</h3><p>Completion Rate</p></div>
+  </div>
+
+  <div id="plansContainer"></div>
+</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script>
+    try {
+      var _FBCFG = {
+        apiKey:            "AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+        authDomain:        "physiowork-8976f.firebaseapp.com",
+        projectId:         "physiowork-8976f",
+        storageBucket:     "physiowork-8976f.firebasestorage.app",
+        messagingSenderId: "789519816056",
+        appId:             "1:789519816056:web:c2c8d82c83f8149fd1a48d"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(_FBCFG);
+      window._fbDb      = firebase.firestore();
+      window._fbStorage = firebase.storage();
+      window.FIREBASE_ENABLED = true;
+    } catch(e) {
+      console.warn('Firebase init failed:', e);
+      window.FIREBASE_ENABLED = false;
+    }
+  </script>
+<script src="js/utils.js"></script>
+<script>requireAuth('patient');</script>
+<script src="js/my-exercises.js"></script>
+
+<script src="js/pwa.js"></script>
+
+<script>
+(function(){
+  function updateBadge(){
+    var user = JSON.parse(localStorage.getItem('currentUser')||'null');
+    if(!user) return;
+    var list = JSON.parse(localStorage.getItem('physio_notifs_'+user.email)||'[]');
+    var n = list.filter(function(x){return !x.read;}).length;
+    // show unread count somewhere visible if needed
+  }
+  updateBadge();
+  setInterval(updateBadge, 5000);
+  // Request browser notification permission
+  if(window.Notification && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+})();
+</script>
+</body>
+</html>

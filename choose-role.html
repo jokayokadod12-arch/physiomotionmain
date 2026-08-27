@@ -341,11 +341,13 @@ try {
   const user = requireAuth('patient');
   if (user) document.getElementById('patientName').textContent = user.name || user.email;
   function goProfile() { window.location.href = 'profile.html'; }
-  function doLogout() {
-    if (confirm('Logout?')) {
-      localStorage.removeItem('currentUser');
-      window.location.href = 'login.html';
-    }
+  async function doLogout() {
+    const ok = await customConfirm('Are you sure you want to log out?', {
+      title: 'Logout', icon: '🚪', confirmLabel: 'Logout', cancelLabel: 'Cancel', danger: true
+    });
+    if (!ok) return;
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
   }
 
   // Populate dashboard stats - runs immediately and refreshes every 10s

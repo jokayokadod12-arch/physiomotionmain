@@ -266,6 +266,13 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 
   <div class="modules-grid">
 
+    <div class="module-card" style="--mc:#5A7A62" onclick="window.location.href='patient-files.html'">
+      <div class="mc-icon">🗂️</div>
+      <div class="mc-title">Patient Files</div>
+      <div class="mc-desc">Organized records — history, notes &amp; linked plans</div>
+      <div class="mc-arr">→</div>
+    </div>
+
     <div class="module-card" style="--mc:var(--sage)" onclick="window.location.href='plans.html'">
       <div class="mc-icon">📁</div>
       <div class="mc-title">Plans</div>
@@ -305,13 +312,6 @@ body { display:flex; flex-direction:column; min-height:100vh; }
       <div class="mc-icon">🩹</div>
       <div class="mc-title">Patient Helper</div>
       <div class="mc-desc">Review patient pain reports &amp; reply with guidance</div>
-      <div class="mc-arr">→</div>
-    </div>
-
-    <div class="module-card" style="--mc:#5A7A62" onclick="window.location.href='patient-files.html'">
-      <div class="mc-icon">🗂️</div>
-      <div class="mc-title">Patient Files</div>
-      <div class="mc-desc">Organized records — history, notes &amp; linked plans</div>
       <div class="mc-arr">→</div>
     </div>
 
@@ -426,11 +426,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 function goProfile() { window.location.href = 'profile.html'; }
-function logout() {
-  if (confirm('Logout?')) {
-    localStorage.removeItem('currentUser');
-    window.location.href = 'login.html';
-  }
+async function logout() {
+  const ok = await customConfirm('Are you sure you want to log out?', {
+    title: 'Logout', icon: '🚪', confirmLabel: 'Logout', cancelLabel: 'Cancel', danger: true
+  });
+  if (!ok) return;
+  localStorage.removeItem('currentUser');
+  window.location.href = 'login.html';
 }
 </script>
 <script>

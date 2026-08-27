@@ -88,7 +88,7 @@
     const r=document.getElementById('romCard');
     if(r){r.style.opacity='.4';r.onclick=()=>alert('ROM Analyzer requires a desktop browser with camera access.');}
   }
-  function logout(){if(confirm('Logout?')){localStorage.removeItem('currentUser');window.location.href='login.html';}}
+  async function logout(){const ok=await customConfirm('Are you sure you want to log out?',{title:'Logout',icon:'🚪',confirmLabel:'Logout',cancelLabel:'Cancel',danger:true});if(!ok)return;localStorage.removeItem('currentUser');window.location.href='login.html';}
 </script>
 </body>
 </html>

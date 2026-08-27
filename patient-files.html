@@ -992,8 +992,23 @@ async function renderLinkedRom(){
         }).join('')}
       </div>` : '';
 
-    const angles = Object.entries(s.angles||{}).filter(([k,v])=>v!=null)
-      .map(([k,v])=>`${ROM_LABELS[k]||k}: <b>${v}°</b>`).join(' &nbsp;·&nbsp; ');
+    // Build the summary line from what's actually under each photo (the
+    // joint the doctor picked and the value frozen at capture time) rather
+    // than the separate s.angles field — that field can be missing/stale on
+    // older sessions saved before the capture fix, while the per-photo data
+    // was always correct. This also naturally dedupes: a joint only shows
+    // once even if measured in more than one photo.
+    const anglesFromPhotos = {};
+    photos.forEach(p=>{
+      if(p.selectedJoint && p.selectedValue!=null){
+        const k = p.jointKey || p.selectedJoint;
+        anglesFromPhotos[k] = { label: p.selectedJoint, value: p.selectedValue };
+      }
+    });
+    const angleEntries = Object.keys(anglesFromPhotos).length
+      ? Object.values(anglesFromPhotos).map(a=>`${esc(a.label)}: <b>${a.value}°</b>`)
+      : Object.entries(s.angles||{}).filter(([k,v])=>v!=null).map(([k,v])=>`${ROM_LABELS[k]||k}: <b>${v}°</b>`);
+    const angles = angleEntries.join(' &nbsp;·&nbsp; ');
 
     const patientMeta = [
       s.patient?.age    ? `Age ${esc(s.patient.age)}`        : '',

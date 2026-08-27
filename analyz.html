@@ -1626,7 +1626,17 @@ async function saveToDatabase() {
       height:  document.getElementById('patientHeight').value || '',
       history: document.getElementById('patientHistory').value || '',
     },
-    angles:  { ...currentAngles },
+    // Only the joint(s) actually selected & measured at capture time —
+    // NOT the whole live currentAngles blob (that holds every angle the
+    // pose model happens to be computing at save time, which is why
+    // unrelated joints were showing up with duplicate values, and why
+    // this could end up empty if the pose was lost before hitting Save).
+    angles:  capturedPhotos.reduce((acc, p) => {
+      if (p.jointKey && p.selectedValue !== null && p.selectedValue !== undefined) {
+        acc[p.jointKey] = p.selectedValue;
+      }
+      return acc;
+    }, {}),
     photos:  capturedPhotos.map(p => ({
       data:          p.data,
       time:          p.time,
@@ -1822,7 +1832,13 @@ async function generatePDF() {
   document.getElementById('pdfBtn').disabled    = true;
   document.getElementById('pdfBtn').textContent = '⏳ Generating…';
   try {
-    await buildPDF(patient, currentAngles, capturedPhotos);
+    const selectedAngles = capturedPhotos.reduce((acc, p) => {
+      if (p.jointKey && p.selectedValue !== null && p.selectedValue !== undefined) {
+        acc[p.jointKey] = p.selectedValue;
+      }
+      return acc;
+    }, {});
+    await buildPDF(patient, selectedAngles, capturedPhotos);
     showFeedback('✅ PDF generated!', 'success');
   } catch(e) {
     showFeedback('❌ PDF error: ' + e.message, 'error');

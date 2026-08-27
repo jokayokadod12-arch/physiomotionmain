@@ -308,7 +308,6 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
     <div class="hero-cta">
       <a href="login.html" class="bh1">✦ Start Your Journey</a>
       <a href="#features" class="bh2">Explore Features</a>
-      <button class="bh3" id="heroInstallBtn" onclick="installPWA()">📲 Install App</button>
     </div>
     <div class="hmetrics">
       <div class="hm"><span class="hm-n">🥇</span><span class="hm-l">First in Egypt</span></div>
@@ -316,20 +315,6 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
       <div class="hm"><span class="hm-n">10+</span><span class="hm-l">AI Features</span></div>
       <div class="hm"><span class="hm-n">☁️</span><span class="hm-l">Cloud Sync</span></div>
     </div>
-    <!-- Install App Banner -->
-    <div id="installBanner" style="margin-top:20px;padding:16px 20px;background:linear-gradient(135deg,rgba(45,74,53,.06),rgba(90,122,98,.04));border:1.5px solid rgba(90,122,98,.2);border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;cursor:pointer;" onclick="installPWA()">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <img src="icons/icon-192.png" style="width:44px;height:44px;border-radius:13px;box-shadow:0 4px 14px rgba(45,74,53,.2);" onerror="this.style.display='none'">
-        <div>
-          <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#2D4A35;">Install Physio Motion</div>
-          <div style="font-size:12px;color:rgba(90,122,98,.7);margin-top:1px;">Works offline · free · no App Store needed</div>
-        </div>
-      </div>
-      <button onclick="event.stopPropagation();installPWA()" style="padding:10px 20px;border-radius:100px;background:linear-gradient(135deg,#1A3020,#5A7A62);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(45,74,53,.3);white-space:nowrap;">
-        📲 Install Now
-      </button>
-    </div>
-
     <!-- Why Choose Us strip -->
     <div style="margin-top:32px;padding:20px 24px;background:rgba(90,122,98,.06);border:1px solid rgba(90,122,98,.15);border-radius:16px;">
       <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);letter-spacing:.5px;margin-bottom:14px;text-transform:uppercase;">Why Physio Motion?</div>
@@ -548,7 +533,6 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
       <div class="fc"><div class="fc-ico">💪</div><div class="fc-t">Muscle Strength Testing</div><div class="fc-d">Full MMT system — grade every major muscle group using MRC scale 0–5. Track bilateral recovery over time.</div><span class="fc-tag">MMT · MRC 0–5 · Bilateral</span></div>
       <div class="fc"><div class="fc-ico">🥗</div><div class="fc-t">Lifestyle & Nutrition</div><div class="fc-d">Doctors generate 7-day nutrition plans with BMR, TDEE, and macros based on patient data. Printable as PDF.</div><span class="fc-tag">Nutrition · BMR · TDEE · PDF</span></div>
       <div class="fc"><div class="fc-ico">💬</div><div class="fc-t">Real-Time Chat</div><div class="fc-d">Secure messaging with text, images, videos, and files. Full history in Firestore — synced across every device.</div><span class="fc-tag">Chat · Files · Cloud · Push</span></div>
-      <div class="fc"><div class="fc-ico">📱</div><div class="fc-t">Install as Mobile App</div><div class="fc-d">PWA — install directly on iPhone or Android. No App Store needed. Offline support and native app experience.</div><span class="fc-tag">PWA · iOS · Android · Offline</span></div>
     </div>
 
   </div>

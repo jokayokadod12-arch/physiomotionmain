@@ -166,10 +166,12 @@ body::before {
 .auth-slide.slide-login  { transform: translateX(0); opacity: 1; }
 .auth-slide.slide-signup { transform: translateX(0); opacity: 1; }
 
-/* Desktop slide */
-#loginWrapper.show-signup .slide-login  { transform: translateX(-105%); opacity: 0; pointer-events: none; position: absolute; top: 0; left: 0; right: 0; }
-#loginWrapper.show-signup .slide-signup { transform: translateX(0); opacity: 1; }
-#loginWrapper:not(.show-signup) .slide-signup { transform: translateX(105%); opacity: 0; pointer-events: none; position: absolute; top: 0; left: 0; right: 0; }
+/* Desktop slide — scoped so it never fights the mobile hidden-mobile toggle below */
+@media (min-width: 681px) {
+  #loginWrapper.show-signup .slide-login  { transform: translateX(-105%); opacity: 0; pointer-events: none; position: absolute; top: 0; left: 0; right: 0; }
+  #loginWrapper.show-signup .slide-signup { transform: translateX(0); opacity: 1; }
+  #loginWrapper:not(.show-signup) .slide-signup { transform: translateX(105%); opacity: 0; pointer-events: none; position: absolute; top: 0; left: 0; right: 0; }
+}
 
 /* Mobile hide */
 @media (max-width: 680px) {

@@ -616,7 +616,8 @@ textarea{min-height:68px;resize:vertical;}
     <div class="panel-body">
     <div class="input-group">
       <label>Patient Name *</label>
-      <input type="text" id="patientName" placeholder="Enter full name" required>
+      <input type="text" id="patientName" placeholder="Enter full name" required list="patientNamesList" autocomplete="off">
+      <datalist id="patientNamesList"></datalist>
     </div>
 
     <div class="row2">
@@ -749,7 +750,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const user = JSON.parse(localStorage.getItem('currentUser'));
   if (!user) { window.location.href = 'login.html'; return; }
   getCameras();
+  loadPatientNamesList();
 });
+
+/* ════════════════════════════════════════════
+   PATIENT NAME AUTOCOMPLETE
+   Populates the datalist with every registered patient account name,
+   so the name typed here matches exactly what's used when linking
+   this session inside a Patient File.
+════════════════════════════════════════════ */
+async function loadPatientNamesList() {
+  const dl = document.getElementById('patientNamesList');
+  if (!dl) return;
+  let patients = [];
+  try {
+    if (window.FIREBASE_ENABLED && window._fbDb) {
+      const snap = await window._fbDb.collection('users').where('role', '==', 'patient').get();
+      patients = snap.docs.map(d => d.data());
+    } else {
+      const raw = JSON.parse(localStorage.getItem('users') || '[]');
+      patients = raw.filter(u => u.role === 'patient');
+    }
+  } catch (e) { console.warn('loadPatientNamesList:', e); }
+
+  dl.innerHTML = patients
+    .filter(p => p.name)
+    .map(p => `<option value="${String(p.name).replace(/"/g,'&quot;')}"></option>`)
+    .join('');
+}
 
 /* ════════════════════════════════════════════
    CAMERAS
@@ -1530,9 +1558,11 @@ async function capturePhoto() {
   const snap = {
     data:          finalCanvas.toDataURL('image/jpeg', 0.5),
     time:          new Date().toLocaleString(),
+    ts:            Date.now(),
     angles:        { ...currentAngles },
     selectedJoint: selLabel,
     selectedValue: selVal,
+    jointKey:      selKey,
   };
   capturedPhotos.push(snap);
   updatePhotoCount();
@@ -1600,9 +1630,11 @@ async function saveToDatabase() {
     photos:  capturedPhotos.map(p => ({
       data:          p.data,
       time:          p.time,
+      ts:            p.ts || Date.now(),
       angles:        p.angles,
       selectedJoint: p.selectedJoint || null,
       selectedValue: p.selectedValue ?? null,
+      jointKey:      p.jointKey || null,
     })),
   };
 

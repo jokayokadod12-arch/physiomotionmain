@@ -137,6 +137,13 @@ textarea.f-input{resize:vertical;min-height:70px;line-height:1.6;}
 .li-progress-track{height:7px;border-radius:4px;background:rgba(90,122,98,.1);overflow:hidden;margin-top:8px;}
 .li-progress-fill{height:100%;border-radius:4px;background:var(--sage);}
 
+/* ROM linked-item photo gallery */
+.rom-photos-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.rom-photo-thumb{width:88px;cursor:pointer;transition:.16s;}
+.rom-photo-thumb:hover{transform:translateY(-2px);}
+.rom-photo-thumb img{width:88px;height:88px;object-fit:cover;border-radius:9px;border:1px solid var(--border);display:block;}
+.rom-photo-cap{font-size:10px;color:var(--charcoal-mid);line-height:1.3;margin-top:4px;text-align:center;}
+
 /* picker modal list */
 .pick-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.16s;}
 .pick-item:hover{border-color:var(--sage-light);background:var(--sage-dim);}
@@ -219,7 +226,10 @@ textarea.f-input{resize:vertical;min-height:70px;line-height:1.6;}
       <div class="chart-card">
         <div class="chart-title">
           <span>📐 ROM Progress</span>
-          <select class="mini-select" id="romJointSelect" onchange="renderRomChart()"></select>
+          <div style="display:flex;gap:6px;">
+            <select class="mini-select" id="romJointSelect" onchange="onRomJointChange()"></select>
+            <select class="mini-select" id="romSideSelect" onchange="renderRomChart()"></select>
+          </div>
         </div>
         <div id="romChartWrap"></div>
       </div>
@@ -372,6 +382,14 @@ const ROM_LABELS = {
   kneeL:'Knee — Left', kneeR:'Knee — Right',
   hipFlexL:'Hip Flexion — Left', hipFlexR:'Hip Flexion — Right',
 };
+// Joint base names (without side suffix) for the split Joint / Side selectors.
+// Combined with 'L' or 'R' this reproduces the exact ROM_LABELS keys above,
+// e.g. 'elbow' + 'L' = 'elbowL'.
+const ROM_JOINTS = {
+  elbow:'Elbow', shoulderFlex:'Shoulder Flexion', shoulderAbd:'Shoulder Abduction',
+  shoulderExt:'Shoulder Extension', knee:'Knee', hipFlex:'Hip Flexion',
+};
+const ROM_SIDE_LABELS = { L:'Left', R:'Right' };
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function initials(name){return(name||'?').split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
@@ -699,38 +717,97 @@ function renderWeightChart(){
   });
 }
 
-function buildRomJointSelect(){
-  const sel = document.getElementById('romJointSelect');
+// Every joint+side key ('elbowL', 'kneeR', …) that actually has a reading
+// among this patient's linked ROM sessions. Prefers the exact value captured
+// with each photo (photo.jointKey / photo.angles) — that's the number the
+// doctor actually saw on screen when the picture was taken — and only falls
+// back to the session-level snapshot for older sessions saved before photos
+// carried their own joint key.
+function romKeysPresent(){
   const sessions = getLinkedRomSessions();
-  const jointsPresent = new Set();
-  sessions.forEach(s=> Object.keys(s.angles||{}).forEach(k=>{ if(s.angles[k]!=null) jointsPresent.add(k); }));
+  const set = new Set();
+  sessions.forEach(s=>{
+    let any = false;
+    (s.photos||[]).forEach(p=>{
+      if(p.jointKey && p.angles && p.angles[p.jointKey]!=null){ set.add(p.jointKey); any = true; }
+    });
+    if(!any) Object.entries(s.angles||{}).forEach(([k,v])=>{ if(v!=null) set.add(k); });
+  });
+  return set;
+}
 
-  if(!jointsPresent.size){
-    sel.innerHTML = `<option value="">No linked ROM sessions</option>`;
+function buildRomFilterSelects(){
+  const jointSel = document.getElementById('romJointSelect');
+  const sideSel  = document.getElementById('romSideSelect');
+  const keys = romKeysPresent();
+
+  if(!keys.size){
+    jointSel.innerHTML = `<option value="">No linked ROM sessions</option>`;
+    sideSel.innerHTML   = `<option value="">—</option>`;
+    sideSel.disabled = true;
     return;
   }
-  const prev = sel.value;
-  sel.innerHTML = [...jointsPresent].map(k=>`<option value="${k}">${ROM_LABELS[k]||k}</option>`).join('');
-  if(prev && jointsPresent.has(prev)) sel.value = prev;
+  sideSel.disabled = false;
+  const basesPresent = new Set([...keys].map(k=>k.slice(0,-1)));
+  const prevJoint = jointSel.value;
+  jointSel.innerHTML = [...basesPresent].map(b=>`<option value="${b}">${ROM_JOINTS[b]||b}</option>`).join('');
+  if(prevJoint && basesPresent.has(prevJoint)) jointSel.value = prevJoint;
+  updateRomSideOptions(keys);
+}
+
+function updateRomSideOptions(keys){
+  keys = keys || romKeysPresent();
+  const jointSel = document.getElementById('romJointSelect');
+  const sideSel  = document.getElementById('romSideSelect');
+  const base = jointSel.value;
+  const sidesPresent = new Set([...keys].filter(k=>k.slice(0,-1)===base).map(k=>k.slice(-1)));
+  const prevSide = sideSel.value;
+  sideSel.innerHTML = [...sidesPresent].map(s=>`<option value="${s}">${ROM_SIDE_LABELS[s]||s}</option>`).join('');
+  if(prevSide && sidesPresent.has(prevSide)) sideSel.value = prevSide;
+}
+
+function onRomJointChange(){
+  updateRomSideOptions();
+  renderRomChart();
 }
 
 async function refreshRomOverview(){
   await getAllRomSessions(); // warms _romCache so getLinkedRomSessions() below is accurate
-  buildRomJointSelect();
+  buildRomFilterSelects();
   renderRomChart();
 }
 
+// Collects one data point per photo that measured this exact joint+side,
+// using the angle value stored on that photo (not the session-level one),
+// so the number shown here is always identical to the number that was on
+// screen the moment that specific picture was captured.
+function collectRomDataPoints(key){
+  const sessions = getLinkedRomSessions();
+  const points = [];
+  sessions.forEach(s=>{
+    let matched = false;
+    (s.photos||[]).forEach(p=>{
+      if(p.jointKey===key && p.angles && p.angles[key]!=null){
+        points.push({ y:p.angles[key], ts:p.ts||s.id, label:fmtDateTime(p.ts||s.id) });
+        matched = true;
+      }
+    });
+    if(!matched && s.angles && s.angles[key]!=null){
+      points.push({ y:s.angles[key], ts:s.id, label:fmtDate(s.id) });
+    }
+  });
+  points.sort((a,b)=>a.ts-b.ts);
+  return points;
+}
+
 function renderRomChart(){
-  const jt = document.getElementById('romJointSelect').value;
-  const sessions = getLinkedRomSessions().slice().sort((a,b)=>a.id-b.id);
-  if(!jt || !sessions.length){
+  const base = document.getElementById('romJointSelect').value;
+  const side = document.getElementById('romSideSelect').value;
+  if(!base || !side){
     document.getElementById('romChartWrap').innerHTML = `<div class="chart-empty">Link ROM sessions to this patient to compare progress over time.</div>`;
     return;
   }
-  const points = sessions
-    .filter(s=> s.angles && s.angles[jt] != null)
-    .map(s=>({ y: s.angles[jt], label: fmtDate(s.id) }));
-
+  const points = collectRomDataPoints(base + side);
   document.getElementById('romChartWrap').innerHTML = buildLineChartSVG(points, {
     color:'#2980B9', unit:'°', id:'rom', emptyMsg:'no readings yet for this joint'
   });
@@ -899,15 +976,42 @@ async function renderLinkedRom(){
     return;
   }
   wrap.innerHTML = items.map(s=>{
+    const photos = s.photos||[];
+    // Per-photo readings — exactly the number that was on screen when that
+    // specific picture was captured (not the possibly-later session snapshot).
+    const photosHtml = photos.length ? `
+      <div class="rom-photos-row">
+        ${photos.map(p=>{
+          const angTxt = (p.selectedJoint && p.selectedValue!=null)
+            ? `${esc(p.selectedJoint)}<br><b>${p.selectedValue}°</b>`
+            : 'No joint selected';
+          return `<div class="rom-photo-thumb" onclick="window.open('${p.data}','_blank')" title="Open full size">
+            <img src="${p.data}" alt="ROM photo">
+            <div class="rom-photo-cap">${angTxt}</div>
+          </div>`;
+        }).join('')}
+      </div>` : '';
+
     const angles = Object.entries(s.angles||{}).filter(([k,v])=>v!=null)
       .map(([k,v])=>`${ROM_LABELS[k]||k}: <b>${v}°</b>`).join(' &nbsp;·&nbsp; ');
+
+    const patientMeta = [
+      s.patient?.age    ? `Age ${esc(s.patient.age)}`        : '',
+      s.patient?.gender ? esc(s.patient.gender)               : '',
+      s.patient?.weight ? `${esc(s.patient.weight)} kg`       : '',
+      s.patient?.height ? `${esc(s.patient.height)} cm`       : '',
+    ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+
     return `<div class="linked-item">
       <div class="li-top">
-        <div class="li-title">📐 ROM Session</div>
+        <div class="li-title">📐 ROM Session${s.doctorName ? ' — '+esc(s.doctorName) : ''}</div>
         <div class="li-unlink" onclick="unlink('rom','${esc(s.id)}')">✕ Unlink</div>
       </div>
       <div class="li-date">${esc(s.date||fmtDate(s.id))}</div>
+      ${patientMeta ? `<div class="li-body" style="opacity:.75;">${patientMeta}</div>` : ''}
       <div class="li-body">${angles || 'No angle data recorded'}</div>
+      ${s.patient?.history ? `<div class="li-body" style="font-style:italic;opacity:.85;">📝 ${esc(s.patient.history)}</div>` : ''}
+      ${photosHtml}
     </div>`;
   }).join('');
 }
@@ -928,7 +1032,7 @@ async function unlink(type, refId){
   }catch(e){ showToast('⚠️ Could not unlink.'); }
   if(type==='exercises') renderLinkedExercises();
   else if(type==='nutrition') renderLinkedNutrition();
-  else { renderLinkedRom(); buildRomJointSelect(); renderRomChart(); }
+  else { renderLinkedRom(); buildRomFilterSelects(); renderRomChart(); }
 }
 
 // ── link picker ──
@@ -1000,7 +1104,7 @@ async function confirmLink(refId){
   closeModal('pickerOverlay');
   if(pickerType==='exercises') renderLinkedExercises();
   else if(pickerType==='nutrition') renderLinkedNutrition();
-  else { renderLinkedRom(); buildRomJointSelect(); renderRomChart(); }
+  else { renderLinkedRom(); buildRomFilterSelects(); renderRomChart(); }
 }
 
 // ── delete file ──

@@ -602,7 +602,7 @@ textarea{min-height:68px;resize:vertical;}
     <div class="photos-section">
       <div class="photos-header">
         <h3>📷 Captured Photos</h3>
-        <span id="photoCount" class="photo-counter">0 / 2</span>
+        <span id="photoCount" class="photo-counter">0 / 1</span>
       </div>
       <div id="photoDisplay"></div>
     </div>
@@ -728,7 +728,7 @@ let detector  = null;
 let currentStream = null;
 let isDetecting   = false;
 let capturedPhotos = [];
-const MAX_PHOTOS   = 2;
+const MAX_PHOTOS   = 1;
 let isCapturing    = false;
 let currentAngles  = {};
 let smoothedKp     = {};  // smoothed keypoint positions for fluid skeleton
@@ -1439,7 +1439,7 @@ const TABLE_ROWS = [
 ════════════════════════════════════════════ */
 function startPhotoTimer() {
   if (isCapturing) return;
-  if (capturedPhotos.length >= MAX_PHOTOS) { alert('Maximum 2 photos allowed per session.'); return; }
+  if (capturedPhotos.length >= MAX_PHOTOS) { alert('Maximum 1 photo allowed per session.'); return; }
   isCapturing = true;
   const timerEl = document.getElementById('timerDisplay');
   document.getElementById('captureBtn').disabled = true;
@@ -1597,7 +1597,7 @@ async function deletePhoto(btn, idx) {
 }
 
 function updatePhotoCount() {
-  document.getElementById('photoCount').textContent = `${capturedPhotos.length} / 2`;
+  document.getElementById('photoCount').textContent = `${capturedPhotos.length} / ${MAX_PHOTOS}`;
 }
 
 /* ════════════════════════════════════════════

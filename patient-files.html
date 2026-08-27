@@ -1006,7 +1006,10 @@ async function confirmLink(refId){
 // ── delete file ──
 async function deleteCurrentFile(){
   if(!activeFile) return;
-  if(!confirm(`Delete the patient file for "${activeFile.patientName}"? This cannot be undone.`)) return;
+  const ok = await customConfirm(`Delete the patient file for "${activeFile.patientName}"? This cannot be undone.`, {
+    title: 'Delete Patient File', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if(!ok) return;
   try{
     await dbDeletePatientFile(activeFile.id);
     allFiles = allFiles.filter(f=>f.id!==activeFile.id);

@@ -726,8 +726,11 @@ function createSessionCard(s) {
 }
 
 // ── Delete session ──
-function deleteSession(id) {
-  if (!confirm('Delete this session? Cannot be undone.')) return;
+async function deleteSession(id) {
+  const ok = await customConfirm('Delete this session? Cannot be undone.', {
+    title: 'Delete Session', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   allSessions = allSessions.filter(s => String(s.id) !== String(id));
   saveSessions();
   // Delete from Firebase too
@@ -898,6 +901,7 @@ function logout()      { localStorage.removeItem('currentUser'); window.location
 </script>
 
 
+<script src="js/confirm-modal.js"></script>
 <script src="js/pwa.js"></script>
 </body>
 </html>

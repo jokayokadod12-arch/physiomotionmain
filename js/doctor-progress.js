@@ -166,7 +166,10 @@ function renderPatients(patients) {
 
 /* ── Delete entire assignment ── */
 async function deleteAssignment(assignId, patientEmail) {
-  if (!confirm('Remove this assignment permanently?')) return;
+  const ok = await customConfirm('Remove this assignment permanently?', {
+    title: 'Remove Assignment', icon: '🗑️', confirmLabel: 'Remove', danger: true
+  });
+  if (!ok) return;
 
   currentDoctor.sentExercises = (currentDoctor.sentExercises || [])
     .filter(a => String(a.id) !== String(assignId));
@@ -177,7 +180,10 @@ async function deleteAssignment(assignId, patientEmail) {
 
 /* ── Delete one exercise ── */
 async function deleteExercise(assignId, exIndex, patientEmail) {
-  if (!confirm('Remove this exercise permanently?')) return;
+  const ok = await customConfirm('Remove this exercise permanently?', {
+    title: 'Remove Exercise', icon: '🗑️', confirmLabel: 'Remove', danger: true
+  });
+  if (!ok) return;
 
   const assign = (currentDoctor.sentExercises || [])
     .find(a => String(a.id) === String(assignId));

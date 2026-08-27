@@ -135,7 +135,10 @@ function buildPlanCard(plan) {
 
 // ── Delete entire plan ──────────────────────────────────────
 async function deletePlan(planIndex) {
-  if (!confirm('Remove this entire exercise plan?')) return;
+  const ok = await customConfirm('Remove this entire exercise plan?', {
+    title: 'Remove Plan', icon: '🗑️', confirmLabel: 'Remove', danger: true
+  });
+  if (!ok) return;
 
   currentUser.exercises = (currentUser.exercises || []).filter((_, i) => i !== planIndex);
   await asyncSaveUser(currentUser);
@@ -144,7 +147,10 @@ async function deletePlan(planIndex) {
 
 // ── Delete single exercise ──────────────────────────────────
 async function deleteExercise(planIndex, exIndex) {
-  if (!confirm('Remove this exercise?')) return;
+  const ok = await customConfirm('Remove this exercise?', {
+    title: 'Remove Exercise', icon: '🗑️', confirmLabel: 'Remove', danger: true
+  });
+  if (!ok) return;
 
   const plan = currentUser.exercises?.[planIndex];
   if (!plan) return;
@@ -160,7 +166,10 @@ async function deleteExercise(planIndex, exIndex) {
 
 // ── Mark complete ───────────────────────────────────────────
 async function markComplete(planIndex, exIndex) {
-  if (!confirm('Mark this exercise as completed?')) return;
+  const ok = await customConfirm('Mark this exercise as completed?', {
+    title: 'Mark Complete', icon: '✅', confirmLabel: 'Mark Done', danger: false
+  });
+  if (!ok) return;
 
   const plan = currentUser.exercises?.[planIndex];
   if (!plan) return;

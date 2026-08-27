@@ -187,7 +187,10 @@ function toggleBody(id) {
 }
 
 async function deletePlan(idx) {
-  if (!confirm('Delete this plan permanently?')) return;
+  const ok = await customConfirm('Delete this plan permanently?', {
+    title: 'Delete Plan', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   doctor.lifestylePlans = (doctor.lifestylePlans||[]).filter((_,i)=>i!==idx);
   await asyncSaveUser(doctor).catch(()=>{});
   updateCurrentUser(doctor);

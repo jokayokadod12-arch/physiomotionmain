@@ -248,7 +248,10 @@ function togglePlan(id) {
 }
 
 async function deletePlan(idx) {
-  if (!confirm('Delete this nutrition plan from your records?')) return;
+  const ok = await customConfirm('Delete this nutrition plan from your records?', {
+    title: 'Delete Plan', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   currentUser.lifestylePlans = (currentUser.lifestylePlans||[]).filter((_,i) => i !== idx);
   await asyncSaveUser(currentUser).catch(() => {});
   updateCurrentUser(currentUser);

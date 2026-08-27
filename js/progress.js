@@ -122,7 +122,10 @@ function render() {
 }
 
 async function deletePlan(planIndex) {
-  if (!confirm('Remove this exercise plan from your progress?\nThis only affects your view.')) return;
+  const ok = await customConfirm('Remove this exercise plan from your progress?\nThis only affects your view.', {
+    title: 'Remove Plan', icon: '🗑️', confirmLabel: 'Remove', danger: true
+  });
+  if (!ok) return;
 
   currentUser.exercises = (currentUser.exercises || []).filter((_, i) => i !== planIndex);
 

@@ -317,7 +317,10 @@ function render() {
 }
 
 async function deleteRecord(id) {
-  if (!confirm('Remove this record from your list?')) return;
+  const ok = await customConfirm('Remove this record from your list?', {
+    title: 'Remove Record', icon: '🗑️', confirmLabel: 'Remove', danger: true
+  });
+  if (!ok) return;
   const idx = _bookingsCache.findIndex(x => x.id === id);
   if (idx !== -1) _bookingsCache.splice(idx, 1);
   await dbUpdateBooking(id, { patientDeleted: true }).catch(()=>{});
@@ -325,7 +328,10 @@ async function deleteRecord(id) {
 }
 
 async function cancelBooking(id) {
-  if (!confirm('Cancel this appointment? This cannot be undone.')) return;
+  const ok = await customConfirm('Cancel this appointment? This cannot be undone.', {
+    title: 'Cancel Appointment', icon: '❌', confirmLabel: 'Cancel Appointment', danger: true
+  });
+  if (!ok) return;
   const idx = _bookingsCache.findIndex(b => b.id === id);
   if (idx === -1) return;
   const b = _bookingsCache[idx];

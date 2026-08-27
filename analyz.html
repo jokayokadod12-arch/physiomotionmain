@@ -1556,8 +1556,11 @@ function renderPhoto(snap, idx) {
   container.appendChild(card);
 }
 
-function deletePhoto(btn, idx) {
-  if (!confirm('Delete this photo?')) return;
+async function deletePhoto(btn, idx) {
+  const ok = await customConfirm('Delete this photo?', {
+    title: 'Delete Photo', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   btn.closest('.photo-card').remove();
   capturedPhotos.splice(idx, 1);
   updatePhotoCount();
@@ -1749,8 +1752,11 @@ function buildSessionCard(s, email) {
     </div>`;
 }
 
-function deleteSession(id, email) {
-  if (!confirm('Delete this session? This cannot be undone.')) return;
+async function deleteSession(id, email) {
+  const ok = await customConfirm('Delete this session? This cannot be undone.', {
+    title: 'Delete Session', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   let sessions = getSessions(email);
   sessions = sessions.filter(s => String(s.id) !== String(id));
   saveSessions(email, sessions);
@@ -1991,6 +1997,7 @@ function goBack()      { window.location.href = 'choose-year.html'; }
 navigator.mediaDevices.addEventListener('devicechange', getCameras);
 </script>
 
+<script src="js/confirm-modal.js"></script>
 <script src="js/pwa.js"></script>
 <script>
 // Block mobile access to ROM Analysis

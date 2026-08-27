@@ -759,7 +759,10 @@ async function approveBooking(id) {
 }
 
 async function rejectBooking(id) {
-  if (!confirm('Reject this booking? The slot will be freed.')) return;
+  const ok = await customConfirm('Reject this booking? The slot will be freed.', {
+    title: 'Reject Booking', icon: '❌', confirmLabel: 'Reject', danger: true
+  });
+  if (!ok) return;
   const b = _bookings.find(x => x.id === id);
   if (b) { b.status = 'rejected'; await dbUpdateBooking(id, { status: 'rejected' }); }
   // Notify patient
@@ -769,7 +772,10 @@ async function rejectBooking(id) {
 }
 
 async function cancelConfirmedBooking(id) {
-  if (!confirm('Cancel this confirmed appointment? The slot will be reopened for other patients.')) return;
+  const ok = await customConfirm('Cancel this confirmed appointment? The slot will be reopened for other patients.', {
+    title: 'Cancel Appointment', icon: '❌', confirmLabel: 'Cancel Appointment', danger: true
+  });
+  if (!ok) return;
   const b = _bookings.find(x => x.id === id);
   if (!b) return;
   b.status = 'cancelled';
@@ -785,7 +791,10 @@ async function cancelConfirmedBooking(id) {
 }
 
 async function deleteBooking(id) {
-  if (!confirm('Delete this booking record? This cannot be undone.')) return;
+  const ok = await customConfirm('Delete this booking record? This cannot be undone.', {
+    title: 'Delete Booking', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   _bookings = _bookings.filter(x => x.id !== id);
   await dbUpdateBooking(id, { deleted: true, status: 'deleted' }).catch(()=>{});
   renderBookings();
@@ -855,7 +864,10 @@ async function dismissReq(id) {
 }
 
 async function deleteReq(id) {
-  if (!confirm('Delete this request message permanently?')) return;
+  const ok = await customConfirm('Delete this request message permanently?', {
+    title: 'Delete Message', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   _requests = _requests.filter(x => x.id !== id);
   await dbUpdateRequest(id, { deleted: true, status: 'deleted' }).catch(() => {});
   renderRequests();

@@ -612,7 +612,10 @@ async function appendMsg(msg) {
 }
 
 async function deleteMsg(msgId) {
-  if (!confirm('Delete this message?')) return;
+  const ok = await customConfirm('Delete this message?', {
+    title: 'Delete Message', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
   const msgs = _msgsCache[ACTIVE_ID] || [];
   const m = msgs.find(x => x.id === msgId);
   if (m && m.from === ME.email) {
@@ -627,7 +630,10 @@ async function deleteConv(convId) {
   if (!convId) return;
   const conv = _convsCache.find(c => c.id === convId);
   const name = conv ? (conv.otherName || conv.otherEmail) : 'this chat';
-  if (!confirm(`Delete your chat with ${name}?\n\nThis only removes it from your list — the other person still has it.`)) return;
+  const ok = await customConfirm(`Delete your chat with ${name}?\n\nThis only removes it from your list — the other person still has it.`, {
+    title: 'Delete Chat', icon: '🗑️', confirmLabel: 'Delete', danger: true
+  });
+  if (!ok) return;
 
   // Remove from local cache
   _convsCache = _convsCache.filter(c => c.id !== convId);

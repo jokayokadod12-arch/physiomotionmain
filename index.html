@@ -258,7 +258,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:68px;display:flex;ali
 .rt{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,44px);font-weight:700;color:#FAF7F2;text-align:center;margin-bottom:14px;letter-spacing:-.5px;}
 .rt em{font-style:italic;color:var(--sage-pale);}
 .rs{text-align:center;color:rgba(250,247,242,.45);font-size:15px;margin-bottom:56px;line-height:1.6;}
-.rg{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.rg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;}
+@media(max-width:1000px){.rg{grid-template-columns:1fr 1fr;}}
 @media(max-width:700px){.rg{grid-template-columns:1fr;}}
 .rc{background:rgba(250,247,242,.04);border:1px solid rgba(250,247,242,.1);border-radius:24px;padding:40px 36px;transition:all .28s;position:relative;overflow:hidden;}
 .rc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--sage-pale),transparent);opacity:0;transition:opacity .28s;}
@@ -393,7 +394,24 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
           </div>
         </div>
 
-        <!-- Card 3 — Why unique -->
+        <!-- Card 3 — Students -->
+        <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:22px 24px;box-shadow:0 8px 32px rgba(44,44,44,.07);position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,#9B59B6,#b47bcf);border-radius:4px 0 0 4px;"></div>
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:44px;height:44px;border-radius:14px;background:rgba(155,89,182,.1);border:1px solid rgba(155,89,182,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🎓</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:6px;">For Physiotherapy Students</div>
+              <p style="font-size:13px;line-height:1.7;color:var(--charcoal-mid);margin:0;">A dedicated learning space for physio students — the same clinical guidelines and manual muscle testing reference doctors use, plus lessons, anatomy, and a communication center on the way.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                <span style="padding:3px 10px;border-radius:100px;background:rgba(155,89,182,.1);color:#9B59B6;font-size:10px;font-weight:700;border:1px solid rgba(155,89,182,.18);">📚 Clinical Guidelines</span>
+                <span style="padding:3px 10px;border-radius:100px;background:rgba(155,89,182,.1);color:#9B59B6;font-size:10px;font-weight:700;border:1px solid rgba(155,89,182,.18);">💪 MMT Reference</span>
+                <span style="padding:3px 10px;border-radius:100px;background:rgba(155,89,182,.1);color:#9B59B6;font-size:10px;font-weight:700;border:1px solid rgba(155,89,182,.18);">🎓 More Coming Soon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Why unique -->
         <div style="background:linear-gradient(135deg,var(--forest-deep),var(--forest));border-radius:20px;padding:22px 24px;box-shadow:0 8px 32px rgba(45,74,53,.25);position:relative;overflow:hidden;">
           <div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(250,247,242,.05);"></div>
           <div style="display:flex;align-items:flex-start;gap:14px;position:relative;z-index:1;">
@@ -418,7 +436,7 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
     </div>
     <div class="steps-g">
       <div class="s-con"></div>
-      <div class="step reveal"><div class="step-n">01</div><div class="step-ti">Create Account</div><div class="step-d">Doctor or Patient — register in seconds. Profile, history, and data sync securely to the cloud.</div></div>
+      <div class="step reveal"><div class="step-n">01</div><div class="step-ti">Create Account</div><div class="step-d">Doctor, Patient, or College Student — register in seconds. Profile, history, and data sync securely to the cloud.</div></div>
       <div class="step reveal" style="transition-delay:.1s"><div class="step-n">02</div><div class="step-ti">Begin Session</div><div class="step-d">AI camera tracks your body in real-time using TensorFlow MoveNet with clinical accuracy.</div></div>
       <div class="step reveal" style="transition-delay:.2s"><div class="step-n">03</div><div class="step-ti">Assign & Follow</div><div class="step-d">Doctors assign video exercise plans. Patients complete them in-app with progress tracking.</div></div>
       <div class="step reveal" style="transition-delay:.3s"><div class="step-n">04</div><div class="step-ti">Save & Report</div><div class="step-d">Capture session photos, generate PDF reports, and store everything in your cloud database.</div></div>
@@ -540,9 +558,9 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
 
 <div class="roles-wrap">
   <div class="ri">
-    <div class="sec-ey" style="color:var(--sage-pale);justify-content:center;margin-bottom:12px;">✦ Two Roles, One Platform</div>
-    <h2 class="rt">Built for <em>Doctors</em> & Patients</h2>
-    <p class="rs">Every feature thoughtfully designed for the way physiotherapy professionals and patients work together.</p>
+    <div class="sec-ey" style="color:var(--sage-pale);justify-content:center;margin-bottom:12px;">✦ Three Roles, One Platform</div>
+    <h2 class="rt">Built for <em>Doctors</em>, Patients & Students</h2>
+    <p class="rs">Every feature thoughtfully designed for the way physiotherapy professionals, patients, and physio students work together.</p>
     <div class="rg">
       <div class="rc reveal">
         <span class="rc-ico">👨‍⚕️</span>
@@ -576,6 +594,19 @@ footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px s
           <li><span class="rli-d"></span>Book appointments by browsing live doctor schedules</li>
           <li><span class="rli-d"></span>Chat with your doctor — full history on every device</li>
           <li><span class="rli-d"></span>Install as mobile app — offline support on iOS and Android</li>
+        </ul>
+      </div>
+      <div class="rc reveal">
+        <span class="rc-ico">🎓</span>
+        <div class="rc-t">College Student</div>
+        <div class="rc-s">Student Account</div>
+        <ul class="rc-li">
+          <li><span class="rli-d"></span>Search clinical guidelines with AI across PubMed and Cochrane</li>
+          <li><span class="rli-d"></span>Full Manual Muscle Testing reference — grading, nerve supply &amp; technique videos</li>
+          <li><span class="rli-d"></span>Own profile with university and year of study — no clinic setup needed</li>
+          <li><span class="rli-d"></span>Physio Communication Center — coming soon</li>
+          <li><span class="rli-d"></span>Physio Lessons — coming soon</li>
+          <li><span class="rli-d"></span>Anatomy reference — coming soon</li>
         </ul>
       </div>
     </div>

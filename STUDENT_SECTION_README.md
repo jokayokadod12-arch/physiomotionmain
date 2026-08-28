@@ -118,7 +118,35 @@
 | `muscle-test.html` | السماح لدور الطالب بالدخول + تعديل زراير الرجوع |
 | `js/profile.js` | عرض اسم الدور "College Student" بدل `student` |
 | `service-worker.js` | إضافة الصفحة الجديدة لقائمة الكاش (Offline support) |
+| `index.html` | إضافة شرح دور الطالب في الصفحة الرئيسية (تفاصيل في القسم 8) |
 | **`student-dashboard.html`** | 🆕 **صفحة جديدة بالكامل** — داشبورد الطالب المستقلة |
+
+---
+
+## 8. صفحة الهبوط الرئيسية `index.html` — إضافة شرح دور الطالب
+
+عشان أي زائر جديد يعرف إن فيه دور تالت للطلبة قبل ما يعمل حساب، اتضاف شرح للدور في 3 أماكن بصفحة الهبوط:
+
+### أ) قسم "For..." في الهيرو (أول الصفحة)
+كان فيه كارتين بس: **For Patients** و **For Physiotherapists**. اتضاف كارت تالت بينهم اسمه **"For Physiotherapy Students"** 🎓 بلون بنفسجي مميز، بيشرح باختصار:
+- نفس الـ Clinical Guidelines و MMT Reference اللي عند الدكتور.
+- إشارة إن باقي الأقسام (Lessons, Anatomy, Communication Center) جاية قريب.
+
+### ب) قسم "Two/Three Roles, One Platform" (تحت الصفحة)
+- العنوان اتغير من **"Two Roles, One Platform"** لـ **"Three Roles, One Platform"**.
+- العنوان الفرعي اتغير من **"Built for Doctors & Patients"** لـ **"Built for Doctors, Patients & Students"**.
+- اتضاف كارت تالت كامل بعنوان **"College Student"** جنب كارت الـ Physiotherapist وكارت الـ Patient، وفيه قائمة بكل حاجة الطالب يقدر يعملها:
+  - البحث في Clinical Guidelines بالـ AI.
+  - مرجع الـ MMT الكامل.
+  - بروفايل خاص بيه (جامعة + سنة دراسية، من غير إعداد عيادة).
+  - الأقسام الجديدة (Communication Center / Lessons / Anatomy) موضحة إنها "coming soon".
+- الشبكة (`grid`) بتاعة الكروت دي اتظبطت تستوعب 3 كروت جنب بعض على الشاشات الكبيرة، وتترتب تلقائي لعمود واحد أو اتنين على الموبايل.
+
+### ج) خطوة "Create Account" في قسم "The Process"
+النص كان بيقول "Doctor or Patient — register in seconds"، اتغير لـ **"Doctor, Patient, or College Student — register in seconds"** عشان يعكس الاختيار التالت من أول خطوة في رحلة المستخدم.
+
+مفيش أي تعديل في المنطق أو الفانكشنز في `index.html` — كل التعديلات دي محتوى نصي/تصميمي بس (Marketing content) عشان تعرّف بدور الطالب الجديد لأي حد بيزور الموقع.
+
 
 ---
 

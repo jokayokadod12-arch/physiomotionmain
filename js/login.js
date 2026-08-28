@@ -21,6 +21,15 @@ async function doLogin() {
     const hashed = await hashPass(pass);
     if (user.pass !== hashed && user.pass !== pass) { showMsg('loginMsg','Invalid email or password.'); return; }
     if (user.pass === pass) { user.pass = hashed; await asyncSaveUser(user).catch(()=>{}); }
+    // ── Admin-controlled account status (Super Admin panel) ──
+    if (user.accountStatus === 'suspended') {
+      showMsg('loginMsg','🚫 Your account has been suspended. Please contact support.');
+      return;
+    }
+    if (user.role === 'doctor' && user.accountStatus === 'pending') {
+      showMsg('loginMsg','⏳ Your account is awaiting admin approval. You\'ll be notified once it\'s approved.');
+      return;
+    }
     updateCurrentUser(user);
     // Ensure this account exists in Firestore (migrates old localStorage-only registrations)
     if (window.FIREBASE_ENABLED) {
@@ -50,7 +59,12 @@ async function doSignup() {
     if (ex) { showMsg('signupMsg','Email already registered.'); return; }
     const hashed = await hashPass(pass);
     const newUserObj = { name, email, pass: hashed, role, db:[], exercises:[], sentExercises:[], profile:{phone:'',specialty:'',bio:''}, createdAt: new Date().toISOString() };
-    if (role === 'doctor') newUserObj.acceptOnline = false; // doctor must explicitly enable in Schedule settings
+    if (role === 'doctor') {
+      newUserObj.acceptOnline = false; // doctor must explicitly enable in Schedule settings
+      newUserObj.accountStatus = 'pending'; // requires Super Admin approval before first login
+    } else {
+      newUserObj.accountStatus = 'active';
+    }
     await asyncSaveUser(newUserObj);
     // Switch to login
     const isMobile = window.innerWidth <= 580;
@@ -61,7 +75,11 @@ async function doSignup() {
       document.getElementById('loginWrapper').classList.remove('show-signup');
     }
     document.getElementById('loginEmail').value = email;
-    showMsg('loginMsg','✅ Account created! Please log in.');
+    if (role === 'doctor') {
+      showMsg('loginMsg','✅ Account created! It\'s pending admin approval — you\'ll be able to log in once approved.');
+    } else {
+      showMsg('loginMsg','✅ Account created! Please log in.');
+    }
     document.getElementById('loginMsg').classList.add('ok');
   } catch(e) {
     showMsg('signupMsg','Error creating account.');

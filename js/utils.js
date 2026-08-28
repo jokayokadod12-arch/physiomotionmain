@@ -258,7 +258,14 @@ function requireAuth(requiredRole = null) {
   // Silently refresh user data from Firestore in background
   if (window.FIREBASE_ENABLED) {
     fbGetUser(user.email).then(fresh => {
-      if (fresh) updateCurrentUser(fresh);
+      if (fresh) {
+        updateCurrentUser(fresh);
+        // If a Super Admin suspended this account mid-session, sign them out immediately
+        if (fresh.accountStatus === 'suspended') {
+          localStorage.removeItem('currentUser');
+          window.location.href = 'login.html';
+        }
+      }
     }).catch(() => {});
   }
   return user;

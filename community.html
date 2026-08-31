@@ -409,11 +409,53 @@ function selectMention(elId, dropId, name, email, isComposer) {
 }
 
 // ─── Composer: attachments ────────────────────────────────
+// Images are re-encoded (resized + JPEG-compressed) client-side before being
+// embedded as base64 in the post document. Firestore rejects any document over
+// ~1MB, and a raw phone photo easily exceeds that on its own — that mismatch is
+// what made "Posting…" hang/never finish when an image was attached.
+function compressImageFile(file, maxDim = 1600, startQuality = 0.75, maxBytes = 260000) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        let quality = startQuality;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // Base64 length ≈ bytes * 1.37 — keep shrinking quality until we're safely
+        // under the per-image budget so a handful of photos never blows past
+        // Firestore's 1MB document cap.
+        while (dataUrl.length > maxBytes * 1.37 && quality > 0.25) {
+          quality -= 0.1;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error('Could not read image'));
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function handleComposerFile(input, kind) {
   const files = Array.from(input.files || []);
   if (!files.length) return;
   if (kind === 'video') {
     const f = files[0];
+    if (f.size > 8 * 1024 * 1024) {
+      alert('Video is too large to attach (max 8MB). Please choose a shorter/smaller clip.');
+      input.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = ev => {
       _cmpVideo = { type:'video', data: ev.target.result, name: f.name, size: fmtSize(f.size) };
@@ -425,16 +467,21 @@ function handleComposerFile(input, kind) {
   } else if (kind === 'image') {
     _cmpVideo = null;
     files.slice(0, 6 - _cmpMedia.length).forEach(f => {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        _cmpMedia.push({ type:'image', data: ev.target.result, name: f.name });
-        renderCmpMediaPrev();
-        updatePostBtn();
-      };
-      reader.readAsDataURL(f);
+      compressImageFile(f)
+        .then(dataUrl => {
+          _cmpMedia.push({ type:'image', data: dataUrl, name: f.name });
+          renderCmpMediaPrev();
+          updatePostBtn();
+        })
+        .catch(() => alert('Could not attach "' + f.name + '". Please try a different image.'));
     });
   } else { // file/document
     const f = files[0];
+    if (f.size > 800 * 1024) {
+      alert('File is too large to attach (max 800KB). Please choose a smaller file or share a link instead.');
+      input.value = '';
+      return;
+    }
     _cmpVideo = null;
     const reader = new FileReader();
     reader.onload = ev => {
@@ -478,10 +525,20 @@ async function submitPost() {
   const text = el.value.trim();
   if (!text && !_cmpMedia.length && !_cmpVideo) return;
   const btn = document.getElementById('postBtn');
-  btn.disabled = true; btn.textContent = 'Posting…';
 
   const media = _cmpVideo ? [_cmpVideo] : _cmpMedia.slice();
   const link = extractFirstUrl(text);
+
+  // Safety net: even after compression, refuse to attempt a write that would
+  // exceed Firestore's ~1MB document limit, instead of leaving the button
+  // stuck on "Posting…" while the write silently fails/hangs.
+  const totalBytes = media.reduce((sum, m) => sum + (m.data ? m.data.length : 0), 0);
+  if (totalBytes > 900000) {
+    alert('This post is too large to publish (images/files too big even after compression). Please remove one or attach fewer items.');
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Posting…';
 
   const post = {
     id: 'p' + Date.now() + Math.random().toString(36).slice(2,6),
@@ -498,8 +555,12 @@ async function submitPost() {
     ts: Date.now()
   };
 
+  // Belt-and-suspenders: never let the button sit on "Posting…" forever, even
+  // if the Firestore write stalls (slow/flaky connection).
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 20000));
+
   try {
-    await dbSavePost(post);
+    await Promise.race([dbSavePost(post), timeout]);
     // Notify mentioned students
     for (const email of _cmpMentions) {
       if (email !== ME.email) {
@@ -511,7 +572,14 @@ async function submitPost() {
     renderCmpMediaPrev();
     document.getElementById('cmpLinkPrev').innerHTML = '';
     await loadFeed();
-  } catch (e) { alert('Could not publish post. Please try again.'); }
+  } catch (e) {
+    if (e && e.message === 'timeout') {
+      alert('Publishing is taking too long. Please check your connection and try again.');
+    } else {
+      alert('Could not publish post. Please try again.');
+    }
+  }
+  btn.disabled = false;
   btn.textContent = 'Post';
   updatePostBtn();
 }

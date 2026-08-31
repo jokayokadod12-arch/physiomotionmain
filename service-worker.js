@@ -5,7 +5,7 @@ const STATIC_FILES = [
   '/patient-helper.html', '/patient-files.html',
   '/exercises-library.html', '/exercises-videos.html', '/guidelines.html',
   '/muscle-test.html', '/therapeutic-exercises.html', '/doctor-progress.html',
-  '/database.html', '/profile.html', '/community.html', '/student-chat.html', '/css/theme.css', '/css/mobile.css',
+  '/database.html', '/profile.html', '/student-chat.html', '/css/theme.css', '/css/mobile.css',
   '/js/utils.js', '/js/firebase-config.js', '/js/login.js', '/js/db.js', '/manifest.json',
 ];
 self.addEventListener('install', e => {

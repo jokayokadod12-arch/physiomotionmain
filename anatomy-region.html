@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Anatomy Region — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; background:var(--bg); }
+
+.ar-hero {
+  position:relative; z-index:1;
+  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, var(--sage) 100%);
+  padding: 26px 24px 20px;
+}
+.ar-back { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:rgba(250,247,242,.75); cursor:pointer; margin-bottom:10px; }
+.ar-title { font-family:'Playfair Display', serif; font-size:clamp(20px,4vw,28px); font-weight:700; color:#FAF7F2; }
+.ar-sub { font-size:12.5px; color:rgba(250,247,242,.55); margin-top:4px; }
+
+.ar-main { flex:1; max-width:900px; margin:0 auto; width:100%; padding:20px 18px 90px; }
+
+.ar-tabs { display:flex; gap:8px; margin-bottom:20px; position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:5; }
+.ar-tab { flex:1; text-align:center; padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--bg-card); font-size:12.5px; font-weight:700; color:var(--text-sec); cursor:pointer; transition:.2s; }
+.ar-tab.active { background:var(--forest); color:#FAF7F2; border-color:var(--forest); }
+
+.ar-quiz-cta {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:linear-gradient(135deg, var(--gold-pale), var(--sage-dim));
+  border:1px solid var(--border-warm); border-radius:16px; padding:16px 18px; margin-bottom:20px;
+}
+.ar-quiz-cta-txt b { font-family:'Playfair Display', serif; color:var(--forest); font-size:14.5px; display:block; margin-bottom:2px; }
+.ar-quiz-cta-txt span { font-size:11.5px; color:var(--muted); }
+.ar-quiz-btn { flex-shrink:0; padding:10px 18px; border-radius:100px; background:var(--gold); color:#fff; font-size:12.5px; font-weight:700; border:none; cursor:pointer; }
+
+.ar-group-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--sage); margin:22px 2px 10px; }
+.ar-group-lbl:first-child { margin-top:0; }
+
+.ar-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; margin-bottom:10px; overflow:hidden; box-shadow:var(--shadow-sm); }
+.ar-card-hd { display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer; }
+.ar-card-hd .dot { width:8px; height:8px; border-radius:50%; background:var(--sage); flex-shrink:0; }
+.ar-card-name { font-family:'Playfair Display', serif; font-size:14.5px; font-weight:700; color:var(--forest); flex:1; }
+.ar-card-tag { font-size:10px; color:var(--muted); }
+.ar-card-chev { font-size:11px; color:var(--muted); transition:transform .2s; }
+.ar-card.open .ar-card-chev { transform:rotate(180deg); }
+
+.ar-card-body { display:none; padding:0 16px 18px; }
+.ar-card.open .ar-card-body { display:block; }
+
+.ar-diagram-wrap { display:flex; justify-content:center; padding:10px 0 14px; }
+.ar-diagram-wrap svg { width:90px; height:auto; }
+.ar-diagram-lbl { text-align:center; font-size:10px; color:var(--muted); margin-top:-6px; margin-bottom:10px; }
+
+.ar-detail-row { margin-bottom:8px; }
+.ar-detail-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gold); margin-bottom:2px; }
+.ar-detail-val { font-size:12.5px; color:var(--text-sec); line-height:1.6; }
+.ar-landmarks { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.ar-landmark-chip { font-size:11px; padding:4px 10px; border-radius:100px; background:var(--sage-dim); color:var(--sage); font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="ar-hero">
+  <div class="ar-back" onclick="window.location.href='anatomy.html'">← Back to Anatomy</div>
+  <div class="ar-title" id="rTitle">Region</div>
+  <div class="ar-sub" id="rSub"></div>
+</div>
+
+<main class="ar-main">
+  <div class="ar-tabs">
+    <div class="ar-tab active" data-t="bones" onclick="switchTab('bones')">🦴 Bones</div>
+    <div class="ar-tab" data-t="joints" onclick="switchTab('joints')">🔗 Joints</div>
+    <div class="ar-tab" data-t="muscles" onclick="switchTab('muscles')">💪 Muscles</div>
+  </div>
+
+  <div class="ar-quiz-cta">
+    <div class="ar-quiz-cta-txt"><b>Ready to test yourself?</b><span>30-question MCQ quiz on this region</span></div>
+    <button class="ar-quiz-btn" onclick="startQuiz()">Start Quiz →</button>
+  </div>
+
+  <div id="content"></div>
+</main>
+
+<script src="js/utils.js"></script>
+<script src="js/anatomy-data.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const regionId = params.get('r') || 'upper-limb';
+const region = ANATOMY_REGIONS.find(r => r.id === regionId) || ANATOMY_REGIONS[0];
+let currentTab = 'bones';
+
+document.getElementById('rTitle').textContent = region.label;
+document.getElementById('rSub').textContent = region.sub;
+
+function diagramSVG(marker) {
+  if (!marker) return '';
+  const d = ANATOMY_DIAGRAMS[marker.diagram];
+  if (!d) return '';
+  return `<div class="ar-diagram-wrap"><svg viewBox="${d.viewBox}" xmlns="http://www.w3.org/2000/svg">
+    ${d.svg}
+    <circle cx="${marker.x * (d.viewBox.split(' ')[2]/100)}" cy="${marker.y * (d.viewBox.split(' ')[3]/100)}" r="7" fill="var(--gold)" stroke="#fff" stroke-width="2"/>
+  </svg></div><div class="ar-diagram-lbl">${d.view}</div>`;
+}
+
+function landmarksHTML(list) {
+  if (!list || !list.length) return '';
+  return `<div class="ar-detail-row"><div class="ar-detail-lbl">Key Landmarks</div><div class="ar-landmarks">${list.map(l=>`<span class="ar-landmark-chip">${l}</span>`).join('')}</div></div>`;
+}
+
+function boneCard(b) {
+  return `<div class="ar-card" id="c-${b.id}">
+    <div class="ar-card-hd" onclick="toggleCard('${b.id}')">
+      <span class="dot"></span>
+      <span class="ar-card-name">${b.name}</span>
+      <span class="ar-card-tag">${b.group}</span>
+      <span class="ar-card-chev">▾</span>
+    </div>
+    <div class="ar-card-body">
+      ${diagramSVG(b.marker)}
+      <div class="ar-detail-row"><div class="ar-detail-val">${b.summary}</div></div>
+      <div class="ar-detail-row"><div class="ar-detail-val">${b.details}</div></div>
+      ${landmarksHTML(b.landmarks)}
+    </div>
+  </div>`;
+}
+
+function jointCard(j) {
+  return `<div class="ar-card" id="c-${j.id}">
+    <div class="ar-card-hd" onclick="toggleCard('${j.id}')">
+      <span class="dot"></span>
+      <span class="ar-card-name">${j.name}</span>
+      <span class="ar-card-tag">${j.type}</span>
+      <span class="ar-card-chev">▾</span>
+    </div>
+    <div class="ar-card-body">
+      ${diagramSVG(j.marker)}
+      <div class="ar-detail-row"><div class="ar-detail-val">${j.summary}</div></div>
+    </div>
+  </div>`;
+}
+
+function muscleCard(m) {
+  return `<div class="ar-card" id="c-${m.id}">
+    <div class="ar-card-hd" onclick="toggleCard('${m.id}')">
+      <span class="dot"></span>
+      <span class="ar-card-name">${m.name}</span>
+      <span class="ar-card-chev">▾</span>
+    </div>
+    <div class="ar-card-body">
+      ${diagramSVG(m.marker)}
+      <div class="ar-detail-row"><div class="ar-detail-lbl">Origin</div><div class="ar-detail-val">${m.origin}</div></div>
+      <div class="ar-detail-row"><div class="ar-detail-lbl">Insertion</div><div class="ar-detail-val">${m.insertion}</div></div>
+      <div class="ar-detail-row"><div class="ar-detail-lbl">Action</div><div class="ar-detail-val">${m.action}</div></div>
+      ${m.note ? `<div class="ar-detail-row"><div class="ar-detail-lbl">Clinical Note</div><div class="ar-detail-val">${m.note}</div></div>` : ''}
+    </div>
+  </div>`;
+}
+
+function toggleCard(id) {
+  document.getElementById('c-' + id).classList.toggle('open');
+}
+
+function switchTab(t) {
+  currentTab = t;
+  document.querySelectorAll('.ar-tab').forEach(el => el.classList.toggle('active', el.dataset.t === t));
+  renderContent();
+}
+
+function renderContent() {
+  const el = document.getElementById('content');
+  if (currentTab === 'bones') {
+    el.innerHTML = (ANATOMY_BONES[regionId] || []).map(boneCard).join('');
+  } else if (currentTab === 'joints') {
+    el.innerHTML = (ANATOMY_JOINTS[regionId] || []).map(jointCard).join('');
+  } else {
+    const groups = ANATOMY_MUSCLE_GROUPS[regionId] || [];
+    el.innerHTML = groups.map(g => `<div class="ar-group-lbl">${g.group}</div>${g.muscles.map(muscleCard).join('')}`).join('');
+  }
+}
+
+function startQuiz() {
+  window.location.href = 'anatomy-quiz.html?r=' + regionId;
+}
+
+renderContent();
+</script>
+</body>
+</html>

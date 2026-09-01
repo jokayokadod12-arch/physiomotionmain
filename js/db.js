@@ -386,6 +386,33 @@ async function dbSaveCaseResult(email, meta, result) {
   return data;
 }
 
+/** Save/merge the result of one finished Anatomy quiz attempt. Keeps the BEST score per region. */
+async function dbSaveAnatomyQuizResult(email, meta, result) {
+  const db = _db();
+  const ref = db.collection('anatomy_scores').doc(email);
+  const snap = await ref.get();
+  const data = snap.exists ? snap.data() : { email, regions: {}, totalScore: 0 };
+  data.email = email;
+  data.name  = meta.name || data.name || '';
+  data.regions = data.regions || {};
+
+  const prev = data.regions[result.regionId];
+  const attempts = (prev ? (prev.attempts || 1) : 0) + 1;
+  const isBest = !prev || result.score > prev.score;
+  if (isBest) {
+    data.regions[result.regionId] = {
+      title: result.regionTitle, score: result.score, total: result.total,
+      percent: result.percent, attempts, updatedAt: Date.now()
+    };
+  } else {
+    data.regions[result.regionId].attempts = attempts;
+  }
+  data.totalScore = Object.values(data.regions).reduce((s, r) => s + (r.score || 0), 0);
+  data.updatedAt = Date.now();
+  await ref.set(data);
+  return data;
+}
+
 /** Load a single user's case-score aggregate doc (or null). */
 async function dbGetCaseScores(email) {
   const db = _db();

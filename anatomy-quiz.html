@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Anatomy Quiz — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; background:var(--bg); }
+.aq-wrap { flex:1; max-width:640px; margin:0 auto; width:100%; padding:20px 18px 100px; }
+
+.aq-top { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.aq-back { font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; }
+.aq-progress-track { flex:1; height:6px; border-radius:100px; background:var(--sage-dim); overflow:hidden; }
+.aq-progress-bar { height:100%; background:var(--sage); border-radius:100px; transition:width .3s; }
+.aq-count { font-size:11.5px; font-weight:700; color:var(--sage); white-space:nowrap; }
+
+.aq-card { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:24px 20px; box-shadow:var(--shadow-sm); }
+.aq-q { font-family:'Playfair Display', serif; font-size:16.5px; font-weight:700; color:var(--forest); line-height:1.4; margin-bottom:18px; }
+.aq-opt { display:flex; align-items:center; gap:12px; padding:14px 16px; border:1.5px solid var(--border); border-radius:14px; margin-bottom:10px; cursor:pointer; transition:.15s; font-size:13.5px; color:var(--text-primary); }
+.aq-opt:hover { border-color:var(--sage-light); }
+.aq-opt .aq-letter { width:24px; height:24px; border-radius:50%; background:var(--bg-warm); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--text-sec); flex-shrink:0; }
+.aq-opt.correct { border-color:var(--success); background:rgba(61,139,91,.08); }
+.aq-opt.correct .aq-letter { background:var(--success); color:#fff; }
+.aq-opt.wrong { border-color:var(--danger); background:rgba(200,74,74,.08); }
+.aq-opt.wrong .aq-letter { background:var(--danger); color:#fff; }
+.aq-opt.disabled { pointer-events:none; }
+
+.aq-next-btn { width:100%; margin-top:16px; padding:14px; border-radius:100px; background:var(--forest); color:#FAF7F2; font-size:13.5px; font-weight:700; border:none; cursor:pointer; display:none; }
+.aq-next-btn.show { display:block; }
+
+/* Result screen */
+.aq-result { text-align:center; padding:20px 10px; }
+.aq-result-emoji { font-size:52px; margin-bottom:10px; }
+.aq-result-pct { font-family:'Playfair Display', serif; font-size:40px; font-weight:900; color:var(--forest); }
+.aq-result-lbl { font-size:12.5px; color:var(--muted); margin-bottom:20px; }
+.aq-result-stats { display:flex; gap:12px; margin-bottom:22px; }
+.aq-result-stat { flex:1; padding:14px; background:var(--bg-warm); border-radius:14px; }
+.aq-result-stat b { display:block; font-family:'Playfair Display', serif; font-size:19px; color:var(--forest); }
+.aq-result-stat span { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+.aq-result-actions { display:flex; gap:10px; }
+.aq-btn { flex:1; padding:13px; border-radius:100px; font-size:12.5px; font-weight:700; border:none; cursor:pointer; }
+.aq-btn.primary { background:var(--forest); color:#fff; }
+.aq-btn.ghost { background:var(--bg-warm); color:var(--forest); border:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="aq-wrap">
+  <div class="aq-top">
+    <span class="aq-back" onclick="confirmExit()">← Exit</span>
+    <div class="aq-progress-track"><div class="aq-progress-bar" id="pbar" style="width:0%"></div></div>
+    <span class="aq-count" id="qcount">1/30</span>
+  </div>
+  <div class="aq-card" id="card"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/anatomy-data.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const regionId = params.get('r') || 'upper-limb';
+const quizData = ANATOMY_QUIZZES[regionId];
+const letters = ['A','B','C','D'];
+
+// Shuffle a copy of the question order each attempt for a fresher quiz feel.
+let questions = quizData ? [...quizData.questions] : [];
+for (let i = questions.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [questions[i], questions[j]] = [questions[j], questions[i]];
+}
+
+let idx = 0, correctCount = 0, answered = false;
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[idx];
+  document.getElementById('pbar').style.width = ((idx) / questions.length * 100) + '%';
+  document.getElementById('qcount').textContent = (idx + 1) + '/' + questions.length;
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="aq-q">${q.q}</div>
+    <div id="opts">${q.options.map((o, i) => `
+      <div class="aq-opt" data-i="${i}" onclick="selectOpt(${i})">
+        <span class="aq-letter">${letters[i]}</span><span>${o}</span>
+      </div>`).join('')}</div>
+    <button class="aq-next-btn" id="nextBtn" onclick="nextQuestion()">${idx === questions.length - 1 ? 'See Results →' : 'Next Question →'}</button>
+  `;
+}
+
+function selectOpt(i) {
+  if (answered) return;
+  answered = true;
+  const q = questions[idx];
+  const isCorrect = i === q.correct;
+  if (isCorrect) correctCount++;
+  document.querySelectorAll('.aq-opt').forEach(el => {
+    el.classList.add('disabled');
+    const oi = parseInt(el.dataset.i, 10);
+    if (oi === q.correct) el.classList.add('correct');
+    else if (oi === i) el.classList.add('wrong');
+  });
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function nextQuestion() {
+  idx++;
+  if (idx >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+async function showResults() {
+  document.getElementById('pbar').style.width = '100%';
+  document.getElementById('qcount').textContent = questions.length + '/' + questions.length;
+  const percent = Math.round((correctCount / questions.length) * 100);
+  const emoji = percent >= 85 ? '🏆' : percent >= 70 ? '🎉' : percent >= 50 ? '👍' : '📚';
+  const msg = percent >= 85 ? 'Excellent mastery!' : percent >= 70 ? 'Solid work!' : percent >= 50 ? 'Good start — review and try again.' : 'Keep studying this region and retry.';
+
+  document.getElementById('card').innerHTML = `
+    <div class="aq-result">
+      <div class="aq-result-emoji">${emoji}</div>
+      <div class="aq-result-pct">${percent}%</div>
+      <div class="aq-result-lbl">${msg}</div>
+      <div class="aq-result-stats">
+        <div class="aq-result-stat"><b>${correctCount}</b><span>Correct</span></div>
+        <div class="aq-result-stat"><b>${questions.length - correctCount}</b><span>Missed</span></div>
+        <div class="aq-result-stat"><b>${questions.length}</b><span>Total</span></div>
+      </div>
+      <div class="aq-result-actions">
+        <button class="aq-btn ghost" onclick="window.location.href='anatomy-region.html?r=${regionId}'">Back to Study</button>
+        <button class="aq-btn primary" onclick="location.reload()">Retry Quiz</button>
+      </div>
+    </div>
+  `;
+
+  try {
+    const me = getCurrentUser();
+    if (me && me.email) {
+      await dbSaveAnatomyQuizResult(me.email, { name: me.name }, {
+        regionId, regionTitle: quizData.title, score: correctCount, total: questions.length, percent
+      });
+    }
+  } catch (e) { /* non-blocking */ }
+}
+
+function confirmExit() {
+  if (idx > 0 && idx < questions.length && !confirm('Exit the quiz? Your progress on this attempt will be lost.')) return;
+  window.location.href = 'anatomy-region.html?r=' + regionId;
+}
+
+if (!quizData) {
+  document.getElementById('card').innerHTML = '<div class="aq-result"><div class="aq-result-emoji">🚧</div><div class="aq-result-lbl">No quiz available for this region yet.</div></div>';
+} else {
+  renderQuestion();
+}
+</script>
+</body>
+</html>

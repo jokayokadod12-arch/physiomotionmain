@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Anatomy — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+.an-hero {
+  position:relative; z-index:1;
+  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, var(--sage) 100%);
+  padding: 32px 24px 26px; overflow:hidden;
+}
+.an-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 50%, rgba(90,122,98,.3) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 90% 20%, rgba(184,148,63,.15) 0%, transparent 55%);
+}
+.an-hero::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, transparent, var(--sage-pale), var(--gold-light), var(--sage-pale), transparent);
+}
+.an-hero-inner { max-width:1000px; margin:0 auto; position:relative; z-index:1; }
+.an-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 14px; border-radius:100px;
+  background:rgba(250,247,242,.1); border:1px solid rgba(250,247,242,.2);
+  font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:rgba(250,247,242,.7); margin-bottom:12px;
+}
+.an-title { font-family:'Playfair Display', serif; font-size:clamp(22px,4vw,32px); font-weight:700; color:#FAF7F2; letter-spacing:-.5px; margin-bottom:6px; line-height:1.2; }
+.an-sub { font-size:13px; color:rgba(250,247,242,.55); max-width:560px; line-height:1.6; }
+
+.an-main { flex:1; max-width:1000px; margin:0 auto; width:100%; padding:28px 20px 80px; }
+.an-sec-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); margin:0 2px 14px; }
+
+.an-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; }
+@media(max-width:600px) { .an-grid { grid-template-columns:1fr; } }
+
+.an-card {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
+  padding:22px; cursor:pointer; transition:all .25s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden; box-shadow:var(--shadow-sm); display:flex; gap:16px; align-items:flex-start;
+}
+.an-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--cc, var(--sage)); opacity:0; transition:opacity .25s; }
+.an-card:hover::before { opacity:1; }
+.an-card:not(.locked):hover { transform:translateY(-4px); box-shadow:0 14px 40px rgba(44,44,44,.11); border-color:rgba(90,122,98,.25); }
+.an-card.locked { opacity:.6; cursor:default; }
+.an-icon { font-size:30px; width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; background:var(--cc-dim, var(--sage-dim)); flex-shrink:0; }
+.an-body { flex:1; min-width:0; }
+.an-name { font-family:'Playfair Display', serif; font-size:17px; font-weight:700; color:var(--forest); margin-bottom:4px; }
+.an-desc { font-size:12.5px; color:var(--muted); line-height:1.5; }
+.an-soon { display:inline-block; margin-top:8px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; padding:3px 10px; border-radius:100px; background:var(--sage-dim); color:var(--sage); }
+.an-go { font-size:12px; font-weight:700; color:var(--gold); margin-top:8px; display:flex; align-items:center; gap:4px; }
+
+.an-note {
+  margin-top:24px; padding:16px 18px; background:var(--bg-warm); border:1px solid var(--border-warm);
+  border-radius:16px; font-size:12px; color:var(--text-sec); line-height:1.7;
+}
+.an-note b { color:var(--forest); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="goHome()">🏠 Dashboard</button>
+  </div>
+</header>
+
+<div class="an-hero">
+  <div class="an-hero-inner">
+    <div class="an-badge"><span>🦴</span> Anatomy</div>
+    <h2 class="an-title">Musculoskeletal Anatomy</h2>
+    <p class="an-sub">Bones, joints and muscles broken down region by region — simplified for study, with a 30-question MCQ quiz to test yourself at the end of each section.</p>
+  </div>
+</div>
+
+<main class="an-main">
+  <div class="an-sec-lbl">Regions</div>
+  <div class="an-grid" id="anGrid"></div>
+
+  <div class="an-note">
+    <b>Note:</b> Diagrams here are original simplified illustrations made for this app (not scanned from any textbook) — they mark the general location of each structure to help you build a mental map, not a substitute for a full atlas.
+  </div>
+</main>
+
+<script src="js/utils.js"></script>
+<script src="js/anatomy-data.js"></script>
+<script>
+function render() {
+  const grid = document.getElementById('anGrid');
+  grid.innerHTML = ANATOMY_REGIONS.map(r => {
+    if (r.status === 'ready') {
+      return `<div class="an-card" style="--cc:${r.color};--cc-dim:${r.color}22" onclick="window.location.href='anatomy-region.html?r=${r.id}'">
+        <div class="an-icon" style="color:${r.color}">${r.icon}</div>
+        <div class="an-body">
+          <div class="an-name">${r.label}</div>
+          <div class="an-desc">${r.sub}</div>
+          <div class="an-go">Study this region →</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="an-card locked">
+      <div class="an-icon" style="color:${r.color}">${r.icon}</div>
+      <div class="an-body">
+        <div class="an-name">${r.label}</div>
+        <div class="an-desc">${r.sub}</div>
+        <span class="an-soon">🔒 Coming Soon</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+render();
+</script>
+</body>
+</html>

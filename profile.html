@@ -41,6 +41,13 @@
       padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600;
       background:rgba(90,122,98,.1); border:1px solid rgba(90,122,98,.2); color:#7A9E82;
     }
+    .case-stats-row { display:flex; gap:10px; margin-top:8px; }
+    .case-stat-box {
+      flex:1; text-align:center; padding:14px 10px; border-radius:14px;
+      background:rgba(90,122,98,.08); border:1px solid rgba(90,122,98,.18);
+    }
+    .case-stat-n { display:block; font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:#2D4A35; }
+    .case-stat-l { display:block; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#8A8A8A; margin-top:4px; }
   </style>
 </head>
 <body>
@@ -118,6 +125,14 @@
           <option value="intern">Internship</option>
         </select>
       </div>
+
+      <div class="section-divider">🩺 Physio Cases Progress</div>
+      <div class="case-stats-row" id="caseStatsRow">
+        <div class="case-stat-box"><span class="case-stat-n" id="csScore">—</span><span class="case-stat-l">Total Score</span></div>
+        <div class="case-stat-box"><span class="case-stat-n" id="csDone">—</span><span class="case-stat-l">Cases Completed</span></div>
+        <div class="case-stat-box"><span class="case-stat-n" id="csRank">—</span><span class="case-stat-l">Leaderboard Rank</span></div>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;margin-top:10px;" onclick="window.location.href='physio-cases.html'">🩺 Go to Physio Cases</button>
     </div>
 
     <div class="profile-actions">
@@ -148,8 +163,28 @@
   } catch(e) { window.FIREBASE_ENABLED = false; }
 </script>
 <script src="js/utils.js"></script>
+<script src="js/db.js"></script>
 <script>requireAuth();</script>
 <script src="js/profile.js"></script>
+<script src="js/physio-cases-data.js"></script>
 <script src="js/pwa.js"></script>
+<script>
+(async function loadCaseStatsForStudent() {
+  const u = getCurrentUser();
+  if (!u || u.role !== 'student' || !window.FIREBASE_ENABLED) return;
+  try {
+    const data = await dbGetCaseScores(u.email);
+    document.getElementById('csScore').textContent = data ? (data.totalScore || 0) : 0;
+    document.getElementById('csDone').textContent = (data ? (data.casesCompleted || 0) : 0) + ' / ' + (typeof PHYSIO_CASES !== 'undefined' ? PHYSIO_CASES.length : '—');
+    const board = await dbGetCaseLeaderboard(500);
+    const idx = board.findIndex(b => b.email === u.email);
+    const total = data ? (data.totalScore || 0) : 0;
+    document.getElementById('csRank').textContent = (idx > -1 && total > 0) ? ('#' + (idx + 1)) : '—';
+  } catch (e) {
+    document.getElementById('csScore').textContent = '0';
+    document.getElementById('csDone').textContent = '0';
+  }
+})();
+</script>
 </body>
 </html>

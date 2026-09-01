@@ -210,6 +210,10 @@ body { display:flex; flex-direction:column; min-height:100vh; }
         <span class="hw-stat-n" id="statYear">—</span>
         <span class="hw-stat-l">Year of Study</span>
       </div>
+      <div class="hw-stat" style="cursor:pointer;" onclick="window.location.href='physio-cases.html'">
+        <span class="hw-stat-n" id="statCaseScore">—</span>
+        <span class="hw-stat-l">Case Score 🩺</span>
+      </div>
     </div>
   </div>
 </div>
@@ -237,6 +241,20 @@ body { display:flex; flex-direction:column; min-height:100vh; }
       <div class="dc-icon">💬</div>
       <div class="dc-title">Student Chat</div>
       <div class="dc-desc">Message fellow students directly</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:#3D8B5B" onclick="window.location.href='physio-cases.html'">
+      <div class="dc-icon">🩺</div>
+      <div class="dc-title">Physio Cases</div>
+      <div class="dc-desc">Solve real patient case journeys — diagnose, treat, and score points</div>
+      <div class="dc-arrow">→</div>
+    </div>
+
+    <div class="dash-card" style="--dc:#D4AF6A" onclick="window.location.href='leaderboard.html'">
+      <div class="dc-icon">🏆</div>
+      <div class="dc-title">Leaderboard</div>
+      <div class="dc-desc">See how your case-solving score ranks against other students</div>
       <div class="dc-arrow">→</div>
     </div>
 
@@ -334,6 +352,7 @@ try {
 } catch(e) { window.FIREBASE_ENABLED = false; }
 </script>
 <script src="js/utils.js"></script>
+<script src="js/db.js"></script>
 <script src="js/complaint-widget.js"></script>
 <script src="js/pwa.js"></script>
 <script>
@@ -343,6 +362,14 @@ try {
     const ys = user.profile && user.profile.yearStudy;
     const yearLabels = { '1':'Year 1', '2':'Year 2', '3':'Year 3', '4':'Year 4', '5':'Year 5', 'intern':'Internship' };
     document.getElementById('statYear').textContent = ys ? (yearLabels[ys] || ys) : '—';
+
+    if (window.FIREBASE_ENABLED) {
+      dbGetCaseScores(user.email).then(data => {
+        document.getElementById('statCaseScore').textContent = data ? (data.totalScore || 0) : 0;
+      }).catch(() => { document.getElementById('statCaseScore').textContent = '0'; });
+    } else {
+      document.getElementById('statCaseScore').textContent = '0';
+    }
   }
   function goProfile() { window.location.href = 'profile.html'; }
   async function doLogout() {

@@ -343,6 +343,72 @@ async function dbClearAllNotifs(toEmail) {
   await batch.commit();
 }
 
+// ─── PHYSIO CASES — SCORES / LEADERBOARD ──────────────────────────────────────
+// Collection: case_scores/{email} → {
+//   email, name, university, yearStudy, avatar,
+//   totalScore, casesCompleted,
+//   cases: { [caseId]: { title, category, score, total, percent, pointsEarned, attempts, updatedAt } },
+//   updatedAt
+// }
+
+/** Save/merge the result of one finished case attempt. Only keeps the BEST score per case.
+ *  Returns the updated aggregate doc. */
+async function dbSaveCaseResult(email, meta, result) {
+  const db = _db();
+  const ref = db.collection('case_scores').doc(email);
+  const snap = await ref.get();
+  const data = snap.exists ? snap.data() : { email, cases: {}, totalScore: 0, casesCompleted: 0 };
+  data.email      = email;
+  data.name       = meta.name || data.name || '';
+  data.university = meta.university || data.university || '';
+  data.yearStudy  = meta.yearStudy || data.yearStudy || '';
+  data.avatar     = meta.avatar || data.avatar || '🎓';
+  data.cases = data.cases || {};
+
+  const prev = data.cases[result.caseId];
+  const attempts = (prev ? (prev.attempts || 1) : 0) + 1;
+  const isBest = !prev || result.pointsEarned > prev.pointsEarned;
+  if (isBest) {
+    data.cases[result.caseId] = {
+      title: result.caseTitle, category: result.category,
+      score: result.score, total: result.total, percent: result.percent,
+      pointsEarned: result.pointsEarned, attempts, updatedAt: Date.now()
+    };
+  } else {
+    data.cases[result.caseId].attempts = attempts;
+  }
+
+  data.totalScore     = Object.values(data.cases).reduce((s, c) => s + (c.pointsEarned || 0), 0);
+  data.casesCompleted = Object.keys(data.cases).length;
+  data.updatedAt      = Date.now();
+
+  await ref.set(data);
+  return data;
+}
+
+/** Load a single user's case-score aggregate doc (or null). */
+async function dbGetCaseScores(email) {
+  const db = _db();
+  const doc = await db.collection('case_scores').doc(email).get();
+  return doc.exists ? doc.data() : null;
+}
+
+/** Load the leaderboard, sorted by totalScore descending. */
+async function dbGetCaseLeaderboard(limitN) {
+  const db = _db();
+  limitN = limitN || 200;
+  try {
+    const snap = await db.collection('case_scores').orderBy('totalScore', 'desc').limit(limitN).get();
+    return snap.docs.map(d => d.data());
+  } catch (e) {
+    // Fallback (e.g. missing index / offline): fetch all and sort client-side
+    const snap = await db.collection('case_scores').get();
+    return snap.docs.map(d => d.data())
+      .sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0))
+      .slice(0, limitN);
+  }
+}
+
 // ─── BLOCKED USERS (Student Chat) ─────────────────────────────────────────────
 // Collection: chat_blocked/{email} → { ids: [otherEmail, ...] }
 // Kept separate from chat_muted (mute = silence notifications, block = freeze chat).

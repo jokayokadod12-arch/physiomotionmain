@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Physio Cases — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ── HERO ── */
+.pc-hero {
+  position:relative; z-index:1;
+  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, var(--sage) 100%);
+  padding: 32px 24px 26px; overflow:hidden;
+}
+.pc-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 80% at 15% 50%, rgba(90,122,98,.3) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 90% 20%, rgba(184,148,63,.15) 0%, transparent 55%);
+}
+.pc-hero::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, transparent, var(--sage-pale), var(--gold-light), var(--sage-pale), transparent);
+}
+.pc-hero-inner { max-width:1000px; margin:0 auto; position:relative; z-index:1; }
+.pc-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 14px; border-radius:100px;
+  background:rgba(250,247,242,.1); border:1px solid rgba(250,247,242,.2);
+  font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:rgba(250,247,242,.7); margin-bottom:12px;
+}
+.pc-title {
+  font-family:'Playfair Display', serif;
+  font-size: clamp(22px, 4vw, 32px); font-weight:700;
+  color:#FAF7F2; letter-spacing:-.5px; margin-bottom:6px; line-height:1.2;
+}
+.pc-sub { font-size:13px; color:rgba(250,247,242,.55); max-width:520px; line-height:1.6; }
+
+.pc-stats-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+.pc-stat {
+  flex:1; min-width:120px; text-align:center; padding:14px 16px;
+  background:rgba(250,247,242,.08); border:1px solid rgba(250,247,242,.12); border-radius:14px;
+}
+.pc-stat-n { font-family:'Playfair Display', serif; font-size:22px; font-weight:700; color:#FAF7F2; display:block; letter-spacing:-.5px; }
+.pc-stat-l { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:rgba(250,247,242,.7); display:block; margin-top:3px; }
+.pc-stat.link { cursor:pointer; transition:.2s; }
+.pc-stat.link:hover { background:rgba(250,247,242,.15); transform:translateY(-2px); }
+
+/* ── MAIN ── */
+.pc-main { flex:1; max-width:1000px; margin:0 auto; width:100%; padding:28px 20px 80px; position:relative; z-index:1; }
+
+.pc-search {
+  display:flex; align-items:center; gap:10px; background:var(--bg-card);
+  border:1px solid var(--border); border-radius:14px; padding:10px 16px; margin-bottom:20px;
+  box-shadow:var(--shadow-sm);
+}
+.pc-search input { flex:1; border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text-primary); }
+.pc-search span { color:var(--muted); font-size:15px; }
+
+.pc-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+.pc-chip {
+  padding:8px 16px; border-radius:100px; border:1px solid var(--border);
+  background:var(--bg-card); font-size:12px; font-weight:600; color:var(--text-sec);
+  cursor:pointer; transition:.2s; white-space:nowrap; display:flex; align-items:center; gap:6px;
+}
+.pc-chip:hover { border-color:rgba(90,122,98,.4); }
+.pc-chip.active { background:var(--forest); color:#FAF7F2; border-color:var(--forest); }
+
+.pc-cat-block { margin-bottom:30px; }
+.pc-cat-hd { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.pc-cat-icon {
+  width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+  font-size:17px; background:var(--cc, var(--sage-dim)); border:1px solid var(--border);
+}
+.pc-cat-title { font-family:'Playfair Display', serif; font-size:16px; font-weight:700; color:var(--forest); }
+.pc-cat-count { font-size:11px; color:var(--muted); margin-left:auto; }
+
+.pc-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+@media(max-width:800px) { .pc-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:480px) { .pc-grid { grid-template-columns:1fr; } }
+
+.pc-card {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:18px;
+  padding:18px; cursor:pointer; transition:all .25s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:10px;
+}
+.pc-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--cc, var(--sage)); opacity:0; transition:opacity .25s; }
+.pc-card:hover::before { opacity:1; }
+.pc-card:hover { transform:translateY(-4px); box-shadow:0 14px 40px rgba(44,44,44,.11); border-color:rgba(90,122,98,.25); }
+.pc-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.pc-avatar { font-size:26px; width:46px; height:46px; border-radius:13px; display:flex; align-items:center; justify-content:center; background:var(--bg-warm); border:1px solid var(--border); flex-shrink:0; }
+.pc-diff { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; padding:3px 9px; border-radius:100px; white-space:nowrap; }
+.pc-diff.Beginner { background:rgba(61,139,91,.12); color:#2E6E45; }
+.pc-diff.Intermediate { background:rgba(184,148,63,.14); color:#8A6A22; }
+.pc-diff.Advanced { background:rgba(200,74,74,.12); color:#A93A3A; }
+.pc-card-title { font-family:'Playfair Display', serif; font-size:15px; font-weight:700; color:var(--forest); line-height:1.3; }
+.pc-card-tag { font-size:11.5px; color:var(--muted); line-height:1.5; }
+.pc-card-foot { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:8px; border-top:1px solid var(--border); }
+.pc-best { font-size:11px; font-weight:700; color:var(--sage); display:flex; align-items:center; gap:4px; }
+.pc-best.none { color:var(--muted-light); font-weight:600; }
+.pc-go { font-size:12px; font-weight:700; color:var(--gold); }
+
+/* ── empty state ── */
+.pc-empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='leaderboard.html'">🏆 Leaderboard</button>
+    <button class="btn btn-header" onclick="goHome()">🏠 Dashboard</button>
+  </div>
+</header>
+
+<div class="pc-hero">
+  <div class="pc-hero-inner">
+    <div class="pc-badge"><span>🩺</span> Physio Cases</div>
+    <h2 class="pc-title">Clinical Case Simulator</h2>
+    <p class="pc-sub">Work through real physiotherapy scenarios — meet the patient, reach a diagnosis, and choose the right assessment, modalities and exercise plan. Get scored, and learn from the explanation after every step.</p>
+    <div class="pc-stats-row">
+      <div class="pc-stat"><span class="pc-stat-n" id="stMyScore">—</span><span class="pc-stat-l">My Total Score</span></div>
+      <div class="pc-stat"><span class="pc-stat-n" id="stMyCases">—</span><span class="pc-stat-l">Cases Completed</span></div>
+      <div class="pc-stat"><span class="pc-stat-n" id="stTotalCases">—</span><span class="pc-stat-l">Total Cases</span></div>
+      <div class="pc-stat link" onclick="window.location.href='leaderboard.html'"><span class="pc-stat-n" id="stMyRank">—</span><span class="pc-stat-l">My Rank 🏆</span></div>
+    </div>
+  </div>
+</div>
+
+<main class="pc-main">
+  <div class="pc-search"><span>🔎</span><input id="searchInput" type="text" placeholder="Search a case (e.g. shoulder, ACL, stroke)…" oninput="renderCases()"></div>
+  <div class="pc-filters" id="filterRow"></div>
+  <div id="casesWrap"></div>
+</main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  if (!firebase.apps.length) firebase.initializeApp({
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  });
+  window._fbDb = firebase.firestore();
+  window._fbStorage = firebase.storage();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/physio-cases-data.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+let currentUser = null;
+let activeFilter = 'all';
+let myScores = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  currentUser = requireAuth(['doctor', 'student']);
+  if (!currentUser) return;
+
+  document.getElementById('stTotalCases').textContent = PHYSIO_CASES.length;
+  buildFilters();
+  renderCases();
+  await loadMyStats();
+});
+
+function buildFilters() {
+  const row = document.getElementById('filterRow');
+  const all = document.createElement('div');
+  all.className = 'pc-chip active';
+  all.textContent = 'All Cases';
+  all.onclick = () => setFilter('all', all);
+  row.appendChild(all);
+  PHYSIO_CASE_CATEGORIES.forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'pc-chip';
+    chip.innerHTML = `<span>${cat.icon}</span> ${cat.label}`;
+    chip.onclick = () => setFilter(cat.id, chip);
+    row.appendChild(chip);
+  });
+}
+function setFilter(id, el) {
+  activeFilter = id;
+  document.querySelectorAll('.pc-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderCases();
+}
+
+async function loadMyStats() {
+  if (!window.FIREBASE_ENABLED || !currentUser) return;
+  try {
+    myScores = await dbGetCaseScores(currentUser.email);
+    const total = myScores ? (myScores.totalScore || 0) : 0;
+    const done  = myScores ? (myScores.casesCompleted || 0) : 0;
+    document.getElementById('stMyScore').textContent = total;
+    document.getElementById('stMyCases').textContent = done + ' / ' + PHYSIO_CASES.length;
+    renderCases(); // re-render to show best-score badges
+    // rank
+    const board = await dbGetCaseLeaderboard(500);
+    const idx = board.findIndex(b => b.email === currentUser.email);
+    document.getElementById('stMyRank').textContent = (idx > -1 && total > 0) ? ('#' + (idx + 1)) : '—';
+  } catch (e) {
+    document.getElementById('stMyScore').textContent = '0';
+    document.getElementById('stMyCases').textContent = '0 / ' + PHYSIO_CASES.length;
+  }
+}
+
+function renderCases() {
+  const wrap = document.getElementById('casesWrap');
+  wrap.innerHTML = '';
+  const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+  const cats = activeFilter === 'all' ? PHYSIO_CASE_CATEGORIES : PHYSIO_CASE_CATEGORIES.filter(c => c.id === activeFilter);
+  let anyShown = false;
+
+  cats.forEach(cat => {
+    let list = getPhysioCasesByCategory(cat.id);
+    if (q) list = list.filter(c => (c.title + ' ' + c.tagline).toLowerCase().includes(q));
+    if (!list.length) return;
+    anyShown = true;
+
+    const block = document.createElement('div');
+    block.className = 'pc-cat-block';
+    block.innerHTML = `
+      <div class="pc-cat-hd">
+        <div class="pc-cat-icon" style="--cc:${cat.color}22">${cat.icon}</div>
+        <div class="pc-cat-title">${cat.label}</div>
+        <div class="pc-cat-count">${list.length} case${list.length>1?'s':''}</div>
+      </div>
+      <div class="pc-grid"></div>`;
+    const grid = block.querySelector('.pc-grid');
+
+    list.forEach(c => {
+      const best = myScores && myScores.cases && myScores.cases[c.id];
+      const max = physioCaseMaxScore(c);
+      const card = document.createElement('div');
+      card.className = 'pc-card';
+      card.style.setProperty('--cc', cat.color);
+      card.onclick = () => window.location.href = 'case-player.html?id=' + encodeURIComponent(c.id);
+      card.innerHTML = `
+        <div class="pc-card-top">
+          <div class="pc-avatar">${c.patient.avatar}</div>
+          <div class="pc-diff ${c.difficulty}">${c.difficulty}</div>
+        </div>
+        <div class="pc-card-title">${c.title}</div>
+        <div class="pc-card-tag">${c.tagline}</div>
+        <div class="pc-card-foot">
+          ${best ? `<span class="pc-best">✅ Best ${best.score}/${best.total}</span>` : `<span class="pc-best none">Not attempted</span>`}
+          <span class="pc-go">${best ? 'Retry →' : 'Start →'}</span>
+        </div>`;
+      grid.appendChild(card);
+    });
+    wrap.appendChild(block);
+  });
+
+  if (!anyShown) {
+    wrap.innerHTML = '<div class="pc-empty">No cases match your search — try another keyword.</div>';
+  }
+}
+</script>
+</body>
+</html>

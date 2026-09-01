@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Case — Physio Motion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/mobile.css">
+<style>
+body { display:flex; flex-direction:column; min-height:100vh; }
+.cp-main { flex:1; max-width:1040px; margin:0 auto; width:100%; padding:24px 20px 90px; position:relative; z-index:1; }
+
+/* ── shared card ── */
+.cp-card { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow-sm); }
+
+/* ── INTRO SCREEN ── */
+#introScreen { max-width:640px; margin:0 auto; }
+.cp-cat-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:100px; background:var(--sage-dim); border:1px solid var(--border); font-size:11px; font-weight:700; color:var(--sage); text-transform:uppercase; letter-spacing:.6px; margin-bottom:14px; }
+.cp-intro-title { font-family:'Playfair Display', serif; font-size: clamp(22px,4vw,30px); font-weight:700; color:var(--forest); margin-bottom:6px; }
+.cp-intro-tag { font-size:13px; color:var(--muted); margin-bottom:22px; }
+.cp-patient-card { display:flex; gap:14px; padding:18px; margin-bottom:18px; align-items:center; }
+.cp-avatar-lg { width:56px; height:56px; border-radius:16px; background:var(--bg-warm); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+.cp-patient-name { font-family:'Playfair Display', serif; font-weight:700; font-size:15px; color:var(--forest); }
+.cp-patient-role { font-size:12px; color:var(--muted); }
+.cp-quote { font-style:italic; font-size:13px; color:var(--text-sec); margin-top:6px; padding-left:10px; border-left:3px solid var(--sage-pale); }
+.cp-briefing { padding:18px; font-size:13.5px; line-height:1.75; color:var(--text-sec); margin-bottom:20px; }
+.cp-briefing b { color:var(--forest); }
+.cp-meta-row { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+.cp-meta-chip { font-size:11px; font-weight:700; padding:5px 12px; border-radius:100px; background:var(--bg-warm); border:1px solid var(--border); color:var(--text-sec); }
+
+/* ── QUIZ SCREEN ── */
+#quizScreen { display:none; grid-template-columns: 1fr 300px; gap:20px; align-items:start; }
+#quizScreen.show { display:grid; }
+@media(max-width:820px){ #quizScreen.show { grid-template-columns:1fr; } }
+
+.cp-progress-wrap { margin-bottom:16px; }
+.cp-progress-lbl { display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px; }
+.cp-progress-bar { height:8px; border-radius:100px; background:var(--bg-warm); overflow:hidden; }
+.cp-progress-fill { height:100%; background:linear-gradient(90deg, var(--sage), var(--gold-light)); border-radius:100px; transition:width .4s ease; }
+
+.cp-q-card { padding:24px; margin-bottom:16px; }
+.cp-q-stage { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:8px; }
+.cp-q-prompt { font-family:'Playfair Display', serif; font-size:17px; font-weight:700; color:var(--forest); line-height:1.4; margin-bottom:18px; }
+.cp-opt { display:flex; align-items:center; gap:12px; padding:13px 16px; border:1.5px solid var(--border); border-radius:14px; margin-bottom:10px; cursor:pointer; transition:.2s; font-size:13.5px; color:var(--text-primary); background:var(--bg); }
+.cp-opt:hover { border-color:rgba(90,122,98,.4); background:var(--sage-dim); }
+.cp-opt .letter { width:26px; height:26px; border-radius:50%; background:var(--bg-warm); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--text-sec); flex-shrink:0; }
+.cp-opt.selected { border-color:var(--sage); background:var(--sage-dim); }
+.cp-opt.correct { border-color:var(--success); background:rgba(61,139,91,.1); }
+.cp-opt.correct .letter { background:var(--success); color:#fff; border-color:var(--success); }
+.cp-opt.wrong { border-color:var(--danger); background:rgba(200,74,74,.08); }
+.cp-opt.wrong .letter { background:var(--danger); color:#fff; border-color:var(--danger); }
+.cp-opt.disabled { cursor:default; }
+
+.cp-feedback { display:none; padding:14px 16px; border-radius:14px; margin-top:6px; font-size:13px; line-height:1.65; }
+.cp-feedback.show { display:block; }
+.cp-feedback.good { background:rgba(61,139,91,.08); border:1px solid rgba(61,139,91,.25); color:#2E6E45; }
+.cp-feedback.bad { background:rgba(200,74,74,.08); border:1px solid rgba(200,74,74,.25); color:#A93A3A; }
+.cp-feedback strong { display:block; margin-bottom:3px; }
+
+.cp-nav-row { display:flex; justify-content:flex-end; }
+
+/* ── PATIENT SIDEBAR / DRAWER ── */
+.cp-patient-panel { position:sticky; top:80px; }
+.cp-pp-hd { display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border); }
+.cp-pp-body { padding:14px 16px; max-height:420px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+.cp-bubble { background:var(--bg-warm); border-radius:14px 14px 14px 4px; padding:10px 13px; font-size:12.5px; line-height:1.55; color:var(--text-sec); border:1px solid var(--border); opacity:.55; transition:.3s; }
+.cp-bubble.active { opacity:1; background:var(--sage-dim); border-color:rgba(90,122,98,.3); }
+.cp-bubble.locked { display:none; }
+
+.cp-drawer-toggle { display:none; }
+@media(max-width:820px) {
+  .cp-patient-panel { position:fixed; top:0; right:0; bottom:0; width:min(320px,88vw); z-index:400; border-radius:0; transform:translateX(105%); transition:transform .3s ease; box-shadow:-10px 0 40px rgba(0,0,0,.2); }
+  .cp-patient-panel.open { transform:translateX(0); }
+  .cp-drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:399; }
+  .cp-drawer-backdrop.open { display:block; }
+  .cp-drawer-toggle {
+    display:flex; align-items:center; gap:6px; position:fixed; right:16px; bottom:24px; z-index:200;
+    background:var(--forest); color:#FAF7F2; border:none; padding:11px 16px; border-radius:100px;
+    font-size:12.5px; font-weight:700; box-shadow:0 10px 30px rgba(44,44,44,.3); cursor:pointer;
+  }
+}
+
+/* ── RESULTS SCREEN ── */
+#resultScreen { display:none; max-width:700px; margin:0 auto; }
+#resultScreen.show { display:block; }
+.cp-score-hero { text-align:center; padding:34px 24px; margin-bottom:20px; }
+.cp-score-ring { width:130px; height:130px; border-radius:50%; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; flex-direction:column; background:conic-gradient(var(--sage) calc(var(--pct,0) * 1%), var(--bg-warm) 0); position:relative; }
+.cp-score-ring::before { content:''; position:absolute; inset:8px; border-radius:50%; background:var(--bg-card); }
+.cp-score-num { position:relative; z-index:1; font-family:'Playfair Display', serif; font-size:26px; font-weight:700; color:var(--forest); }
+.cp-score-sub { position:relative; z-index:1; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.cp-score-title { font-family:'Playfair Display', serif; font-size:19px; font-weight:700; color:var(--forest); margin-bottom:6px; }
+.cp-score-points { font-size:13px; color:var(--text-sec); }
+.cp-score-points b { color:var(--gold); }
+
+.cp-review-hd { font-family:'Playfair Display', serif; font-size:15px; font-weight:700; color:var(--forest); margin:26px 0 12px; }
+.cp-review-item { padding:16px; margin-bottom:10px; }
+.cp-review-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+.cp-review-icon { font-size:16px; flex-shrink:0; }
+.cp-review-q { font-size:13px; font-weight:700; color:var(--forest); line-height:1.5; }
+.cp-review-ans { font-size:12px; color:var(--text-sec); margin:6px 0 2px; padding-left:26px; }
+.cp-review-ans .yours { color:var(--danger); font-weight:600; }
+.cp-review-ans .right { color:var(--success); font-weight:600; }
+.cp-review-exp { font-size:12px; color:var(--muted); line-height:1.6; padding-left:26px; margin-top:4px; }
+
+.cp-summary-card { padding:18px; margin:22px 0; background:linear-gradient(135deg, var(--forest-deep), var(--forest)); border:none; }
+.cp-summary-card .lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:rgba(250,247,242,.6); margin-bottom:8px; }
+.cp-summary-card p { font-size:13px; color:rgba(250,247,242,.9); line-height:1.7; }
+
+.cp-actions-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; }
+.cp-actions-row .btn { flex:1; min-width:140px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion</div>
+  <div class="header-actions">
+    <button class="btn btn-header" onclick="window.location.href='physio-cases.html'">← Cases</button>
+  </div>
+</header>
+
+<main class="cp-main">
+
+  <!-- ═══ INTRO ═══ -->
+  <div id="introScreen">
+    <div class="cp-cat-pill" id="introCat">—</div>
+    <div class="cp-intro-title" id="introTitle">Loading case…</div>
+    <div class="cp-intro-tag" id="introTag"></div>
+
+    <div class="cp-meta-row">
+      <span class="cp-meta-chip" id="introDiff">—</span>
+      <span class="cp-meta-chip" id="introSteps">—</span>
+      <span class="cp-meta-chip" id="introMax">—</span>
+    </div>
+
+    <div class="cp-card cp-patient-card">
+      <div class="cp-avatar-lg" id="introAvatar">🧑</div>
+      <div style="flex:1;">
+        <div class="cp-patient-name" id="introName">—</div>
+        <div class="cp-patient-role" id="introRole">—</div>
+        <div class="cp-quote" id="introQuote">"…"</div>
+      </div>
+    </div>
+
+    <div class="cp-card cp-briefing" id="introBriefing"></div>
+
+    <button class="btn btn-primary" style="width:100%;" onclick="startCase()">▶ Start Case</button>
+  </div>
+
+  <!-- ═══ QUIZ ═══ -->
+  <div id="quizScreen">
+    <div>
+      <div class="cp-progress-wrap">
+        <div class="cp-progress-lbl"><span id="progLbl">Step 1</span><span id="progCount">1 / 4</span></div>
+        <div class="cp-progress-bar"><div class="cp-progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="cp-card cp-q-card">
+        <div class="cp-q-stage" id="qStage">—</div>
+        <div class="cp-q-prompt" id="qPrompt">—</div>
+        <div id="qOptions"></div>
+        <div class="cp-feedback" id="qFeedback"></div>
+      </div>
+
+      <div class="cp-nav-row">
+        <button class="btn btn-primary" id="nextBtn" style="display:none;" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <aside class="cp-card cp-patient-panel" id="patientPanel">
+      <div class="cp-pp-hd">
+        <div class="cp-avatar-lg" style="width:40px;height:40px;font-size:19px;" id="ppAvatar">🧑</div>
+        <div>
+          <div class="cp-patient-name" style="font-size:13px;" id="ppName">—</div>
+          <div class="cp-patient-role" style="font-size:11px;" id="ppRole">—</div>
+        </div>
+      </div>
+      <div class="cp-pp-body" id="ppBody"></div>
+    </aside>
+  </div>
+  <div class="cp-drawer-backdrop" id="drawerBackdrop" onclick="togglePatientDrawer(false)"></div>
+  <button class="cp-drawer-toggle" id="drawerToggle" onclick="togglePatientDrawer()">🗣️ Patient</button>
+
+  <!-- ═══ RESULTS ═══ -->
+  <div id="resultScreen">
+    <div class="cp-card cp-score-hero">
+      <div class="cp-score-ring" id="scoreRing" style="--pct:0;">
+        <span class="cp-score-num" id="scorePct">0%</span>
+        <span class="cp-score-sub" id="scoreFrac">0/0</span>
+      </div>
+      <div class="cp-score-title" id="scoreGrade">—</div>
+      <div class="cp-score-points">Points earned: <b id="scorePoints">0</b></div>
+    </div>
+
+    <div class="cp-summary-card cp-card">
+      <div class="lbl">📚 Case Takeaway</div>
+      <p id="scoreSummary"></p>
+    </div>
+
+    <div class="cp-review-hd">Review Your Answers</div>
+    <div id="reviewList"></div>
+
+    <div class="cp-actions-row">
+      <button class="btn btn-primary" onclick="retryCase()">🔁 Retry Case</button>
+      <button class="btn btn-secondary" onclick="window.location.href='physio-cases.html'">📚 More Cases</button>
+      <button class="btn btn-secondary" onclick="window.location.href='leaderboard.html'">🏆 Leaderboard</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+try {
+  if (!firebase.apps.length) firebase.initializeApp({
+    apiKey:"AIzaSyCzK4OGhLBgmIKktawOm44zd9KyhHlaITE",
+    authDomain:"physiowork-8976f.firebaseapp.com",
+    projectId:"physiowork-8976f",
+    storageBucket:"physiowork-8976f.firebasestorage.app",
+    messagingSenderId:"789519816056",
+    appId:"1:789519816056:web:c2c8d82c83f8149fd1a48d"
+  });
+  window._fbDb = firebase.firestore();
+  window._fbStorage = firebase.storage();
+  window.FIREBASE_ENABLED = true;
+} catch(e) { window.FIREBASE_ENABLED = false; }
+</script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/physio-cases-data.js"></script>
+<script src="js/pwa.js"></script>
+<script>
+let currentUser = null;
+let theCase = null;
+let stepIndex = 0;
+let answers = [];      // chosen option index per step (-1 if unanswered)
+let locked = false;    // has current step been answered
+let POINTS_PER_Q = 10;
+
+document.addEventListener('DOMContentLoaded', () => {
+  currentUser = requireAuth(['doctor', 'student']);
+  if (!currentUser) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  theCase = getPhysioCaseById(id);
+  if (!theCase) {
+    document.getElementById('introTitle').textContent = 'Case not found';
+    document.getElementById('introBriefing').textContent = 'This case does not exist. Please go back and pick a case from the list.';
+    return;
+  }
+  answers = new Array(theCase.steps.length).fill(-1);
+  renderIntro();
+});
+
+function renderIntro() {
+  const cat = getPhysioCategoryMeta(theCase.category);
+  document.getElementById('introCat').innerHTML = `${cat ? cat.icon : '🩺'} ${cat ? cat.label : ''}`;
+  document.getElementById('introTitle').textContent = theCase.title;
+  document.getElementById('introTag').textContent = theCase.tagline;
+  document.getElementById('introDiff').textContent = '🎯 ' + theCase.difficulty;
+  document.getElementById('introSteps').textContent = '📝 ' + theCase.steps.length + ' steps';
+  document.getElementById('introMax').textContent = '⭐ Max ' + physioCaseMaxScore(theCase) + ' pts';
+  document.getElementById('introAvatar').textContent = theCase.patient.avatar;
+  document.getElementById('introName').textContent = theCase.patient.name;
+  document.getElementById('introRole').textContent = theCase.patient.role;
+  document.getElementById('introQuote').textContent = '"' + theCase.patient.history[0] + '"';
+  document.getElementById('introBriefing').innerHTML = '<b>Clinical Briefing —</b> ' + theCase.briefing;
+
+  document.getElementById('ppAvatar').textContent = theCase.patient.avatar;
+  document.getElementById('ppName').textContent = theCase.patient.name;
+  document.getElementById('ppRole').textContent = theCase.patient.role;
+}
+
+function startCase() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('quizScreen').classList.add('show');
+  stepIndex = 0;
+  renderStep();
+}
+
+function renderPatientPanel() {
+  const body = document.getElementById('ppBody');
+  body.innerHTML = '';
+  theCase.patient.history.forEach((line, i) => {
+    if (i > stepIndex) return; // reveal progressively
+    const b = document.createElement('div');
+    b.className = 'cp-bubble' + (i === stepIndex ? ' active' : '');
+    b.textContent = '"' + line + '"';
+    body.appendChild(b);
+  });
+  body.scrollTop = body.scrollHeight;
+}
+
+function renderStep() {
+  locked = false;
+  const step = theCase.steps[stepIndex];
+  document.getElementById('progLbl').textContent = step.stage;
+  document.getElementById('progCount').textContent = (stepIndex + 1) + ' / ' + theCase.steps.length;
+  document.getElementById('progFill').style.width = Math.round(((stepIndex) / theCase.steps.length) * 100) + '%';
+  document.getElementById('qStage').textContent = 'Step ' + (stepIndex + 1) + ' · ' + step.stage;
+  document.getElementById('qPrompt').textContent = step.prompt;
+
+  const optWrap = document.getElementById('qOptions');
+  optWrap.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+  step.options.forEach((opt, i) => {
+    const el = document.createElement('div');
+    el.className = 'cp-opt';
+    el.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    el.onclick = () => selectOption(i);
+    optWrap.appendChild(el);
+  });
+
+  document.getElementById('qFeedback').className = 'cp-feedback';
+  document.getElementById('qFeedback').innerHTML = '';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  renderPatientPanel();
+  togglePatientDrawer(false);
+}
+
+function selectOption(i) {
+  if (locked) return;
+  locked = true;
+  const step = theCase.steps[stepIndex];
+  answers[stepIndex] = i;
+  const opts = document.querySelectorAll('#qOptions .cp-opt');
+  opts.forEach((el, idx) => {
+    el.classList.add('disabled');
+    if (idx === step.correct) el.classList.add('correct');
+    else if (idx === i && i !== step.correct) el.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('qFeedback');
+  const isCorrect = i === step.correct;
+  fb.className = 'cp-feedback show ' + (isCorrect ? 'good' : 'bad');
+  fb.innerHTML = `<strong>${isCorrect ? '✅ Correct!' : '❌ Not quite.'}</strong>${step.explanation}`;
+
+  document.getElementById('nextBtn').style.display = 'inline-flex';
+  document.getElementById('nextBtn').textContent = (stepIndex === theCase.steps.length - 1) ? 'See Results →' : 'Continue →';
+}
+
+function nextStep() {
+  if (stepIndex < theCase.steps.length - 1) {
+    stepIndex++;
+    renderStep();
+  } else {
+    finishCase();
+  }
+}
+
+async function finishCase() {
+  let score = 0;
+  theCase.steps.forEach((step, i) => { if (answers[i] === step.correct) score += POINTS_PER_Q; });
+  const total = physioCaseMaxScore(theCase);
+  const percent = Math.round((score / total) * 100);
+
+  document.getElementById('quizScreen').classList.remove('show');
+  document.getElementById('resultScreen').classList.add('show');
+  togglePatientDrawer(false);
+
+  document.getElementById('scoreRing').style.setProperty('--pct', percent);
+  document.getElementById('scorePct').textContent = percent + '%';
+  document.getElementById('scoreFrac').textContent = (score/POINTS_PER_Q) + '/' + (total/POINTS_PER_Q) + ' correct';
+  document.getElementById('scorePoints').textContent = score;
+
+  let grade = 'Keep Practicing 📖';
+  if (percent === 100) grade = 'Perfect Score! 🌟';
+  else if (percent >= 80) grade = 'Excellent Work! 🎉';
+  else if (percent >= 60) grade = 'Good Job 👍';
+  document.getElementById('scoreGrade').textContent = grade;
+  document.getElementById('scoreSummary').textContent = theCase.summary;
+
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+  theCase.steps.forEach((step, i) => {
+    const correct = answers[i] === step.correct;
+    const item = document.createElement('div');
+    item.className = 'cp-card cp-review-item';
+    item.innerHTML = `
+      <div class="cp-review-top">
+        <span class="cp-review-icon">${correct ? '✅' : '❌'}</span>
+        <span class="cp-review-q">${step.stage}: ${step.prompt}</span>
+      </div>
+      <div class="cp-review-ans">
+        ${!correct ? `<div>Your answer: <span class="yours">${step.options[answers[i]] ?? '— skipped —'}</span></div>` : ''}
+        <div>Correct answer: <span class="right">${step.options[step.correct]}</span></div>
+      </div>
+      <div class="cp-review-exp">${step.explanation}</div>`;
+    reviewList.appendChild(item);
+  });
+
+  // Persist result
+  if (window.FIREBASE_ENABLED && currentUser) {
+    try {
+      await dbSaveCaseResult(currentUser.email, {
+        name: currentUser.name,
+        university: currentUser.profile && currentUser.profile.university,
+        yearStudy: currentUser.profile && currentUser.profile.yearStudy,
+        avatar: theCase.patient.avatar
+      }, {
+        caseId: theCase.id, caseTitle: theCase.title, category: theCase.category,
+        score: score / POINTS_PER_Q, total: total / POINTS_PER_Q, percent,
+        pointsEarned: score
+      });
+    } catch (e) { console.warn('Could not save case result', e); }
+  }
+}
+
+function retryCase() {
+  answers = new Array(theCase.steps.length).fill(-1);
+  stepIndex = 0;
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('quizScreen').classList.add('show');
+  renderStep();
+}
+
+function togglePatientDrawer(force) {
+  const panel = document.getElementById('patientPanel');
+  const backdrop = document.getElementById('drawerBackdrop');
+  const open = force !== undefined ? force : !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  backdrop.classList.toggle('open', open);
+}
+</script>
+</body>
+</html>

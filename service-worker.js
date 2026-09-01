@@ -1,4 +1,4 @@
-const CACHE_NAME = 'physio-v6';
+const CACHE_NAME = 'physio-v7';
 const STATIC_FILES = [
   '/login.html', '/choose-role.html', '/choose-year.html', '/student-dashboard.html', '/index.html',
   '/plans.html', '/my-exercises.html', '/progress.html', '/pain-helper.html',
@@ -7,6 +7,7 @@ const STATIC_FILES = [
   '/muscle-test.html', '/therapeutic-exercises.html', '/doctor-progress.html',
   '/database.html', '/profile.html', '/student-chat.html', '/css/theme.css', '/css/mobile.css',
   '/js/utils.js', '/js/firebase-config.js', '/js/login.js', '/js/db.js', '/manifest.json',
+  '/physio-cases.html', '/case-player.html', '/leaderboard.html', '/js/physio-cases-data.js',
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(STATIC_FILES).catch(() => {})));

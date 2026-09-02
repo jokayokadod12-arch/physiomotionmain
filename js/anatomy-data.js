@@ -16,6 +16,27 @@ const ANATOMY_REGIONS = [
   { id: 'head-neck', label: 'Head & Neck', sub: 'Skull · Cervical spine · Face', icon: '🧠', color: '#9B59B6', status: 'ready' },
 ];
 
+// ─── VIDEOS ──────────────────────────────────────────────
+// Reference videos per region. youtubeId is the 11-char video ID
+// (parsed from youtu.be/<id> links). Each entry renders as a card with an
+// in-app player button and an "Open on YouTube" button.
+const ANATOMY_VIDEOS = {
+  'upper-limb': [
+    { id:'ul-1', title:'Upper Limb Anatomy Overview', youtubeId:'crC-0WAWrdc' },
+  ],
+  'lower-limb': [
+    { id:'ll-1', title:'Lower Limb Anatomy Overview', youtubeId:'o8-jI-TX0nI' },
+  ],
+  'trunk-spine': [
+    { id:'ts-1', title:'Spine Anatomy Overview', youtubeId:'N28uEWxhH8I' },
+    { id:'ts-2', title:'Core / Trunk Anatomy Overview', youtubeId:'9gB9PEHP-Ok' },
+  ],
+  'head-neck': [
+    { id:'hn-1', title:'Muscles of the Head & Neck', youtubeId:'F_O0Rj3IWn8' },
+    { id:'hn-2', title:'Bones of the Skull', youtubeId:'34jeggKoNiM' },
+  ],
+};
+
 // ─── BONES ───────────────────────────────────────────────
 const ANATOMY_BONES = {
   'upper-limb': [

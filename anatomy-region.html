@@ -77,7 +77,7 @@ body { display:flex; flex-direction:column; min-height:100vh; background:var(--b
   </div>
 
   <div class="ar-quiz-cta">
-    <div class="ar-quiz-cta-txt"><b>Ready to test yourself?</b><span>30-question MCQ quiz on this region</span></div>
+    <div class="ar-quiz-cta-txt"><b>Ready to test yourself?</b><span id="quizCountLbl">MCQ quiz on this region</span></div>
     <button class="ar-quiz-btn" onclick="startQuiz()">Start Quiz →</button>
   </div>
 
@@ -94,6 +94,11 @@ let currentTab = 'bones';
 
 document.getElementById('rTitle').textContent = region.label;
 document.getElementById('rSub').textContent = region.sub;
+(function setQuizLabel() {
+  const q = ANATOMY_QUIZZES[regionId];
+  const lbl = document.getElementById('quizCountLbl');
+  lbl.textContent = q ? (q.questions.length + '-question MCQ quiz on this region') : 'Quiz coming soon for this region';
+})();
 
 function landmarksHTML(list) {
   if (!list || !list.length) return '';

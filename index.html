@@ -117,9 +117,6 @@ nav{
 .btn-gold:hover{transform:translateY(-2px); box-shadow:0 10px 26px rgba(184,148,63,.45);}
 .btn-ghost-white{background:rgba(255,255,255,.08); color:var(--cream); border:1.5px solid rgba(255,255,255,.28);}
 .btn-ghost-white:hover{background:rgba(255,255,255,.16); transform:translateY(-2px);}
-#navInstallBtn,#heroInstallBtn{display:none;}
-@media(max-width:860px),(hover:none){#navInstallBtn{display:inline-flex;}}
-@media(display-mode:standalone){#navInstallBtn,#heroInstallBtn{display:none!important;}}
 
 /* ============================================================
    HERO
@@ -342,6 +339,102 @@ a:focus-visible, button:focus-visible, .mod-item:focus-visible{outline:2px solid
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
 }
+
+/* ============================================================
+   MOBILE TIGHTENING — everything a size down, nothing stacked
+   flush against the next thing
+============================================================ */
+@media(max-width:600px){
+  .sig-strip{font-size:9px; letter-spacing:1.4px; padding:6px 10px;}
+  nav{height:58px; padding:0 14px;}
+  .brand-mark{width:32px; height:32px; border-radius:9px;}
+  .brand-word .n1{font-size:13.5px;}
+  .nav-r{gap:6px;}
+  .btn{padding:8px 14px; font-size:11.5px; gap:5px;}
+
+  .hero{padding:30px 14px 10px;}
+  .hero-in{gap:32px;}
+  .hero-kicker{font-size:9.5px; letter-spacing:1.2px; margin-bottom:12px;}
+  .hero-title{font-size:28px; letter-spacing:-.8px; margin-bottom:12px;}
+  .hero-desc{font-size:13.5px; line-height:1.65; margin-bottom:20px;}
+  .hero-cta{gap:8px; margin-bottom:22px;}
+
+  .readout{border-radius:12px;}
+  .ro{padding:10px 12px;}
+  .ro-v{font-size:13.5px;}
+  .ro-l{font-size:7.5px; letter-spacing:.6px;}
+
+  .console{padding:16px 15px 18px; border-radius:16px;}
+  .console-head{margin-bottom:14px;}
+  .console-tag{font-size:9px;}
+  .gauge-row{gap:12px; margin-bottom:14px;}
+  .gauge-num{font-size:32px;}
+  .gauge-sub{font-size:10px; margin-top:3px;}
+  .gauge-arc{width:74px; height:74px;}
+  .mini-rows{gap:6px;}
+  .mini-row{padding:7px 10px; border-radius:8px;}
+  .mini-name{font-size:10.5px;}
+  .mini-val{font-size:11px;}
+  .float-tag{padding:6px 9px; border-radius:8px; gap:6px;}
+  .float-tag span{font-size:8.5px;}
+  .ft-a{top:-8px;}
+  .ft-b{bottom:-8px;}
+
+  .ticker-wrap{padding:11px 0;}
+  .ticker-track span{font-size:9.5px; padding:0 12px; gap:12px; letter-spacing:1px;}
+
+  .sec{padding:44px 0;}
+  .sec-head{margin-bottom:26px;}
+  .eyebrow{font-size:9.5px; margin-bottom:10px;}
+  .sec-title{font-size:22px; letter-spacing:-.5px;}
+  .sec-desc{font-size:12.5px; margin-top:10px;}
+
+  .modules-grid{border-radius:16px;}
+  .mod-item{padding:12px 14px; gap:10px;}
+  .mod-code{font-size:9.5px; width:26px;}
+  .mod-title{font-size:12.5px;}
+  .mod-cat{font-size:9.5px;}
+  .mod-detail{padding:18px 15px;}
+  .detail-code{font-size:10px; margin-bottom:6px;}
+  .detail-title{font-size:19px; margin-bottom:10px;}
+  .detail-desc{font-size:12.5px; margin-bottom:16px;}
+  .detail-tags{gap:6px; margin-bottom:16px;}
+  .dtag{padding:5px 11px; font-size:10px;}
+  .detail-stats{gap:8px;}
+  .dstat{padding:10px 14px; min-width:96px; border-radius:10px;}
+  .dstat-v{font-size:16px;}
+  .dstat-l{font-size:9px;}
+
+  .roles-sec{padding:44px 0;}
+  .role-grid{gap:14px; margin-top:26px;}
+  .flip-stage{height:300px;}
+  .flip-face{padding:20px 18px; border-radius:16px;}
+  .role-ico{width:42px; height:42px; border-radius:12px; font-size:19px;}
+  .role-name{font-size:18px; margin-top:12px;}
+  .role-tag{font-size:9px;}
+  .role-hint{font-size:10.5px;}
+  .flip-back h4{font-size:13.5px; margin-bottom:10px;}
+  .flip-back li{font-size:11px; gap:7px;}
+
+  .bento{gap:8px; margin-top:26px;}
+  .bcell{padding:15px 13px; border-radius:12px;}
+  .b-num{font-size:22px;}
+  .b-label{font-size:10px; margin-top:5px;}
+  .b-mark{top:12px; right:12px; width:6px; height:6px;}
+
+  .cta-band{padding:34px 16px; border-radius:16px; margin:0 12px;}
+  .cta-title{font-size:20px; letter-spacing:-.4px; margin-bottom:10px;}
+  .cta-sub{font-size:12px; margin-bottom:18px;}
+  .cta-btns .btn{width:100%; justify-content:center;}
+
+  footer{padding:40px 16px 24px;}
+  .f-mark{margin-bottom:12px;}
+  .f-mark img{width:26px; height:26px;}
+  .f-mark span{font-size:13.5px;}
+  .f-tag{font-size:9px; letter-spacing:1.6px; margin-bottom:18px;}
+  .f-credit{font-size:11px;}
+  .f-copy{font-size:9.5px;}
+}
 </style>
 <link rel="stylesheet" href="css/mobile.css">
 </head>
@@ -364,9 +457,7 @@ a:focus-visible, button:focus-visible, .mod-item:focus-visible{outline:2px solid
     <a class="nl" href="#numbers">By the numbers</a>
   </div>
   <div class="nav-r">
-    <a href="#" id="navInstallBtn" class="btn btn-line">⇩ Install</a>
     <a href="login.html" class="btn btn-line">Sign in</a>
-    <a href="choose-role.html" class="btn btn-solid">Get started</a>
   </div>
 </nav>
 
@@ -575,7 +666,6 @@ a:focus-visible, button:focus-visible, .mod-item:focus-visible{outline:2px solid
       <p class="cta-sub">Create your account as a doctor, patient, or student — every module above is one login away.</p>
       <div class="cta-btns">
         <a href="choose-role.html" class="btn btn-gold">Choose your role</a>
-        <a href="login.html" class="btn btn-ghost-white">Sign in</a>
       </div>
     </div>
   </div>
@@ -709,11 +799,6 @@ document.querySelectorAll('[data-flip]').forEach(el=>{
 const obs = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-/* ---------- install banner (standalone check) ---------- */
-if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-  const nb = document.getElementById('navInstallBtn');
-  if (nb) nb.style.display = 'none';
-}
 </script>
 <script src="js/pwa.js"></script>
 </body>

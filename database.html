@@ -457,8 +457,13 @@ td.inactive { color:#8A8A8A; font-style:italic; }
 <body>
 
 <header class="site-header" style="height:auto;padding:0 28px;">
-    <div>📁 Patient Database - Dr. <span id="doctorName"></span></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img class="logo-img" src="icons/logo.png" alt="Physio Motion" style="width:34px;height:34px;border-radius:9px;" onerror="this.style.display='none'">
+        <span>📁 Patient Database - Dr. <span id="doctorName"></span></span>
+    </div>
     <div>
+        <button onclick="window.location.href='plans.html'">← Plans</button>
+        <button onclick="window.location.href='choose-year.html'">🏠 Dashboard</button>
         <button onclick="logout()">Logout</button>
     </div>
 </header>

@@ -11,36 +11,43 @@
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
   <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-  <meta name="theme-color" content="#1D3028">
+  <meta name="theme-color" content="#152A1D">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Physio Motion">
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Plans — Physio Motion</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/function-lab.css">
+  <link rel="stylesheet" href="css/mobile.css">
   <style>
     body{display:flex;flex-direction:column;min-height:100vh;}
-    .plans-main{flex:1;max-width:900px;margin:0 auto;padding:28px 20px 60px;position:relative;z-index:1;width:100%;}
-    .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px;}
+    .sub-hero{position:relative;z-index:1;padding:30px 24px 34px;}
+    .sub-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;}
+    .sub-kicker{margin-bottom:10px;}
+    .sub-title{font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#FAF7F2;letter-spacing:-.6px;line-height:1.2;}
+    .sub-desc{font-size:13px;color:rgba(250,247,242,.55);margin-top:6px;max-width:520px;}
+    .plans-main{flex:1;max-width:900px;margin:0 auto;padding:30px 20px 60px;position:relative;z-index:1;width:100%;}
+    .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px;}
     @media(max-width:520px){.hub-grid{grid-template-columns:1fr;}}
     .hub-card{
-      background:rgba(245,239,228,.78);border:1px solid rgba(90,122,98,.16);
-      border-radius:18px;padding:28px 24px;cursor:pointer;
-      transition:all .25s;position:relative;overflow:hidden;
-      display:flex;align-items:flex-start;gap:18px;
+      background:#fff;border-radius:16px;padding:26px 22px;cursor:pointer;
+      transition:all .26s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;
+      display:flex;align-items:flex-start;gap:16px;
     }
-    .hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--hc,#7A9E82);opacity:0;transition:.25s;}
+    .hub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--hc,var(--sage));opacity:0;transition:.26s;}
     .hub-card:hover::before{opacity:1;}
-    .hub-card:hover{transform:translateY(-5px);border-color:var(--hc,rgba(90,122,98,.4));box-shadow:0 12px 36px rgba(0,0,0,.45),0 0 20px rgba(90,122,98,.1);}
-    .hc-icon{font-size:40px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(90,122,98,.3));}
-    .hc-body h3{font-family:'Playfair Display',monospace;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--forest);margin-bottom:7px;}
-    .hc-body p{font-size:12px;color:var(--charcoal-mid);line-height:1.6;}
-    .hc-badge{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;background:rgba(90,122,98,.1);color:#7A9E82;border:1px solid rgba(90,122,98,.25);}
+    .hub-card:hover{transform:translateY(-5px);}
+    .hc-icon-box{width:52px;height:52px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:23px;background:var(--fl-paper,#FBF9F4);border:1px solid var(--fl-line-strong,rgba(45,74,53,.3));}
+    .hc-body h3{font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:700;letter-spacing:-.1px;color:var(--forest-deep);margin-bottom:7px;}
+    .hc-body p{font-size:12px;color:var(--muted);line-height:1.6;}
+    .hc-badge{display:inline-flex;align-items:center;margin-top:10px;padding:3px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--sage-dim);color:var(--sage);border:1px solid rgba(90,122,98,.2);}
   </style>
-  <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="fl-app">
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📁</span> Plans</div>
   <div class="header-actions">
@@ -49,33 +56,40 @@
     <button class="btn btn-header" onclick="logout()">🚪 Logout</button>
   </div>
 </header>
+
+<div class="sub-hero fl-console">
+  <div class="sub-hero-inner">
+    <div class="fl-kicker sub-kicker">Records module</div>
+    <h1 class="sub-title">📁 Plans &amp; Patient Records</h1>
+    <p class="sub-desc">All patient data, plans and progress tracking in one place</p>
+  </div>
+</div>
+
 <div class="plans-main">
   <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
-  <div class="page-title">📁 Plans</div>
-  <div class="page-subtitle">All patient data, plans and progress tracking in one place</div>
   <div class="hub-grid">
-    <div class="hub-card" style="--hc:#7A9E82" onclick="window.location.href='database.html'">
-      <div class="hc-icon">📊</div>
+    <div class="hub-card" style="--hc:var(--sage)" onclick="window.location.href='database.html'">
+      <div class="hc-icon-box">📊</div>
       <div class="hc-body">
         <h3>ROM Patient Data</h3>
         <p>View all ROM analysis sessions, joint angles and session history per patient.</p>
-        <span class="hc-badge">SESSION RECORDS</span>
+        <span class="hc-badge">Session records</span>
       </div>
     </div>
     <div class="hub-card" style="--hc:#00bcd4" onclick="window.location.href='doctor-progress.html'">
-      <div class="hc-icon">🏋️</div>
+      <div class="hc-icon-box">🏋️</div>
       <div class="hc-body">
         <h3>Exercise Patient Data</h3>
         <p>Monitor assigned therapeutic exercises, completion rates and patient adherence.</p>
-        <span class="hc-badge">EXERCISE PLANS</span>
+        <span class="hc-badge">Exercise plans</span>
       </div>
     </div>
-    <div class="hub-card" style="--hc:#ff9800" onclick="window.location.href='doctor-lifestyle.html'">
-      <div class="hc-icon">🥗</div>
+    <div class="hub-card" style="--hc:var(--gold)" onclick="window.location.href='doctor-lifestyle.html'">
+      <div class="hc-icon-box">🥗</div>
       <div class="hc-body">
         <h3>Lifestyle Patient Plans</h3>
         <p>View all nutrition plans created for patients with caloric targets and meal schedules.</p>
-        <span class="hc-badge">NUTRITION PLANS</span>
+        <span class="hc-badge">Nutrition plans</span>
       </div>
     </div>
   </div>

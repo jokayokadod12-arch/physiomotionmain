@@ -19,12 +19,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Patient Reports — Physio Motion Analyzer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/function-lab.css">
   <link rel="stylesheet" href="css/doctor-progress.css">
   <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="fl-app">
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📈</span> Patient Reports</div>
   <div class="header-actions">
@@ -34,11 +36,16 @@
   </div>
 </header>
 
+<div class="fl-subhero fl-console">
+  <div class="fl-subhero-inner">
+    <div class="fl-kicker" style="margin-bottom:10px;">Records module</div>
+    <h1 class="fl-subtitle">📈 Patient Reports</h1>
+    <p class="fl-subdesc">Monitor completion rates and patient progress</p>
+  </div>
+</div>
+
 <div class="page-container">
   <button class="btn-back" onclick="window.location.href='plans.html'">← Plans</button>
-
-  <div class="page-title">Patient Reports</div>
-  <div class="page-subtitle">Monitor completion rates and patient progress</div>
 
   <div class="stats-grid">
     <div class="stat-card"><h3 id="statPatients">0</h3><p>Total Patients</p></div>

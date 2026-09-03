@@ -17,15 +17,17 @@
   <meta name="apple-mobile-web-app-title" content="Physio Motion">
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Therapeutic Exercises — Physio Motion</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/function-lab.css">
   <style>
     body{display:flex;flex-direction:column;min-height:100vh;}
     .ex-main{flex:1;max-width:960px;margin:0 auto;padding:24px 18px 60px;position:relative;z-index:1;width:100%;}
 
     /* ── STEP BAR ── */
-    .step-bar{display:flex;align-items:center;gap:0;margin-bottom:24px;background:rgba(245,239,228,.65);border:1px solid rgba(90,122,98,.1);border-radius:10px;overflow:hidden;}
-    .step-item{flex:1;padding:11px 8px;text-align:center;font-family:'Playfair Display',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(90,122,98,.45);border-right:1px solid rgba(90,122,98,.08);transition:.2s;cursor:default;}
+    .step-bar{display:flex;align-items:center;gap:0;margin-bottom:24px;background:#fff;border:1px solid rgba(90,122,98,.14);border-radius:12px;overflow:hidden;}
+    .step-item{flex:1;padding:11px 8px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(90,122,98,.45);border-right:1px solid rgba(90,122,98,.08);transition:.2s;cursor:default;}
     .step-item:last-child{border-right:none;}
     .step-item.active{background:rgba(90,122,98,.12);color:#7A9E82;}
     .step-item.done{color:rgba(90,122,98,.45);cursor:pointer;}
@@ -34,38 +36,39 @@
 
     /* ── SELECTION SUMMARY ── */
     .sel-summary{display:none;background:rgba(90,122,98,.06);border:1px solid rgba(90,122,98,.18);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-    .sel-chip{background:rgba(90,122,98,.12);border:1px solid rgba(90,122,98,.25);border-radius:20px;padding:4px 14px;font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;color:#7A9E82;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+    .sel-chip{background:rgba(90,122,98,.12);border:1px solid rgba(90,122,98,.25);border-radius:20px;padding:4px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#7A9E82;letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
     .sel-chip .rm{cursor:pointer;opacity:.5;margin-left:4px;font-size:12px;}
     .sel-chip .rm:hover{opacity:1;}
 
     /* ── CATEGORY LABEL ── */
-    .cat-label{font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(90,122,98,.55);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .cat-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(90,122,98,.55);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
     .cat-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(90,122,98,.18),transparent);}
 
     /* ── CATEGORY GRID ── */
     .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:11px;margin-bottom:24px;}
     @media(max-width:480px){.cat-grid{grid-template-columns:repeat(2,1fr);gap:8px;}}
 
-    .cat-card{background:rgba(245,239,228,.72);border:1.5px solid rgba(90,122,98,.1);border-radius:13px;padding:18px 13px;cursor:pointer;text-align:center;transition:all .2s;position:relative;}
+    .cat-card{background:#fff;border:1.5px solid rgba(90,122,98,.14);border-radius:14px;padding:18px 13px;cursor:pointer;text-align:center;transition:all .2s;position:relative;}
     .cat-card:hover{border-color:rgba(90,122,98,.35);background:rgba(90,122,98,.08);transform:translateY(-3px);}
     .cat-card.selected{border-color:#7A9E82;background:rgba(90,122,98,.12);box-shadow:0 0 16px rgba(90,122,98,.15);}
     .cat-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;font-size:11px;color:#7A9E82;font-weight:900;}
     .cat-icon{font-size:28px;margin-bottom:8px;display:block;}
-    .cat-name{font-family:'Playfair Display',monospace;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--forest);line-height:1.4;}
+    .cat-name{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--forest);line-height:1.4;}
 
     /* ── GO BUTTON ── */
-    .go-btn{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#1e88e5,#5A7A62);color:#fff;font-family:'Playfair Display',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(90,122,98,.35);transition:.2s;display:none;}
+    .go-btn{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#1e88e5,#5A7A62);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(90,122,98,.35);transition:.2s;display:none;}
     .go-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(90,122,98,.5);}
     .go-btn.show{display:block;}
 
     /* ── BACK BETWEEN STEPS ── */
-    .step-back-btn{display:none;align-items:center;gap:6px;padding:8px 16px;background:rgba(245,239,228,.7);border:1px solid rgba(90,122,98,.2);border-radius:8px;color:#7A9E82;font-family:'Playfair Display',monospace;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:.18s;margin-bottom:16px;}
+    .step-back-btn{display:none;align-items:center;gap:6px;padding:8px 16px;background:#fff;border:1px solid rgba(90,122,98,.2);border-radius:10px;color:var(--sage);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:.18s;margin-bottom:16px;}
     .step-back-btn:hover{background:rgba(90,122,98,.1);}
     .step-back-btn.show{display:flex;}
   </style>
   <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="fl-app">
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🏋️</span> Therapeutic Exercises</div>
   <div class="header-actions">

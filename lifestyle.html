@@ -18,15 +18,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Lifestyle Modification — Physio Motion</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/function-lab.css">
   <style>
     body { display:flex; flex-direction:column; min-height:100vh; }
     .wrap { max-width:860px; margin:0 auto; padding:24px 18px 80px; position:relative; z-index:1; width:100%; }
 
     /* ── Section cards ── */
-    .sec { background:rgba(245,239,228,.8); border:1px solid rgba(90,122,98,.13); border-radius:16px; padding:22px 20px; margin-bottom:18px; }
-    .sec-title { font-family:'Playfair Display',monospace; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#7A9E82; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+    .sec { background:#fff; border-radius:16px; padding:22px 20px; margin-bottom:18px; }
+    .sec-title { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#7A9E82; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
 
     /* ── Form grid ── */
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -34,9 +36,9 @@
 
     .fld label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(90,122,98,.7); display:block; margin-bottom:6px; }
     .fld input, .fld select {
-      width:100%; background:rgba(250,247,242,.8); border:1px solid rgba(90,122,98,.18);
-      border-radius:8px; padding:11px 13px; color:#2C2C2C;
-      font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:.2s;
+      width:100%; background:var(--fl-paper,#FBF9F4); border:1.5px solid rgba(90,122,98,.18);
+      border-radius:10px; padding:11px 13px; color:#2C2C2C;
+      font-family:'Inter',sans-serif; font-size:14px; outline:none; transition:.2s;
     }
     .fld input:focus, .fld select:focus { border-color:#7A9E82; box-shadow:0 0 0 3px rgba(90,122,98,.08); }
     .fld select option { background:#F5EFE4; }
@@ -45,8 +47,9 @@
     .disease-grid { display:flex; flex-wrap:wrap; gap:8px; }
     .chip {
       padding:7px 14px; border-radius:20px; cursor:pointer;
-      border:1px solid rgba(90,122,98,.2); background:rgba(250,247,242,.6);
+      border:1px solid rgba(90,122,98,.2); background:#fff;
       color:var(--charcoal-mid); font-size:12px; font-weight:600;
+      font-family:'Inter',sans-serif;
       transition:all .2s; user-select:none;
     }
     .chip:hover { border-color:rgba(90,122,98,.45); color:#2C2C2C; }
@@ -57,7 +60,7 @@
     .goal-btn {
       flex:1; min-width:120px; padding:14px 10px; border-radius:12px;
       border:1px solid rgba(90,122,98,.18); background:rgba(250,247,242,.6);
-      color:var(--charcoal-mid); font-family:'DM Sans',sans-serif;
+      color:var(--charcoal-mid); font-family:'Inter',sans-serif;
       font-size:13px; font-weight:700; cursor:pointer; text-align:center;
       transition:all .2s; letter-spacing:.5px;
     }
@@ -69,7 +72,7 @@
     .btn-analyze {
       width:100%; padding:16px; border:none; border-radius:12px;
       background:linear-gradient(135deg,#5A7A62,#2D4A35);
-      color:#fff; font-family:'Playfair Display',monospace;
+      color:#fff; font-family:'JetBrains Mono',monospace;
       font-size:14px; font-weight:700; letter-spacing:2px;
       cursor:pointer; transition:all .25s;
       box-shadow:0 4px 20px rgba(45,74,53,.4);
@@ -83,20 +86,20 @@
     .metrics-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
     @media(max-width:480px){ .metrics-row{ grid-template-columns:1fr 1fr; } }
     .metric-box { background:rgba(250,247,242,.7); border:1px solid rgba(90,122,98,.15); border-radius:12px; padding:14px 12px; text-align:center; }
-    .metric-val { font-family:'Playfair Display',monospace; font-size:20px; font-weight:700; color:#7A9E82; }
+    .metric-val { font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:#7A9E82; }
     .metric-lbl { font-size:10px; color:var(--charcoal-mid); letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
     .metric-sub { font-size:11px; color:var(--muted); margin-top:2px; }
 
     /* Meal plan table */
     .meal-day { background:rgba(250,247,242,.5); border:1px solid rgba(90,122,98,.1); border-radius:12px; margin-bottom:14px; overflow:hidden; }
     .meal-day-header { background:rgba(45,74,53,.15); padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(90,122,98,.1); }
-    .meal-day-title { font-family:'Playfair Display',monospace; font-size:11px; font-weight:700; color:#7A9E82; letter-spacing:1.5px; }
+    .meal-day-title { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:#7A9E82; letter-spacing:1.5px; }
     .meal-day-cals { font-size:12px; color:var(--charcoal-mid); }
     .meal-row { display:grid; grid-template-columns:100px 1fr auto; gap:10px; padding:10px 16px; border-bottom:1px solid rgba(90,122,98,.05); align-items:start; }
     .meal-row:last-child { border-bottom:none; }
     .meal-type { font-size:11px; font-weight:700; color:rgba(90,122,98,.7); letter-spacing:.8px; text-transform:uppercase; padding-top:2px; }
     .meal-items { font-size:13px; color:#2C2C2C; line-height:1.6; }
-    .meal-cals { font-family:'Playfair Display',monospace; font-size:12px; color:#7A9E82; white-space:nowrap; padding-top:2px; }
+    .meal-cals { font-family:'JetBrains Mono',monospace; font-size:12px; color:#7A9E82; white-space:nowrap; padding-top:2px; }
 
     /* Tips section */
     .tips-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -109,7 +112,7 @@
     .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
     .btn-action {
       flex:1; min-width:140px; padding:12px 16px; border-radius:10px;
-      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700;
       letter-spacing:.8px; cursor:pointer; text-align:center; transition:all .2s;
       display:flex; align-items:center; justify-content:center; gap:8px;
     }
@@ -177,7 +180,8 @@
   </style>
   <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="fl-app">
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">🥗</span> Lifestyle Modification</div>
   <div class="header-actions">
@@ -187,10 +191,16 @@
   </div>
 </header>
 
+<div class="fl-subhero fl-console">
+  <div class="fl-subhero-inner">
+    <div class="fl-kicker" style="margin-bottom:10px;">Nutrition module</div>
+    <h1 class="fl-subtitle">🥗 Lifestyle Modification</h1>
+    <p class="fl-subdesc">Personalized nutrition &amp; calorie plan based on patient data</p>
+  </div>
+</div>
+
 <div class="wrap">
   <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
-  <div class="page-title">🥗 Lifestyle Modification</div>
-  <div class="page-subtitle">Personalized nutrition & calorie plan based on patient data</div>
 
   <!-- ── Patient Info ── -->
   <div class="sec">

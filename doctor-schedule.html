@@ -18,8 +18,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Schedule — Physio Motion</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/function-lab.css">
 <link rel="stylesheet" href="css/mobile.css">
 <style>
 :root{--cyan:#7A9E82;--blue:#5A7A62;--dark:#FAF7F2;--text:#2C2C2C;--border:rgba(90,122,98,.14);}
@@ -27,9 +29,9 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .pw{max-width:980px;margin:0 auto;padding:22px 16px 80px;width:100%;position:relative;z-index:1;}
 
 /* Tabs */
-.tabs{display:flex;background:rgba(245,239,228,.75);border:1px solid var(--border);border-radius:10px;overflow-x:auto;overflow-y:hidden;margin-bottom:22px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs{display:flex;background:#fff;border:1px solid var(--border);border-radius:12px;overflow-x:auto;overflow-y:hidden;margin-bottom:22px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{flex:1;padding:12px 8px;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--charcoal-mid);border:none;background:transparent;transition:.18s;white-space:nowrap;}
+.tab{flex:1;padding:12px 8px;text-align:center;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--charcoal-mid);border:none;background:transparent;transition:.18s;white-space:nowrap;}
 .tab.on{background:rgba(90,122,98,.1);color:var(--cyan);box-shadow:inset 0 -2px 0 var(--cyan);}
 
 /* Panels */
@@ -37,14 +39,14 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 
 /* ── DAY NAV ── */
 .day-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.day-label{font-family:'Playfair Display',monospace;font-size:14px;color:#2C2C2C;font-weight:700;}
+.day-label{font-family:'JetBrains Mono',monospace;font-size:14px;color:#2C2C2C;font-weight:700;}
 .arr-btn{background:rgba(90,122,98,.08);border:1px solid var(--border);color:var(--cyan);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:18px;transition:.18s;}
 .arr-btn:hover{background:rgba(90,122,98,.18);}
 
 /* Day stats */
 .day-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
-.ds{background:rgba(245,239,228,.7);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
-.ds strong{font-family:'Playfair Display',monospace;font-size:14px;color:var(--cyan);}
+.ds{background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.ds strong{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--cyan);}
 
 /* Legend */
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--charcoal-mid);margin-bottom:14px;align-items:center;}
@@ -53,7 +55,7 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 
 /* Slot grid */
 .slot-grid{display:flex;flex-direction:column;gap:6px;}
-.slot-row{display:flex;align-items:center;gap:10px;background:rgba(245,239,228,.72);border:1px solid var(--border);border-radius:12px;padding:12px 14px;transition:.18s;flex-wrap:wrap;}
+.slot-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px;transition:.18s;flex-wrap:wrap;}
 .slot-row.booked{border-color:rgba(90,122,98,.35);background:rgba(45,74,53,.08);padding:14px;}
 @media(max-width:600px){
   .slot-row{gap:8px;}
@@ -68,7 +70,7 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .ind-booked{background:var(--cyan);box-shadow:0 0 7px var(--cyan);}
 .ind-break{background:#ff9800;}
 .ind-closed{background:#444;}
-.slot-time{font-family:'Playfair Display',monospace;font-size:13px;font-weight:700;color:var(--cyan);min-width:58px;flex-shrink:0;}
+.slot-time{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--cyan);min-width:58px;flex-shrink:0;}
 .slot-info{flex:1;}
 .slot-patient{font-size:13px;color:#2C2C2C;font-weight:600;}
 .slot-type{font-size:11px;color:rgba(90,122,98,.55);margin-top:1px;}
@@ -79,17 +81,17 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 
 /* ── BOOKINGS ── */
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.fchip{padding:6px 14px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(245,239,228,.7);color:rgba(90,122,98,.65);transition:.18s;}
+.fchip{padding:6px 14px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:rgba(90,122,98,.65);transition:.18s;font-family:'Inter',sans-serif;}
 .fchip.on,.fchip:hover{background:rgba(90,122,98,.14);border-color:var(--cyan);color:var(--cyan);}
 
-.bk-card{background:rgba(245,239,228,.82);border:1px solid var(--border);border-radius:13px;padding:15px 18px;margin-bottom:10px;transition:.18s;}
+.bk-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:15px 18px;margin-bottom:10px;transition:.18s;}
 .bk-card.upcoming{border-left:3px solid var(--cyan);}
 .bk-card.pending{border-left:3px solid var(--gold);background:rgba(184,148,63,.04);}
 .bk-card.done{border-left:3px solid #4caf50;opacity:.75;}
 .bk-card.ns{border-left:3px solid rgba(255,82,82,.5);opacity:.65;}
 .bk-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
-.bk-name{font-family:'Playfair Display',monospace;font-size:13px;color:#2C2C2C;font-weight:700;}
-.bk-datetime{font-size:12px;color:var(--cyan);font-family:'Playfair Display',monospace;}
+.bk-name{font-family:'JetBrains Mono',monospace;font-size:13px;color:#2C2C2C;font-weight:700;}
+.bk-datetime{font-size:12px;color:var(--cyan);font-family:'JetBrains Mono',monospace;}
 .bk-meta{font-size:12px;color:var(--charcoal-mid);margin-bottom:10px;}
 .bk-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .bk-btn{padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:.18s;}
@@ -106,7 +108,7 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .s-pending_approval{background:rgba(184,148,63,.12);border:1px solid rgba(184,148,63,.3);color:var(--gold);}
 
 /* ── REQUESTS ── */
-.req-card{background:rgba(245,239,228,.82);border:1px solid rgba(255,152,0,.18);border-left:3px solid #ff9800;border-radius:13px;padding:15px 18px;margin-bottom:10px;}
+.req-card{background:#fff;border:1px solid rgba(255,152,0,.18);border-left:3px solid #ff9800;border-radius:16px;padding:15px 18px;margin-bottom:10px;}
 .req-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
 .req-name{font-size:14px;font-weight:700;color:#2C2C2C;}
 .req-time{font-size:11px;color:var(--muted);}
@@ -119,13 +121,13 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 
 /* ── SETTINGS ── */
 .set-section{margin-bottom:22px;}
-.set-head{font-family:'Playfair Display',monospace;font-size:10px;letter-spacing:1.5px;color:rgba(90,122,98,.55);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.set-head{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;color:rgba(90,122,98,.55);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .set-head::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(90,122,98,.18),transparent);}
-.set-card{background:rgba(245,239,228,.72);border:1px solid var(--border);border-radius:11px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;}
+.set-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;}
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .set-lbl{font-size:14px;color:#2C2C2C;font-weight:600;}
 .set-sub{font-size:11px;color:var(--muted);margin-top:1px;}
-.set-input{background:rgba(250,247,242,.72);border:1px solid rgba(90,122,98,.2);border-radius:8px;color:#2C2C2C;font-family:'DM Sans',sans-serif;font-size:14px;padding:8px 11px;outline:none;min-width:90px;}
+.set-input{background:rgba(250,247,242,.72);border:1px solid rgba(90,122,98,.2);border-radius:8px;color:#2C2C2C;font-family:'Inter',sans-serif;font-size:14px;padding:8px 11px;outline:none;min-width:90px;}
 .set-input:focus{border-color:rgba(90,122,98,.45);}
 .toggle{position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;}
 .toggle input{opacity:0;width:0;height:0;}
@@ -133,12 +135,12 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .toggle input:checked + .ttrack{background:rgba(90,122,98,.38);border-color:var(--cyan);}
 .tthumb{position:absolute;width:18px;height:18px;background:var(--cyan);border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 0 6px rgba(90,122,98,.4);}
 .toggle input:checked ~ .tthumb{left:22px;}
-.btn-save{padding:12px 28px;background:linear-gradient(135deg,var(--sage),#5A7A62);border:1px solid rgba(90,122,98,.5);color:#ffffff;font-family:'Playfair Display',monospace;font-size:11px;letter-spacing:1px;border-radius:9px;cursor:pointer;transition:.2s;margin-top:8px;font-weight:700;}
+.btn-save{padding:12px 28px;background:linear-gradient(135deg,var(--sage),#5A7A62);border:1px solid rgba(90,122,98,.5);color:#ffffff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;border-radius:9px;cursor:pointer;transition:.2s;margin-top:8px;font-weight:700;}
 .btn-save:hover{background:linear-gradient(135deg,#5A7A62,#2D4A35);box-shadow:0 4px 16px rgba(90,122,98,.35);}
 
 /* Month calendar for quick day-opening */
 .month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.month-title{font-family:'Playfair Display',monospace;font-size:13px;color:var(--forest);}
+.month-title{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--forest);}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
 .cal-day-hdr{text-align:center;font-size:10px;color:rgba(90,122,98,.4);letter-spacing:1px;padding:4px 0;}
 .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid transparent;transition:.18s;position:relative;}
@@ -154,7 +156,8 @@ body{display:flex;flex-direction:column;min-height:100vh;}
 .empty-state span{font-size:40px;display:block;margin-bottom:10px;}
 </style>
 </head>
-<body>
+<body class="fl-app">
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"><span style="display:none">📅</span> My Schedule</div>
@@ -167,10 +170,16 @@ body{display:flex;flex-direction:column;min-height:100vh;}
   </div>
 </header>
 
+<div class="fl-subhero fl-console">
+  <div class="fl-subhero-inner">
+    <div class="fl-kicker" style="margin-bottom:10px;">Calendar module</div>
+    <h1 class="fl-subtitle">📅 Schedule Manager</h1>
+    <p class="fl-subdesc">Control your availability and manage bookings</p>
+  </div>
+</div>
+
 <div class="pw">
   <button class="btn-back" onclick="window.location.href='choose-year.html'">← Dashboard</button>
-  <div class="page-title">📅 Schedule Manager</div>
-  <div class="page-subtitle">Control your availability and manage bookings</div>
 
   <!-- TABS -->
   <div class="tabs">

@@ -164,6 +164,57 @@ body.fl-app .sch-dot { background:var(--fl-gold) !important; border-radius:2px !
 /* ---------- section labels ---------- */
 body.fl-app .sec-lbl { font-family:'JetBrains Mono',monospace !important; letter-spacing:2px !important; }
 
+/* ---------- generic page chrome (sub-pages without a custom hero) ---------- */
+body.fl-app .page-title {
+  font-family:'Space Grotesk',sans-serif !important; letter-spacing:-.5px !important;
+  color:var(--fl-forest-deep) !important;
+}
+body.fl-app .page-subtitle { color:var(--fl-muted) !important; }
+body.fl-app .btn-back {
+  font-family:'Inter',sans-serif; font-weight:700; border-radius:10px;
+  border:1.5px solid var(--fl-line-strong); background:var(--fl-paper); box-shadow:none;
+}
+body.fl-app .btn-back:hover { background:var(--fl-forest-deep); color:var(--fl-cream); border-color:var(--fl-forest-deep); }
+
+/* ---------- generic cards / stats used across sub-pages ---------- */
+body.fl-app .card, body.fl-app .stat-card, body.fl-app .patient-card,
+body.fl-app .hub-card, body.fl-app .video-card, body.fl-app .assign-item {
+  border-radius:16px !important; box-shadow:none !important;
+  border:1px solid var(--fl-line-strong) !important;
+}
+body.fl-app .stat-card { text-align:center; }
+body.fl-app .stat-card h3 {
+  font-family:'JetBrains Mono',monospace !important; color:var(--fl-forest-deep) !important;
+}
+body.fl-app .stat-card p { color:var(--fl-muted) !important; font-size:11px; }
+body.fl-app .patient-name, body.fl-app .patient-card h3,
+body.fl-app .sch-name, body.fl-app .video-card .vid-info h3 {
+  font-family:'Space Grotesk',sans-serif !important;
+}
+body.fl-app .progress-pct, body.fl-app .big-num {
+  font-family:'JetBrains Mono',monospace !important;
+  color:var(--fl-forest) !important; text-shadow:none !important;
+}
+body.fl-app .prog-label { font-family:'JetBrains Mono',monospace !important; }
+body.fl-app input[type=text], body.fl-app input[type=email], body.fl-app input[type=password],
+body.fl-app input[type=number], body.fl-app input[type=tel], body.fl-app textarea, body.fl-app select {
+  border-radius:10px !important; box-shadow:none !important; border:1.5px solid var(--fl-line-strong) !important;
+  font-family:'Inter',sans-serif;
+}
+body.fl-app input:focus, body.fl-app textarea:focus, body.fl-app select:focus {
+  border-color:var(--fl-sage) !important; box-shadow:0 0 0 3px rgba(90,122,98,.12) !important;
+}
+body.fl-app .badge { font-family:'JetBrains Mono',monospace; letter-spacing:1px; border-radius:6px !important; }
+
+/* ---------- lightweight sub-page hero (used on hub/report pages) ---------- */
+.fl-subhero { position:relative; z-index:1; padding:30px 24px 34px; }
+.fl-subhero-inner { max-width:1080px; margin:0 auto; position:relative; z-index:1; }
+.fl-subtitle {
+  font-size:clamp(20px,3.5vw,30px); font-weight:700; color:#FAF7F2;
+  letter-spacing:-.6px; line-height:1.2; font-family:'Space Grotesk',sans-serif;
+}
+.fl-subdesc { font-size:13px; color:rgba(250,247,242,.55); margin-top:6px; max-width:560px; }
+
 /* ---------- focus & motion ---------- */
 body.fl-app a:focus-visible, body.fl-app button:focus-visible { outline:2px solid var(--fl-gold); outline-offset:2px; }
 @media (prefers-reduced-motion: reduce) { body.fl-app *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }

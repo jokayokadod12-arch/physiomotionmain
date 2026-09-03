@@ -1,0 +1,169 @@
+/* ============================================================
+   FUNCTION LAB — shared skin for app screens
+   (login, patient dashboard, doctor dashboard, student dashboard)
+   Loaded AFTER theme.css / mobile.css — only affects body.fl-app
+============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+body.fl-app {
+  --fl-forest-deep:#152A1D; --fl-forest:#2D4A35; --fl-forest-mid:#3C6249;
+  --fl-sage:#5A7A62; --fl-sage-light:#84AA8C; --fl-sage-pale:#C8DAC9;
+  --fl-gold:#B8943F; --fl-gold-light:#D9B36A;
+  --fl-cream:#FAF7F2; --fl-paper:#FBF9F4;
+  --fl-ink:#17241B; --fl-ink-soft:#3E4A41; --fl-muted:#7C877E;
+  --fl-line:rgba(45,74,53,.16); --fl-line-strong:rgba(45,74,53,.3);
+  font-family:'Inter',sans-serif;
+  color:var(--fl-ink);
+  background:var(--fl-cream);
+}
+body.fl-app .display,
+body.fl-app h1, body.fl-app h2, body.fl-app h3 { font-family:'Space Grotesk',sans-serif; }
+body.fl-app .mono { font-family:'JetBrains Mono',monospace; }
+
+/* ---------- blueprint backdrop ---------- */
+body.fl-app::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(var(--fl-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fl-line) 1px, transparent 1px);
+  background-size:56px 56px;
+  opacity:.3;
+  mask-image:radial-gradient(ellipse 75% 55% at 50% 0%, #000 0%, transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 0%, #000 0%, transparent 75%);
+}
+
+/* ---------- signature strip ---------- */
+.fl-sig {
+  position:relative; z-index:5;
+  background:var(--fl-forest-deep); color:var(--fl-sage-pale);
+  text-align:center; padding:8px 16px;
+  font-family:'JetBrains Mono',monospace; font-size:10.5px;
+  letter-spacing:2.2px; font-weight:500;
+}
+.fl-sig b { color:var(--fl-gold-light); font-weight:600; }
+
+/* ---------- header override ---------- */
+body.fl-app .site-header {
+  position:relative; z-index:50;
+  background:rgba(250,247,242,.9);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--fl-line-strong);
+  box-shadow:none;
+}
+body.fl-app .site-header .logo {
+  font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:-.2px;
+  color:var(--fl-forest-deep);
+}
+body.fl-app .logo-img { border-radius:10px; border:1px solid var(--fl-line-strong); }
+body.fl-app .btn-header {
+  font-family:'Inter',sans-serif; font-weight:700; font-size:12px;
+  border-radius:10px; border:1.5px solid var(--fl-line-strong);
+  background:var(--fl-cream); color:var(--fl-ink-soft);
+  box-shadow:none; transition:all .2s;
+}
+body.fl-app .btn-header:hover {
+  background:var(--fl-forest-deep); color:var(--fl-cream); border-color:var(--fl-forest-deep);
+  transform:translateY(-2px);
+}
+body.fl-app .btn-back {
+  font-family:'Inter',sans-serif; font-weight:700; border-radius:10px;
+  border:1.5px solid var(--fl-line-strong); background:var(--fl-cream); box-shadow:none;
+}
+body.fl-app .btn-back:hover { background:var(--fl-forest-deep); color:var(--fl-cream); border-color:var(--fl-forest-deep); }
+
+/* ---------- console / hero panel ---------- */
+.fl-console {
+  position:relative; overflow:hidden;
+  background:linear-gradient(150deg, var(--fl-forest-deep) 0%, var(--fl-forest) 65%, var(--fl-forest-mid) 100%);
+}
+.fl-console::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(250,247,242,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250,247,242,.06) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image:radial-gradient(ellipse 70% 90% at 20% 30%, #000 0%, transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 90% at 20% 30%, #000 0%, transparent 70%);
+}
+.fl-console::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, transparent, var(--fl-sage-pale), var(--fl-gold-light), var(--fl-sage-pale), transparent);
+}
+.fl-kicker {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:500;
+  letter-spacing:1.8px; text-transform:uppercase; color:var(--fl-sage-pale);
+}
+.fl-kicker::before { content:''; width:6px; height:6px; background:var(--fl-gold-light); transform:rotate(45deg); flex-shrink:0; }
+
+/* ---------- readout chips (stat numbers) ---------- */
+body.fl-app .hw-stat, body.fl-app .dhs, body.fl-app .qsc {
+  background:rgba(250,247,242,.07) !important;
+  border:1px solid rgba(250,247,242,.16) !important;
+  border-radius:12px !important;
+}
+body.fl-app .qsc { background:var(--fl-paper) !important; border-color:var(--fl-line-strong) !important; }
+body.fl-app .qsc::after { display:none; }
+body.fl-app .hw-stat-n, body.fl-app .dhs-n {
+  font-family:'JetBrains Mono',monospace !important; font-weight:600 !important;
+  letter-spacing:0 !important; color:var(--fl-cream) !important;
+}
+body.fl-app .hw-stat-l, body.fl-app .dhs-l { color:rgba(250,247,242,.55) !important; }
+body.fl-app .qsc-n {
+  font-family:'JetBrains Mono',monospace !important; font-weight:600 !important;
+  letter-spacing:0 !important; color:var(--fl-forest-deep) !important;
+}
+body.fl-app .qsc-l { color:var(--fl-muted) !important; }
+
+body.fl-app .hw-badge, body.fl-app .dh-badge {
+  font-family:'JetBrains Mono',monospace; letter-spacing:1.6px; border-radius:6px;
+}
+body.fl-app .hw-name, body.fl-app .dh-info h2 { font-family:'Space Grotesk',sans-serif; letter-spacing:-.6px; }
+
+/* ---------- module tiles (dash-card / module-card) ---------- */
+body.fl-app .dash-card, body.fl-app .module-card {
+  border-radius:16px !important;
+  border:1px solid var(--fl-line-strong) !important;
+  box-shadow:none !important;
+  position:relative;
+}
+body.fl-app .dash-card::before, body.fl-app .module-card::before { border-radius:16px 16px 0 0 !important; height:3px !important; }
+body.fl-app .dash-card:hover, body.fl-app .module-card:hover {
+  box-shadow:0 16px 40px rgba(21,42,29,.12) !important;
+  border-color:var(--fl-line-strong) !important;
+}
+body.fl-app .dc-icon, body.fl-app .mc-icon {
+  border-radius:12px !important; background:var(--fl-paper) !important; border:1px solid var(--fl-line-strong) !important;
+}
+body.fl-app .dc-title, body.fl-app .mc-title { font-family:'Space Grotesk',sans-serif !important; letter-spacing:-.1px !important; color:var(--fl-forest-deep) !important; }
+body.fl-app .dc-desc, body.fl-app .mc-desc { color:var(--fl-muted) !important; }
+
+.tile-code {
+  position:absolute; top:12px; left:14px; z-index:2;
+  font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:600;
+  letter-spacing:1px; color:var(--fl-sage);
+  background:var(--fl-paper); border:1px solid var(--fl-line-strong);
+  border-radius:5px; padding:2px 6px;
+}
+
+/* ---------- tip / field-note card ---------- */
+body.fl-app .tip-card { border-radius:16px !important; box-shadow:none !important; position:relative; overflow:hidden; }
+body.fl-app .tip-card::before {
+  content:'FIELD NOTE'; position:absolute; top:12px; right:16px;
+  font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px;
+  color:rgba(250,247,242,.35);
+}
+body.fl-app .tip-text h4 { font-family:'Space Grotesk',sans-serif !important; }
+
+/* ---------- schedule list (doctor) ---------- */
+body.fl-app .schedule-card { border-radius:16px !important; box-shadow:none !important; border:1px solid var(--fl-line-strong) !important; }
+body.fl-app .sch-title { font-family:'Space Grotesk',sans-serif !important; }
+body.fl-app .sch-time { font-family:'JetBrains Mono',monospace !important; }
+body.fl-app .sch-dot { background:var(--fl-gold) !important; border-radius:2px !important; transform:rotate(45deg); }
+
+/* ---------- section labels ---------- */
+body.fl-app .sec-lbl { font-family:'JetBrains Mono',monospace !important; letter-spacing:2px !important; }
+
+/* ---------- focus & motion ---------- */
+body.fl-app a:focus-visible, body.fl-app button:focus-visible { outline:2px solid var(--fl-gold); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce) { body.fl-app *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }

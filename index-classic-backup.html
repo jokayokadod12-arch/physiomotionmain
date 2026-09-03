@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="theme-color" content="#1D3028">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physio Motion">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Physio Motion — Premium Physiotherapy Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+  --cream:#FAF7F2;--cream-warm:#F5EFE4;--cream-deep:#EDE3D4;
+  --sage:#5A7A62;--sage-light:#7A9E82;--sage-pale:#C8DAC9;
+  --sage-dim:rgba(90,122,98,.1);
+  --forest:#2D4A35;--forest-deep:#1A3020;
+  --gold:#B8943F;--gold-light:#D4AF6A;--gold-pale:rgba(184,148,63,.12);
+  --charcoal:#2C2C2C;--charcoal-mid:#4A4A4A;
+  --muted:#8A8A8A;--border:rgba(90,122,98,.15);
+}
+body{background:var(--cream);color:var(--charcoal);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at -5% 0%,rgba(90,122,98,.09) 0%,transparent 55%),
+  radial-gradient(ellipse 70% 80% at 105% 100%,rgba(184,148,63,.07) 0%,transparent 50%),
+  radial-gradient(ellipse 50% 50% at 80% 20%,rgba(90,122,98,.05) 0%,transparent 45%);}
+.bot{position:fixed;pointer-events:none;z-index:0;border-radius:50%;}
+.bot-1{width:600px;height:600px;background:radial-gradient(circle,rgba(90,122,98,.1) 0%,transparent 65%);top:-200px;right:-150px;animation:f1 22s ease-in-out infinite alternate;}
+.bot-2{width:400px;height:400px;background:radial-gradient(circle,rgba(184,148,63,.07) 0%,transparent 65%);bottom:-120px;left:-100px;animation:f2 18s ease-in-out infinite alternate;}
+@keyframes f1{to{transform:translate(-60px,80px) scale(1.1);}}
+@keyframes f2{to{transform:translate(50px,-60px) scale(.95);}}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(250,247,242,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);box-shadow:0 2px 20px rgba(44,44,44,.05);}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--forest);display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--forest),var(--sage));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(45,74,53,.25);}
+.nav-r{display:flex;align-items:center;gap:10px;}
+.npill{padding:9px 22px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .22s;display:inline-flex;align-items:center;gap:7px;border:none;}
+.nlogin{background:transparent;color:var(--forest);border:1.5px solid rgba(45,74,53,.25);}
+.nlogin:hover{background:var(--sage-dim);border-color:var(--sage);transform:translateY(-1px);}
+.ncta{background:linear-gradient(135deg,var(--forest-deep),var(--sage));color:#fff;box-shadow:0 4px 16px rgba(45,74,53,.3);}
+.ncta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(45,74,53,.4);}
+.ninstall{background:var(--gold-pale);color:var(--gold);border:1px solid rgba(184,148,63,.3);font-size:12px;padding:8px 14px;}
+.ninstall:hover{background:rgba(184,148,63,.18);transform:translateY(-1px);}
+@media(max-width:640px){nav{padding:0 18px;height:60px;}.nav-logo{font-size:15px;}.npill{padding:8px 14px;font-size:12px;}}
+
+/* Install button — only show on mobile */
+#navInstallBtn, #heroInstallBtn, #installBanner {
+  display: none;
+}
+@media(max-width:768px),(hover:none) {
+  #navInstallBtn  { display: inline-flex; }
+  #heroInstallBtn { display: inline-flex; }
+  #installBanner  { display: flex; }
+}
+/* Already installed as PWA → hide (handled by JS too) */
+@media(display-mode: standalone) {
+  #navInstallBtn, #heroInstallBtn, #installBanner { display: none !important; }
+}
+
+.hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;max-width:1200px;margin:0 auto;padding:100px 40px 60px;gap:60px;}
+@media(max-width:900px){.hero{grid-template-columns:1fr;text-align:center;padding:90px 24px 60px;gap:40px;}.hero-vis{order:-1;}.hero-cta{justify-content:center;}.why-grid{grid-template-columns:1fr!important;}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;background:var(--gold-pale);border:1px solid rgba(184,148,63,.25);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:22px;opacity:0;animation:fadeUp .7s .2s ease forwards;}
+.ebdot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(42px,5.5vw,72px);font-weight:900;line-height:1.05;letter-spacing:-1.5px;color:var(--forest-deep);margin-bottom:10px;opacity:0;animation:fadeUp .9s .35s ease forwards;}
+.hero-title em{font-style:italic;background:linear-gradient(135deg,var(--sage) 0%,var(--sage-light) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-desc{font-size:clamp(15px,2vw,18px);font-weight:400;line-height:1.7;color:var(--charcoal-mid);max-width:480px;margin-bottom:36px;opacity:0;animation:fadeUp .8s .5s ease forwards;}
+@media(max-width:900px){.hero-desc{margin:0 auto 36px;}}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .65s ease forwards;margin-bottom:48px;}
+.bh1{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;border-radius:100px;background:linear-gradient(135deg,var(--forest-deep),var(--sage));color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;text-decoration:none;border:none;cursor:pointer;box-shadow:0 8px 32px rgba(45,74,53,.35);transition:all .25s cubic-bezier(.34,1.4,.64,1);}
+.bh1:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 16px 48px rgba(45,74,53,.45);}
+.bh2{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:100px;background:white;color:var(--forest);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;text-decoration:none;border:1.5px solid var(--border);cursor:pointer;box-shadow:0 4px 16px rgba(44,44,44,.08);transition:all .22s;}
+.bh2:hover{border-color:var(--sage);background:var(--sage-dim);transform:translateY(-2px);}
+.bh3{display:inline-flex;align-items:center;gap:8px;padding:15px 28px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;text-decoration:none;border:1px solid rgba(184,148,63,.3);cursor:pointer;transition:all .22s;}
+.bh3:hover{background:rgba(184,148,63,.2);transform:translateY(-2px);}
+.hmetrics{display:flex;background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(44,44,44,.08);opacity:0;animation:fadeUp .7s .8s ease forwards;}
+.hm{flex:1;padding:18px 20px;text-align:center;border-right:1px solid var(--border);}
+.hm:last-child{border-right:none;}
+.hm-n{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--forest);display:block;letter-spacing:-.5px;}
+.hm-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-top:3px;}
+@media(max-width:500px){.hmetrics{flex-wrap:wrap;}.hm{flex:0 0 50%;min-width:0;}.hm:nth-child(2){border-right:none;}.hm:nth-child(3){border-top:1px solid var(--border);}.hm:nth-child(4){border-right:none;border-top:1px solid var(--border);}}
+
+.hero-vis{position:relative;opacity:0;animation:scaleIn 1s .4s ease forwards;}
+
+/* ── ANATOMICAL CARD ── */
+.anat-card{
+  background:white; border:1px solid var(--border); border-radius:28px;
+  padding:24px 24px 20px; overflow:hidden; position:relative;
+  box-shadow:0 24px 80px rgba(44,44,44,.12),0 4px 16px rgba(44,44,44,.06);
+}
+.anat-shimmer{
+  position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg,var(--sage-pale),var(--sage),var(--gold-light),var(--sage),var(--sage-pale));
+  background-size:200% 100%; animation:shimmer 3s linear infinite;
+}
+@keyframes shimmer{to{background-position:-200% center;}}
+
+/* Head row */
+.anat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;margin-top:4px;}
+.anat-head-left{display:flex;align-items:center;gap:12px;}
+.anat-pulse-ring{
+  width:38px;height:38px;border-radius:12px;
+  background:var(--sage-dim);border:1px solid rgba(90,122,98,.2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.anat-pulse-dot{
+  width:12px;height:12px;border-radius:50%;background:var(--sage);
+  box-shadow:0 0 0 0 rgba(90,122,98,.5);
+  animation:pulseDot 2s ease-in-out infinite;
+}
+@keyframes pulseDot{
+  0%{box-shadow:0 0 0 0 rgba(90,122,98,.5);}
+  70%{box-shadow:0 0 0 8px rgba(90,122,98,.0);}
+  100%{box-shadow:0 0 0 0 rgba(90,122,98,.0);}
+}
+.anat-head-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);}
+.anat-head-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.anat-status{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:100px;
+  background:rgba(90,122,98,.08);border:1px solid rgba(90,122,98,.2);
+  font-size:11px;font-weight:700;color:var(--sage);
+}
+.anat-status-dot{width:6px;height:6px;border-radius:50%;background:var(--sage);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+/* Body area */
+.anat-body-wrap{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+
+/* SVG figure */
+.anat-figure{
+  position:relative;flex-shrink:0;
+  width:120px;
+  background:var(--cream-warm);border-radius:16px;
+  border:1px solid var(--border);
+  padding:10px 0;
+  display:flex;align-items:center;justify-content:center;
+}
+.body-svg{width:90px;height:auto;display:block;}
+
+/* Joint dots */
+.jdot{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:var(--sage-pale);border:2px solid var(--sage);
+  cursor:pointer;transition:all .2s;
+}
+.jdot:hover{transform:scale(1.5);z-index:10;}
+.jdot-active{background:var(--sage);border-color:var(--forest);}
+.jdot-warn{background:rgba(200,131,42,.15);border-color:var(--warning);}
+.jring{
+  position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid var(--sage-pale);opacity:.5;
+  animation:jringPulse 2.5s ease-in-out infinite;
+}
+.jdot-active .jring{border-color:var(--sage);opacity:.6;}
+.jdot-warn .jring{border-color:var(--warning);opacity:.5;}
+@keyframes jringPulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.6);opacity:0;}}
+
+/* Metrics panel */
+.anat-metrics{flex:1;display:flex;flex-direction:column;gap:6px;}
+.am-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--sage);margin-bottom:2px;}
+.am-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--cream-warm);border-radius:10px;border:1px solid var(--border);}
+.am-item.am-warn{background:rgba(200,131,42,.06);border-color:rgba(200,131,42,.2);}
+.am-joint{font-size:12px;font-weight:600;color:var(--charcoal-mid);}
+.am-warn .am-joint{color:var(--warning);}
+.am-arc-wrap{display:flex;align-items:center;gap:4px;}
+.am-arc{width:34px;height:34px;}
+.am-deg{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--sage);}
+.am-divider{height:1px;background:var(--border);margin:4px 0;}
+.am-score-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold);}
+.am-score-ring-wrap{position:relative;width:64px;height:64px;margin:4px auto 0;}
+.am-score-ring{width:64px;height:64px;transform:rotate(-90deg);}
+.am-score-val{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--sage);
+}
+
+/* Footer */
+.anat-footer{
+  display:flex;gap:14px;justify-content:center;
+  padding-top:14px;border-top:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.af-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--charcoal-mid);}
+.af-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.af-green{background:#3D8B5B;}
+.af-sage{background:var(--sage);}
+.af-gold{background:var(--gold);}
+
+/* Floating badge */
+.float-b{
+  position:absolute;bottom:-16px;right:-16px;
+  background:white;border:1px solid var(--border);
+  border-radius:14px;padding:11px 15px;
+  box-shadow:0 8px 30px rgba(44,44,44,.14);
+  display:flex;align-items:center;gap:10px;
+  animation:fb 4s ease-in-out infinite;
+}
+@keyframes fb{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.fb-ico{font-size:22px;}
+.fb-txt strong{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);display:block;}
+.fb-txt span{font-size:11px;color:var(--muted);}
+
+@media(max-width:900px){
+  .anat-card{padding:20px;}
+  .anat-figure{width:100px;}
+  .body-svg{width:76px;}
+}
+
+.how-wrap{position:relative;z-index:1;background:var(--cream-warm);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:90px 40px;overflow:hidden;}
+.how-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--sage-pale),var(--gold-light),var(--sage-pale),transparent);}
+.how-inner{max-width:1100px;margin:0 auto;}
+.sec-ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sage);margin-bottom:14px;}
+.sec-t{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,46px);font-weight:700;line-height:1.15;letter-spacing:-.8px;color:var(--forest-deep);}
+.sec-t em{font-style:italic;color:var(--sage);}
+.sec-d{font-size:15px;line-height:1.75;color:var(--charcoal-mid);max-width:520px;margin-bottom:50px;font-weight:400;}
+.steps-g{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+@media(max-width:768px){.steps-g{grid-template-columns:1fr 1fr;}.s-con{display:none;}}
+@media(max-width:480px){.steps-g{grid-template-columns:1fr;}}
+.s-con{position:absolute;top:36px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--sage-pale),var(--sage-pale),transparent);pointer-events:none;}
+.step{text-align:center;padding:0 24px 40px;}
+.step-n{width:72px;height:72px;border-radius:50%;background:white;border:1.5px solid var(--sage-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--sage);position:relative;z-index:1;box-shadow:0 4px 16px rgba(90,122,98,.12);}
+.step-ti{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:10px;}
+.step-d{font-size:13px;color:var(--muted);line-height:1.65;}
+
+.feat-wrap{position:relative;z-index:1;padding:100px 40px;max-width:1200px;margin:0 auto;}
+@media(max-width:768px){.feat-wrap{padding:70px 20px;}}
+@media(max-width:768px){.sp-row{grid-template-columns:1fr!important;}}
+@media(max-width:768px){.fc-grid-3{grid-template-columns:1fr!important;}}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
+.fc{background:white;border:1px solid var(--border);border-radius:20px;padding:32px 28px;transition:all .28s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;}
+.fc::after{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--sage-pale),var(--sage),var(--sage-pale));opacity:0;transition:opacity .28s;}
+.fc:hover{transform:translateY(-6px);border-color:var(--sage-pale);box-shadow:0 20px 60px rgba(90,122,98,.14);}
+.fc:hover::after{opacity:1;}
+.fc-ico{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--sage-dim),rgba(90,122,98,.04));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px;transition:all .28s;}
+.fc:hover .fc-ico{background:linear-gradient(135deg,rgba(90,122,98,.2),rgba(90,122,98,.07));border-color:var(--sage-pale);transform:scale(1.08);}
+.fc-t{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--forest);margin-bottom:10px;letter-spacing:-.2px;}
+.fc-d{font-size:13.5px;line-height:1.7;color:var(--charcoal-mid);font-weight:400;}
+.fc-tag{display:inline-block;margin-top:18px;padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.5px;border:1px solid rgba(90,122,98,.15);}
+
+.roles-wrap{background:var(--forest-deep);padding:100px 40px;position:relative;z-index:1;overflow:hidden;}
+.roles-wrap::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 60% at 0% 50%,rgba(90,122,98,.2) 0%,transparent 55%),radial-gradient(ellipse 50% 50% at 100% 50%,rgba(184,148,63,.1) 0%,transparent 50%);}
+.ri{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+.rt{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,44px);font-weight:700;color:#FAF7F2;text-align:center;margin-bottom:14px;letter-spacing:-.5px;}
+.rt em{font-style:italic;color:var(--sage-pale);}
+.rs{text-align:center;color:rgba(250,247,242,.45);font-size:15px;margin-bottom:56px;line-height:1.6;}
+.rg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;}
+@media(max-width:1000px){.rg{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.rg{grid-template-columns:1fr;}}
+.rc{background:rgba(250,247,242,.04);border:1px solid rgba(250,247,242,.1);border-radius:24px;padding:40px 36px;transition:all .28s;position:relative;overflow:hidden;}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--sage-pale),transparent);opacity:0;transition:opacity .28s;}
+.rc:hover{background:rgba(250,247,242,.07);border-color:rgba(250,247,242,.18);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.rc:hover::before{opacity:1;}
+.rc-ico{font-size:44px;margin-bottom:20px;display:block;}
+.rc-t{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#FAF7F2;margin-bottom:6px;letter-spacing:-.3px;}
+.rc-s{font-size:11px;color:var(--sage-pale);letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;font-weight:600;}
+.rc-li{list-style:none;display:flex;flex-direction:column;gap:11px;}
+.rc-li li{display:flex;align-items:flex-start;gap:11px;font-size:14px;color:rgba(250,247,242,.65);line-height:1.55;}
+.rli-d{width:6px;height:6px;border-radius:50%;background:var(--sage-pale);flex-shrink:0;margin-top:5px;}
+
+footer{position:relative;z-index:1;background:var(--cream-warm);border-top:1px solid var(--border);padding:56px 40px;text-align:center;}
+.fl{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--forest);margin-bottom:8px;letter-spacing:-.3px;}
+.fb{font-size:13px;color:var(--muted);margin-bottom:4px;}
+.fn{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--sage);}
+.fline{width:160px;height:1px;margin:20px auto;background:linear-gradient(90deg,transparent,var(--sage-pale),transparent);}
+.fc2{font-size:11px;color:#B5B5B5;letter-spacing:1px;}
+
+.reveal{opacity:0;transform:translateY(20px);transition:all .65s cubic-bezier(.22,1,.36,1);}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="bot bot-1"></div>
+<div class="bot bot-2"></div>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-mark">🦴</div>
+    Physio Motion
+  </a>
+  <div class="nav-r">
+    <a href="login.html" class="npill nlogin">Sign In</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow"><span class="ebdot"></span>🇪🇬 Egypt's First All-in-One Physiotherapy Platform</div>
+    <h1 class="hero-title">Your Recovery,<br><em>Reimagined.</em></h1>
+    <p class="hero-desc">The world's most complete physiotherapy platform — combining AI motion analysis, 373 curated exercises, real-time doctor–patient chat, smart scheduling, pain AI, MMT testing, lifestyle coaching, and clinical guidelines <strong style="color:var(--forest);">all in one place</strong>. Built for Egypt. Built for the world.</p>
+    <div class="hero-cta">
+      <a href="login.html" class="bh1">✦ Start Your Journey</a>
+      <a href="#features" class="bh2">Explore Features</a>
+    </div>
+    <div class="hmetrics">
+      <div class="hm"><span class="hm-n">🥇</span><span class="hm-l">First in Egypt</span></div>
+      <div class="hm"><span class="hm-n">373</span><span class="hm-l">Exercises</span></div>
+      <div class="hm"><span class="hm-n">10+</span><span class="hm-l">AI Features</span></div>
+      <div class="hm"><span class="hm-n">☁️</span><span class="hm-l">Cloud Sync</span></div>
+    </div>
+    <!-- Why Choose Us strip -->
+    <div style="margin-top:32px;padding:20px 24px;background:rgba(90,122,98,.06);border:1px solid rgba(90,122,98,.15);border-radius:16px;">
+      <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);letter-spacing:.5px;margin-bottom:14px;text-transform:uppercase;">Why Physio Motion?</div>
+      <div class="why-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--charcoal-mid);line-height:1.5;">
+          <span style="color:var(--sage);font-size:15px;flex-shrink:0;">✓</span>
+          Everything in <strong style="color:var(--forest);">&nbsp;one platform</strong>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--charcoal-mid);line-height:1.5;">
+          <span style="color:var(--sage);font-size:15px;flex-shrink:0;">✓</span>
+          Real-time <strong style="color:var(--forest);">&nbsp;AI analysis</strong>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--charcoal-mid);line-height:1.5;">
+          <span style="color:var(--sage);font-size:15px;flex-shrink:0;">✓</span>
+          Doctor–patient <strong style="color:var(--forest);">&nbsp;live chat</strong>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--charcoal-mid);line-height:1.5;">
+          <span style="color:var(--sage);font-size:15px;flex-shrink:0;">✓</span>
+          Smart <strong style="color:var(--forest);">&nbsp;scheduling</strong>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--charcoal-mid);line-height:1.5;">
+          <span style="color:var(--sage);font-size:15px;flex-shrink:0;">✓</span>
+          Clinical-grade <strong style="color:var(--forest);">&nbsp;MMT testing</strong>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--charcoal-mid);line-height:1.5;">
+          <span style="color:var(--sage);font-size:15px;flex-shrink:0;">✓</span>
+          Install as <strong style="color:var(--forest);">&nbsp;mobile app</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-vis">
+    <!-- ── COMPELLING VALUE PROPOSITION ── -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Platform headline badge -->
+      <div style="display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:100px;background:var(--gold-pale);border:1px solid rgba(184,148,63,.3);width:fit-content;">
+        <span style="font-size:16px;">🥇</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);">Egypt's First Complete Physio Platform</span>
+      </div>
+
+      <!-- 3 value cards -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Card 1 — Patients -->
+        <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:22px 24px;box-shadow:0 8px 32px rgba(44,44,44,.07);position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--sage),var(--sage-light));border-radius:4px 0 0 4px;"></div>
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:44px;height:44px;border-radius:14px;background:var(--sage-dim);border:1px solid rgba(90,122,98,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧑‍🦽</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:6px;">For Patients</div>
+              <p style="font-size:13px;line-height:1.7;color:var(--charcoal-mid);margin:0;">Book appointments with your physio, follow your personalised exercise plan, track your recovery progress, and stay connected — all from one app, on any device.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                <span style="padding:3px 10px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:10px;font-weight:700;border:1px solid rgba(90,122,98,.18);">📅 Book Instantly</span>
+                <span style="padding:3px 10px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:10px;font-weight:700;border:1px solid rgba(90,122,98,.18);">🏃 Exercise Plans</span>
+                <span style="padding:3px 10px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:10px;font-weight:700;border:1px solid rgba(90,122,98,.18);">📈 Track Progress</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — Doctors -->
+        <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:22px 24px;box-shadow:0 8px 32px rgba(44,44,44,.07);position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--gold),var(--gold-light));border-radius:4px 0 0 4px;"></div>
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:44px;height:44px;border-radius:14px;background:var(--gold-pale);border:1px solid rgba(184,148,63,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👨‍⚕️</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:6px;">For Physiotherapists</div>
+              <p style="font-size:13px;line-height:1.7;color:var(--charcoal-mid);margin:0;">Run live AI motion analysis, assign exercise plans from 373 videos, generate nutrition plans, manage your schedule, and chat with every patient — a full clinical toolkit in your browser.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                <span style="padding:3px 10px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-size:10px;font-weight:700;border:1px solid rgba(184,148,63,.18);">🤖 AI ROM Analysis</span>
+                <span style="padding:3px 10px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-size:10px;font-weight:700;border:1px solid rgba(184,148,63,.18);">🏋️ 373 Exercises</span>
+                <span style="padding:3px 10px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-size:10px;font-weight:700;border:1px solid rgba(184,148,63,.18);">📊 Smart Scheduling</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — Students -->
+        <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:22px 24px;box-shadow:0 8px 32px rgba(44,44,44,.07);position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:linear-gradient(180deg,#9B59B6,#b47bcf);border-radius:4px 0 0 4px;"></div>
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:44px;height:44px;border-radius:14px;background:rgba(155,89,182,.1);border:1px solid rgba(155,89,182,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🎓</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--forest);margin-bottom:6px;">For Physiotherapy Students</div>
+              <p style="font-size:13px;line-height:1.7;color:var(--charcoal-mid);margin:0;">A dedicated learning space for physio students — the same clinical guidelines and manual muscle testing reference doctors use, plus lessons, anatomy, and student chat.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                <span style="padding:3px 10px;border-radius:100px;background:rgba(155,89,182,.1);color:#9B59B6;font-size:10px;font-weight:700;border:1px solid rgba(155,89,182,.18);">📚 Clinical Guidelines</span>
+                <span style="padding:3px 10px;border-radius:100px;background:rgba(155,89,182,.1);color:#9B59B6;font-size:10px;font-weight:700;border:1px solid rgba(155,89,182,.18);">💪 MMT Reference</span>
+                <span style="padding:3px 10px;border-radius:100px;background:rgba(155,89,182,.1);color:#9B59B6;font-size:10px;font-weight:700;border:1px solid rgba(155,89,182,.18);">🎓 More Coming Soon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Why unique -->
+        <div style="background:linear-gradient(135deg,var(--forest-deep),var(--forest));border-radius:20px;padding:22px 24px;box-shadow:0 8px 32px rgba(45,74,53,.25);position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(250,247,242,.05);"></div>
+          <div style="display:flex;align-items:flex-start;gap:14px;position:relative;z-index:1;">
+            <div style="width:44px;height:44px;border-radius:14px;background:rgba(250,247,242,.12);border:1px solid rgba(250,247,242,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">✨</div>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#FAF7F2;margin-bottom:6px;">Everything in One Place</div>
+              <p style="font-size:13px;line-height:1.7;color:rgba(250,247,242,.75);margin:0;">No more juggling between apps. Physio Motion is the first platform in Egypt — and one of very few worldwide — that combines AI motion analysis, clinical guidelines, MMT testing, nutrition planning, real-time chat, and smart scheduling in a single tool.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="how-wrap" id="how">
+  <div class="how-inner">
+    <div style="text-align:center;margin-bottom:50px;">
+      <div class="sec-ey" style="justify-content:center;">✦ The Process</div>
+      <h2 class="sec-t" style="text-align:center;">From first session to full <em>recovery</em></h2>
+    </div>
+    <div class="steps-g">
+      <div class="s-con"></div>
+      <div class="step reveal"><div class="step-n">01</div><div class="step-ti">Create Account</div><div class="step-d">Doctor, Patient, or College Student — register in seconds. Profile, history, and data sync securely to the cloud.</div></div>
+      <div class="step reveal" style="transition-delay:.1s"><div class="step-n">02</div><div class="step-ti">Begin Session</div><div class="step-d">AI camera tracks your body in real-time using TensorFlow MoveNet with clinical accuracy.</div></div>
+      <div class="step reveal" style="transition-delay:.2s"><div class="step-n">03</div><div class="step-ti">Assign & Follow</div><div class="step-d">Doctors assign video exercise plans. Patients complete them in-app with progress tracking.</div></div>
+      <div class="step reveal" style="transition-delay:.3s"><div class="step-n">04</div><div class="step-ti">Save & Report</div><div class="step-d">Capture session photos, generate PDF reports, and store everything in your cloud database.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="feat-wrap" id="features">
+  <div style="text-align:center;margin-bottom:60px;">
+    <div class="sec-ey" style="justify-content:center;">✦ Platform Pages</div>
+    <h2 class="sec-t" style="text-align:center;">Everything in one <em>platform</em></h2>
+    <p style="font-size:15px;color:var(--charcoal-mid);max-width:520px;margin:12px auto 0;line-height:1.7;">Each page is built for a specific clinical purpose — here's what makes each one powerful.</p>
+  </div>
+
+  <!-- SPOTLIGHT ROWS -->
+  <div style="display:flex;flex-direction:column;gap:32px;max-width:1100px;margin:0 auto;">
+
+    <!-- ROM Analyzer -->
+    <div class="sp-row reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;background:white;border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:var(--shadow);">
+      <div style="padding:40px 36px;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:100px;background:var(--sage-dim);border:1px solid rgba(90,122,98,.2);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:18px;">🤖 AI-Powered · Desktop Only</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--forest);margin-bottom:12px;letter-spacing:-0.3px;">ROM Analyzer</h3>
+        <p style="font-size:14px;line-height:1.75;color:var(--charcoal-mid);margin-bottom:20px;">Real-time range-of-motion analysis using TensorFlow MoveNet AI. Detects 17 body keypoints via webcam, calculates 6 joint angles with clinically accurate formulas, and generates annotated PDF reports — all without any wearables.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">17 Keypoints</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-size:11px;font-weight:600;border:1px solid rgba(184,148,63,.2);">PDF Reports</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">6 Joint Types</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">Cloud Sync</span>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--cream-warm),var(--cream-deep));padding:40px;display:flex;align-items:center;justify-content:center;min-height:240px;">
+        <div style="text-align:center;">
+          <div style="font-size:72px;margin-bottom:16px;">🎯</div>
+          <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--forest);">142°</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1px;">Knee Flexion · Live</div>
+          <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <div style="padding:6px 14px;background:white;border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--sage);font-weight:600;">Shoulder 124°</div>
+            <div style="padding:6px 14px;background:white;border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--gold);font-weight:600;">Elbow ⚠ 88°</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exercise Library + Assignment -->
+    <div class="sp-row reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;background:white;border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:var(--shadow);">
+      <div style="background:linear-gradient(135deg,var(--forest-deep),var(--forest));padding:40px;display:flex;flex-direction:column;gap:12px;min-height:240px;justify-content:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage-pale);margin-bottom:4px;">373 Videos</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <span style="padding:8px 16px;background:rgba(90,122,98,.25);border-radius:10px;color:#FAF7F2;font-size:13px;font-weight:600;">💪 Strengthening</span>
+          <span style="padding:8px 16px;background:rgba(90,122,98,.18);border-radius:10px;color:rgba(250,247,242,.8);font-size:13px;font-weight:600;">🧘 Flexibility</span>
+          <span style="padding:8px 16px;background:rgba(90,122,98,.12);border-radius:10px;color:rgba(250,247,242,.7);font-size:13px;font-weight:600;">⚡ Mobility</span>
+          <span style="padding:8px 16px;background:rgba(184,148,63,.2);border-radius:10px;color:var(--gold-light);font-size:13px;font-weight:600;">🩹 Pain Relief</span>
+          <span style="padding:8px 16px;background:rgba(90,122,98,.12);border-radius:10px;color:rgba(250,247,242,.7);font-size:13px;font-weight:600;">⚖ Balance</span>
+          <span style="padding:8px 16px;background:rgba(90,122,98,.12);border-radius:10px;color:rgba(250,247,242,.7);font-size:13px;font-weight:600;">🫁 Breathing</span>
+        </div>
+        <div style="font-size:12px;color:rgba(250,247,242,.5);margin-top:8px;">8 exercise types × 8 body regions</div>
+      </div>
+      <div style="padding:40px 36px;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:100px;background:var(--sage-dim);border:1px solid rgba(90,122,98,.2);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:18px;">🏋️ Exercise System</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--forest);margin-bottom:12px;letter-spacing:-0.3px;">Video Library & Assignment</h3>
+        <p style="font-size:14px;line-height:1.75;color:var(--charcoal-mid);margin-bottom:20px;">Browse 373 curated physiotherapy videos organised by type and body region. Doctors select multiple videos, add personalised notes, and send complete exercise plans. Patients watch, complete, and track progress — all in-app.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">Multi-Select Plans</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">Doctor Notes</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-size:11px;font-weight:600;border:1px solid rgba(184,148,63,.2);">Progress Tracking</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointments + Scheduling -->
+    <div class="sp-row reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;background:white;border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:var(--shadow);">
+      <div style="padding:40px 36px;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:100px;background:var(--sage-dim);border:1px solid rgba(90,122,98,.2);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:18px;">📅 Smart Scheduling</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--forest);margin-bottom:12px;letter-spacing:-0.3px;">Appointments & Booking</h3>
+        <p style="font-size:14px;line-height:1.75;color:var(--charcoal-mid);margin-bottom:20px;">Patients browse live doctor schedules and book confirmed slots instantly. Doctors control their availability, set session durations, enable auto-accept, or manually approve each booking. Full history with past/upcoming views for both sides.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">Auto-Accept Toggle</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--sage-dim);color:var(--sage);font-size:11px;font-weight:600;border:1px solid rgba(90,122,98,.2);">Live Calendar</span>
+          <span style="padding:4px 12px;border-radius:100px;background:var(--gold-pale);color:var(--gold);font-size:11px;font-weight:600;border:1px solid rgba(184,148,63,.2);">Accept / Reject</span>
+        </div>
+      </div>
+      <div style="background:var(--cream-warm);padding:32px;min-height:240px;display:flex;flex-direction:column;gap:10px;justify-content:center;">
+        <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow-sm);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--forest);">Mon 28 Apr · 10:00</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">First Visit · 60 min</div>
+          </div>
+          <span style="padding:4px 10px;border-radius:100px;background:rgba(90,122,98,.1);border:1px solid rgba(90,122,98,.2);font-size:11px;font-weight:700;color:var(--sage);">Confirmed</span>
+        </div>
+        <div style="background:white;border-radius:12px;border:1px solid rgba(184,148,63,.2);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow-sm);border-left:3px solid var(--gold);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--forest);">Wed 30 Apr · 14:00</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">ROM Check · 45 min</div>
+          </div>
+          <span style="padding:4px 10px;border-radius:100px;background:rgba(184,148,63,.12);border:1px solid rgba(184,148,63,.3);font-size:11px;font-weight:700;color:var(--gold);">⏳ Pending</span>
+        </div>
+        <div style="background:white;border-radius:12px;border:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow-sm);opacity:.6;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--forest);">Fri 18 Apr · 09:00</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Follow-up · 30 min</div>
+          </div>
+          <span style="padding:4px 10px;border-radius:100px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.2);font-size:11px;font-weight:700;color:#4caf50;">✅ Completed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clinical Tools Grid -->
+    <div class="reveal fc-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <div class="fc"><div class="fc-ico">🩹</div><div class="fc-t">Pain Helper</div><div class="fc-d">Patients describe where it hurts, pick a specialist, and send a pain report in seconds — no forms, no phone calls.</div><span class="fc-tag">10 Pain Zones · Send Report</span></div>
+      <div class="fc"><div class="fc-ico">📥</div><div class="fc-t">Patient Helper</div><div class="fc-d">Doctors review incoming pain reports from their patients and reply directly with tailored clinical guidance.</div><span class="fc-tag">Review Reports · Reply · Guidance</span></div>
+      <div class="fc"><div class="fc-ico">📚</div><div class="fc-t">Clinical Guidelines</div><div class="fc-d">AI search across PubMed, PEDro, Cochrane, and Google Scholar. Evidence-based summaries with direct source links.</div><span class="fc-tag">AI Search · PubMed · Cochrane</span></div>
+      <div class="fc"><div class="fc-ico">💪</div><div class="fc-t">Muscle Strength Testing</div><div class="fc-d">Full MMT system — grade every major muscle group using MRC scale 0–5. Track bilateral recovery over time.</div><span class="fc-tag">MMT · MRC 0–5 · Bilateral</span></div>
+      <div class="fc"><div class="fc-ico">🥗</div><div class="fc-t">Lifestyle & Nutrition</div><div class="fc-d">Doctors generate 7-day nutrition plans with BMR, TDEE, and macros based on patient data. Printable as PDF.</div><span class="fc-tag">Nutrition · BMR · TDEE · PDF</span></div>
+      <div class="fc"><div class="fc-ico">💬</div><div class="fc-t">Real-Time Chat</div><div class="fc-d">Secure messaging with text, images, videos, and files. Full history in Firestore — synced across every device.</div><span class="fc-tag">Chat · Files · Cloud · Push</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="roles-wrap">
+  <div class="ri">
+    <div class="sec-ey" style="color:var(--sage-pale);justify-content:center;margin-bottom:12px;">✦ Three Roles, One Platform</div>
+    <h2 class="rt">Built for <em>Doctors</em>, Patients & Students</h2>
+    <p class="rs">Every feature thoughtfully designed for the way physiotherapy professionals, patients, and physio students work together.</p>
+    <div class="rg">
+      <div class="rc reveal">
+        <span class="rc-ico">👨‍⚕️</span>
+        <div class="rc-t">Physiotherapist</div>
+        <div class="rc-s">Doctor Account</div>
+        <ul class="rc-li">
+          <li><span class="rli-d"></span>Run real-time ROM analysis with AI skeleton tracking</li>
+          <li><span class="rli-d"></span>Capture annotated session photos and generate PDF reports</li>
+          <li><span class="rli-d"></span>Browse 373 exercise videos across 8 types and 8 body parts</li>
+          <li><span class="rli-d"></span>Assign multi-video exercise plans with personal notes</li>
+          <li><span class="rli-d"></span>Monitor patient exercise completion and rehab progress</li>
+          <li><span class="rli-d"></span>Create 7-day nutrition plans with BMR, TDEE, and macros</li>
+          <li><span class="rli-d"></span>Search clinical guidelines with AI across PubMed and Cochrane</li>
+          <li><span class="rli-d"></span>Manage your appointment schedule with live calendar sync</li>
+          <li><span class="rli-d"></span>Chat directly with patients — messages and files in the cloud</li>
+          <li><span class="rli-d"></span>Keep organised Patient Files — history, notes &amp; linked plans</li>
+          <li><span class="rli-d"></span>Patient Helper — review pain reports and reply with guidance</li>
+        </ul>
+      </div>
+      <div class="rc reveal">
+        <span class="rc-ico">🧑‍🦽</span>
+        <div class="rc-t">Patient</div>
+        <div class="rc-s">Patient Account</div>
+        <ul class="rc-li">
+          <li><span class="rli-d"></span>View and complete prescribed physiotherapy exercise plans</li>
+          <li><span class="rli-d"></span>Watch exercise videos in-app without leaving the page</li>
+          <li><span class="rli-d"></span>Mark exercises complete with automatic date tracking</li>
+          <li><span class="rli-d"></span>Track rehabilitation progress with visual charts</li>
+          <li><span class="rli-d"></span>Pain Helper — describe your pain and send a report to your doctor</li>
+          <li><span class="rli-d"></span>Receive personalised 7-day nutrition plans from your doctor</li>
+          <li><span class="rli-d"></span>Book appointments by browsing live doctor schedules</li>
+          <li><span class="rli-d"></span>Chat with your doctor — full history on every device</li>
+          <li><span class="rli-d"></span>Install as mobile app — offline support on iOS and Android</li>
+        </ul>
+      </div>
+      <div class="rc reveal">
+        <span class="rc-ico">🎓</span>
+        <div class="rc-t">College Student</div>
+        <div class="rc-s">Student Account</div>
+        <ul class="rc-li">
+          <li><span class="rli-d"></span>Search clinical guidelines with AI across PubMed and Cochrane</li>
+          <li><span class="rli-d"></span>Full Manual Muscle Testing reference — grading, nerve supply &amp; technique videos</li>
+          <li><span class="rli-d"></span>Own profile with university and year of study — no clinic setup needed</li>
+          <li><span class="rli-d"></span>Student Chat — message fellow students</li>
+          <li><span class="rli-d"></span>Physio Lessons — coming soon</li>
+          <li><span class="rli-d"></span>Anatomy reference — coming soon</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="fl">Physio Motion</div>
+  <div class="fline"></div>
+  <div class="fb">Designed & Developed by</div>
+  <div class="fn">Youssef Elhadidy</div>
+  <div class="fline"></div>
+  <div class="fc2">© 2026 · AI-Powered Physiotherapy Platform by Therapix</div>
+</footer>
+
+<script>
+// Hide install banner if already running as standalone PWA
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+  const b = document.getElementById('installBanner');
+  const nb = document.getElementById('navInstallBtn');
+  const hb = document.getElementById('heroInstallBtn');
+  if (b)  b.style.display  = 'none';
+  if (nb) nb.style.display = 'none';
+  if (hb) hb.style.display = 'none';
+}
+
+const obs = new IntersectionObserver(es => es.forEach(e => {if(e.isIntersecting) e.target.classList.add('visible');}), {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+document.querySelectorAll('[href="#features"]').forEach(el => el.addEventListener('click', e => {e.preventDefault();document.getElementById('features').scrollIntoView({behavior:'smooth'});}));
+</script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

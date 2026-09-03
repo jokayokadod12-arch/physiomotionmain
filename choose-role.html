@@ -11,159 +11,112 @@
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
   <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-  <meta name="theme-color" content="#1D3028">
+  <meta name="theme-color" content="#152A1D">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Physio Motion">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Patient Dashboard — Physio Motion</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/function-lab.css">
 <link rel="stylesheet" href="css/mobile.css">
 <style>
 body { display:flex; flex-direction:column; min-height:100vh; }
 
-/* ── WELCOME HERO ── */
-.dash-hero {
-  position:relative; z-index:1;
-  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, var(--sage) 100%);
-  padding: 36px 24px 52px; overflow: hidden;
-}
-.dash-hero::before {
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background:
-    radial-gradient(ellipse 70% 80% at 15% 50%, rgba(90,122,98,.3) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 65% at 90% 20%, rgba(184,148,63,.15) 0%, transparent 55%);
-}
-.dash-hero::after {
-  content:''; position:absolute; bottom:0; left:0; right:0; height:4px;
-  background: linear-gradient(90deg, transparent, var(--sage-pale), var(--gold-light), var(--sage-pale), transparent);
-}
+/* ── WELCOME CONSOLE ── */
+.dash-hero { position:relative; z-index:1; padding: 34px 24px 46px; }
 .hero-inner {
-  max-width:900px; margin:0 auto; position:relative; z-index:1;
+  max-width:920px; margin:0 auto; position:relative; z-index:1;
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
 }
 .hw-left { flex:1; }
 .hw-badge {
   display:inline-flex; align-items:center; gap:7px;
-  padding:5px 14px; border-radius:100px;
-  background:rgba(250,247,242,.1); border:1px solid rgba(250,247,242,.2);
-  font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-  color:rgba(250,247,242,.7); margin-bottom:14px;
+  padding:5px 13px; border-radius:7px;
+  background:rgba(250,247,242,.08); border:1px solid rgba(250,247,242,.18);
+  font-size:10.5px; font-weight:600; letter-spacing:1.6px; text-transform:uppercase;
+  color:rgba(250,247,242,.72); margin-bottom:14px;
 }
-.hw-pulse {
-  width:6px; height:6px; border-radius:50%; background:var(--sage-pale);
-  animation: hwblink 2s ease-in-out infinite;
-}
+.hw-pulse { width:6px; height:6px; border-radius:50%; background:#8CD39C; animation: hwblink 2s ease-in-out infinite; }
 @keyframes hwblink { 0%,100%{opacity:1;} 50%{opacity:.3;} }
 .hw-name {
-  font-family:'Playfair Display', serif;
   font-size: clamp(20px, 3.5vw, 32px); font-weight:700;
-  color:#FAF7F2; letter-spacing:-.5px; margin-bottom:6px; line-height:1.2;
+  color:#FAF7F2; letter-spacing:-.7px; margin-bottom:6px; line-height:1.2;
 }
-.hw-sub { font-size:13px; color:rgba(250,247,242,.45); }
-.hw-right { display:flex; gap:16px; flex-wrap:wrap; }
-.hw-stat {
-  text-align:center; padding:14px 20px;
-  background:rgba(250,247,242,.08); border:1px solid rgba(250,247,242,.12); border-radius:14px;
-}
-.hw-stat-n {
-  font-family:'Playfair Display', serif;
-  font-size:24px; font-weight:700; color:#FAF7F2; display:block; letter-spacing:-.5px;
-}
-.hw-stat-l {
-  font-size:10px; font-weight:600; text-transform:uppercase;
-  letter-spacing:1px; color:rgba(250,247,242,.75); display:block; margin-top:3px;
-}
+.hw-sub { font-size:13px; color:rgba(250,247,242,.5); }
+.hw-right { display:flex; gap:14px; flex-wrap:wrap; }
+.hw-stat { text-align:center; padding:13px 18px; min-width:96px; }
+.hw-stat-n { font-size:21px; display:block; }
+.hw-stat-l { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:1px; display:block; margin-top:3px; }
 
 /* ── MAIN ── */
 .dash-main {
-  flex:1; max-width:900px; margin:0 auto; width:100%;
+  flex:1; max-width:920px; margin:0 auto; width:100%;
   padding:36px 24px 80px; position:relative; z-index:1;
 }
-
-/* ── SECTION LABEL ── */
 .sec-lbl {
-  font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  font-size:10.5px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
   color:var(--sage); margin-bottom:16px;
   display:flex; align-items:center; gap:10px;
 }
 .sec-lbl::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
 
-/* ── DASHBOARD CARDS ── */
-.cards-row {
-  display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:32px;
-}
+/* ── MODULE TILES ── */
+.cards-row { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:32px; }
 @media(max-width:680px) { .cards-row { grid-template-columns: 1fr 1fr; } }
 @media(max-width:380px) { .cards-row { grid-template-columns: 1fr 1fr; gap:10px; } }
 
 .dash-card {
-  background: white; border:1px solid var(--border); border-radius:20px;
+  background: white; border-radius:16px;
   display:flex; flex-direction:column; align-items:center;
-  padding:28px 18px 22px; gap:12px; cursor:pointer;
-  transition:all .28s cubic-bezier(.22,1,.36,1);
+  padding:32px 18px 22px; gap:11px; cursor:pointer;
+  transition:all .26s cubic-bezier(.22,1,.36,1);
   position:relative; overflow:hidden; text-align:center;
-  box-shadow: var(--shadow-sm);
 }
 .dash-card::before {
   content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  background: var(--dc, var(--sage)); opacity:0; transition:opacity .28s;
-  border-radius:20px 20px 0 0;
+  background: var(--dc, var(--sage)); opacity:0; transition:opacity .26s;
 }
-.dash-card::after {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg, rgba(90,122,98,.04), transparent);
-  opacity:0; transition:opacity .28s;
-}
-.dash-card:hover::before, .dash-card:hover::after { opacity:1; }
-.dash-card:hover {
-  transform:translateY(-6px);
-  border-color: rgba(90,122,98,.25);
-  box-shadow: 0 16px 50px rgba(44,44,44,.11);
-}
+.dash-card:hover::before { opacity:1; }
+.dash-card:hover { transform:translateY(-5px); }
 .dc-icon {
-  width:64px; height:64px; border-radius:18px;
-  background:var(--bg-warm, #F5EFE4); border:1px solid var(--border);
+  width:58px; height:58px;
   display:flex; align-items:center; justify-content:center;
-  font-size:28px; transition:all .28s; position:relative; z-index:1;
+  font-size:26px; transition:all .26s; position:relative; z-index:1;
 }
-.dash-card:hover .dc-icon { transform:scale(1.08); box-shadow:0 4px 16px rgba(44,44,44,.1); }
-.dc-title {
-  font-family:'Playfair Display', serif;
-  font-size:14px; font-weight:700; color:var(--forest);
-  position:relative; z-index:1; letter-spacing:-.1px;
-}
-.dc-desc { font-size:11px; color:var(--muted); line-height:1.55; position:relative; z-index:1; }
-.dc-arrow { font-size:16px; color:rgba(90,122,98,.2); transition:.28s; position:relative; z-index:1; }
+.dash-card:hover .dc-icon { transform:scale(1.08); }
+.dc-title { font-size:14px; font-weight:700; position:relative; z-index:1; }
+.dc-desc { font-size:11px; line-height:1.55; position:relative; z-index:1; }
+.dc-arrow { font-size:15px; color:rgba(90,122,98,.25); transition:.26s; position:relative; z-index:1; }
 .dash-card:hover .dc-arrow { color:var(--dc, var(--sage)); transform:translateX(3px); }
 
-/* ── TIP CARD ── */
+/* ── FIELD NOTE ── */
 .tip-card {
   background:linear-gradient(135deg, var(--forest-deep), var(--forest));
-  border-radius:20px; padding:24px 28px;
+  border-radius:16px; padding:24px 28px;
   display:flex; align-items:center; gap:18px;
-  box-shadow: var(--shadow);
 }
-.tip-icon { font-size:36px; flex-shrink:0; }
-.tip-text h4 {
-  font-family:'Playfair Display', serif;
-  font-size:16px; font-weight:700; color:#FAF7F2; margin-bottom:5px;
-}
+.tip-icon { font-size:34px; flex-shrink:0; }
+.tip-text h4 { font-size:15px; font-weight:700; color:#FAF7F2; margin-bottom:5px; }
 .tip-text p { font-size:13px; color:rgba(250,247,242,.55); line-height:1.65; }
 
 @media(max-width:420px) {
-  .dash-card { padding:18px 12px 15px; border-radius:16px; gap:8px; }
-  .dc-icon { width:50px; height:50px; font-size:22px; }
+  .dash-card { padding:20px 12px 15px; border-radius:14px; gap:8px; }
+  .dc-icon { width:48px; height:48px; font-size:21px; }
   .dc-title { font-size:12px; }
   .dc-desc { display:none; }
   .dash-main { padding:22px 14px 70px; }
-  .dash-hero { padding:28px 16px 44px; }
+  .dash-hero { padding:26px 16px 40px; }
   .tip-card { flex-direction:column; gap:12px; text-align:center; }
 }
 </style>
 </head>
-<body>
+<body class="fl-app">
+
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion</div>
@@ -177,22 +130,17 @@ body { display:flex; flex-direction:column; min-height:100vh; }
   </div>
 </header>
 
-<div class="dash-hero">
+<div class="dash-hero fl-console">
   <div class="hero-inner">
     <div class="hw-left">
-      <div class="hw-badge"><span class="hw-pulse"></span>Patient Dashboard</div>
+      <div class="hw-badge"><span class="hw-pulse"></span>Patient node · active</div>
       <h2 class="hw-name">Welcome back, <span id="patientName">—</span> 👋</h2>
       <p class="hw-sub">What would you like to work on today?</p>
     </div>
     <div class="hw-right">
-      <div class="hw-stat">
-        <span class="hw-stat-n" id="statExPlans">—</span>
-        <span class="hw-stat-l">Exercise Plans</span>
-      </div>
-      <div class="hw-stat">
-        <span class="hw-stat-n" id="statNutrPlans">—</span>
-        <span class="hw-stat-l">Nutrition Plans</span>
-      </div>
+      <div class="hw-stat"><span class="hw-stat-n mono" id="statExPlans">—</span><span class="hw-stat-l">Exercise Plans</span></div>
+      <div class="hw-stat"><span class="hw-stat-n mono" id="statNutrPlans">—</span><span class="hw-stat-l">Nutrition Plans</span></div>
+      <div class="hw-stat"><span class="hw-stat-n mono" id="statAppts">—</span><span class="hw-stat-l">Upcoming Visits</span></div>
     </div>
   </div>
 </div>
@@ -203,6 +151,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
   <div class="cards-row">
 
     <div class="dash-card" style="--dc:#C84A4A" onclick="window.location.href='pain-helper.html'">
+      <span class="tile-code">P01</span>
       <div class="dc-icon">🩹</div>
       <div class="dc-title">Pain Helper</div>
       <div class="dc-desc">Report your pain &amp; get guidance from a doctor</div>
@@ -210,6 +159,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="dash-card" style="--dc:var(--sage)" onclick="window.location.href='my-exercises.html'">
+      <span class="tile-code">P02</span>
       <div class="dc-icon">📋</div>
       <div class="dc-title">Exercise Plans</div>
       <div class="dc-desc">View and complete your prescribed exercises</div>
@@ -217,6 +167,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="dash-card" style="--dc:#3D8B5B" onclick="window.location.href='my-lifestyle.html'">
+      <span class="tile-code">P03</span>
       <div class="dc-icon">🥗</div>
       <div class="dc-title">Nutrition Plans</div>
       <div class="dc-desc">Your personalised nutrition programme</div>
@@ -224,6 +175,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="dash-card" style="--dc:var(--gold)" onclick="window.location.href='progress.html'">
+      <span class="tile-code">P04</span>
       <div class="dc-icon">📈</div>
       <div class="dc-title">My Progress</div>
       <div class="dc-desc">Track your rehabilitation journey</div>
@@ -231,6 +183,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="dash-card" style="--dc:#9B59B6" onclick="window.location.href='find-doctor.html'">
+      <span class="tile-code">P05</span>
       <div class="dc-icon">🔍</div>
       <div class="dc-title">Find a Doctor</div>
       <div class="dc-desc">Search &amp; book with physiotherapists</div>
@@ -238,6 +191,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="dash-card" style="--dc:#2980B9" onclick="window.location.href='my-appointments.html'">
+      <span class="tile-code">P06</span>
       <div class="dc-icon">📅</div>
       <div class="dc-title">My Appointments</div>
       <div class="dc-desc">View, manage and track your bookings</div>

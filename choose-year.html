@@ -11,207 +11,117 @@
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
   <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
-  <meta name="theme-color" content="#1D3028">
+  <meta name="theme-color" content="#152A1D">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Physio Motion">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Doctor Dashboard — Physio Motion</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/function-lab.css">
 <link rel="stylesheet" href="css/mobile.css">
 <style>
 body { display:flex; flex-direction:column; min-height:100vh; }
 
-/* ── DOCTOR HERO ── */
+/* ── DOCTOR CONSOLE ── */
 .doc-hero { position:relative; z-index:1; overflow:hidden; }
-
-.dh-top {
-  background: linear-gradient(135deg, var(--forest-deep) 0%, var(--forest) 55%, #3D6B47 100%);
-  padding:36px 24px 32px; position:relative; overflow:hidden;
-}
-.dh-top::before {
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background:
-    radial-gradient(ellipse 60% 100% at 100% 50%, rgba(184,148,63,.12) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 70% at 0% 0%, rgba(90,122,98,.25) 0%, transparent 50%);
-}
-.dh-top::after {
-  content:''; position:absolute; bottom:0; left:0; right:0; height:4px;
-  background: linear-gradient(90deg, transparent, var(--gold-light), var(--sage-pale), var(--gold-light), transparent);
-}
+.dh-top { padding:34px 24px 30px; position:relative; }
 .dh-inner {
-  max-width:1060px; margin:0 auto; position:relative; z-index:1;
+  max-width:1080px; margin:0 auto; position:relative; z-index:1;
   display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:22px;
 }
-.dh-profile { display:flex; align-items:center; gap:18px; }
+.dh-profile { display:flex; align-items:center; gap:16px; }
 .dh-av {
-  width:64px; height:64px; border-radius:20px;
-  background:rgba(250,247,242,.12); border:2px solid rgba(250,247,242,.2);
+  width:58px; height:58px; border-radius:15px;
+  background:rgba(250,247,242,.1); border:1.5px solid rgba(250,247,242,.2);
   display:flex; align-items:center; justify-content:center;
-  font-size:28px; box-shadow:0 8px 24px rgba(0,0,0,.2);
-  flex-shrink:0;
+  font-size:26px; flex-shrink:0;
 }
-.dh-info h2 {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(18px, 2.5vw, 26px); font-weight:700;
-  color:#FAF7F2; letter-spacing:-.3px; margin-bottom:4px;
-}
-.dh-info p { font-size:12px; color:rgba(250,247,242,.45); }
+.dh-info h2 { font-size:clamp(18px, 2.5vw, 25px); font-weight:700; color:#FAF7F2; letter-spacing:-.4px; margin-bottom:4px; }
+.dh-info p { font-size:12px; color:rgba(250,247,242,.5); }
 .dh-badge {
-  display:inline-flex; align-items:center; gap:6px; margin-top:8px;
-  padding:4px 12px; border-radius:100px;
-  background:rgba(184,148,63,.15); border:1px solid rgba(184,148,63,.3);
-  font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  display:inline-flex; align-items:center; gap:6px; margin-top:9px;
+  padding:4px 11px; border-radius:6px;
+  background:rgba(184,148,63,.15); border:1px solid rgba(184,148,63,.32);
+  font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
   color:var(--gold-light);
 }
-.dh-stats { display:flex; gap:14px; flex-wrap:wrap; }
-.dhs {
-  text-align:center; padding:14px 18px;
-  background:rgba(250,247,242,.08); border:1px solid rgba(250,247,242,.12); border-radius:14px;
-  min-width:78px;
-}
-.dhs-n {
-  font-family:'Playfair Display', serif;
-  font-size:22px; font-weight:700; color:#FAF7F2; display:block; letter-spacing:-.3px;
-}
-.dhs-l {
-  font-size:10px; font-weight:600; text-transform:uppercase;
-  letter-spacing:1px; color:rgba(250,247,242,.35); display:block; margin-top:3px;
-}
+.dh-stats { display:flex; gap:12px; flex-wrap:wrap; }
+.dhs { text-align:center; padding:13px 17px; min-width:76px; }
+.dhs-n { font-size:19px; display:block; }
+.dhs-l { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:1px; display:block; margin-top:3px; }
 
-/* ── QUICK STATS STRIP ── */
-.qs-strip {
-  background:white; border-bottom:1px solid var(--border); padding:20px 24px;
-  box-shadow:0 2px 12px rgba(44,44,44,.05);
-}
-.qs-inner {
-  max-width:1060px; margin:0 auto;
-  display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;
-}
-@media(max-width:600px) { .qs-inner { gap:10px; } }
-.qsc {
-  background:var(--cream-warm, #F5EFE4); border:1px solid var(--border);
-  border-radius:14px; padding:16px; text-align:center;
-  position:relative; overflow:hidden; transition:all .22s;
-}
-.qsc::after {
-  content:''; position:absolute; bottom:0; left:10%; right:10%; height:2px;
-  background:var(--qc, var(--sage-pale)); border-radius:2px;
-}
-.qsc:hover { box-shadow:var(--shadow-sage); transform:translateY(-2px); }
-.qsc-n {
-  font-family:'Playfair Display', serif;
-  font-size:26px; font-weight:700; color:var(--qc, var(--sage));
-  display:block; letter-spacing:-.5px;
-}
-.qsc-l {
-  font-size:10px; font-weight:600; text-transform:uppercase;
-  letter-spacing:1.2px; color:var(--muted); display:block; margin-top:4px;
-}
+/* ── SPEC STRIP ── */
+.qs-strip { background:white; border-bottom:1px solid var(--border); padding:18px 24px; position:relative; z-index:1; }
+.qs-inner { max-width:1080px; margin:0 auto; display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+@media(max-width:600px) { .qs-inner { gap:9px; } }
+.qsc { border-radius:12px; padding:15px; text-align:center; }
+.qsc-n { font-size:22px; display:block; }
+.qsc-l { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:1.1px; display:block; margin-top:4px; }
 
 /* ── MAIN ── */
-.doc-main {
-  flex:1; max-width:1060px; margin:0 auto; width:100%;
-  padding:32px 24px 80px; position:relative; z-index:1;
-}
+.doc-main { flex:1; max-width:1080px; margin:0 auto; width:100%; padding:32px 24px 80px; position:relative; z-index:1; }
 .sec-lbl {
-  font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
-  color:var(--sage); margin-bottom:16px;
-  display:flex; align-items:center; gap:10px;
+  font-size:10.5px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--sage); margin-bottom:16px; display:flex; align-items:center; gap:10px;
 }
 .sec-lbl::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
 
-/* ── MODULE CARDS ── */
-.modules-grid {
-  display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;
-}
+/* ── MODULE TILES ── */
+.modules-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:28px; }
+@media(max-width:900px) { .modules-grid { grid-template-columns:repeat(3, 1fr); } }
 @media(max-width:700px) { .modules-grid { grid-template-columns:1fr 1fr; } }
 @media(max-width:380px) { .modules-grid { grid-template-columns:1fr 1fr; gap:10px; } }
 
 .module-card {
-  background:white; border:1px solid var(--border); border-radius:20px;
-  padding:26px 18px 20px; cursor:pointer;
-  transition:all .28s cubic-bezier(.22,1,.36,1);
+  background:white; border-radius:16px;
+  padding:28px 16px 18px; cursor:pointer;
+  transition:all .26s cubic-bezier(.22,1,.36,1);
   position:relative; overflow:hidden;
-  display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;
-  box-shadow: var(--shadow-sm);
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:9px;
 }
 .module-card::before {
   content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  background:var(--mc, var(--sage)); opacity:0; transition:.28s;
-  border-radius:20px 20px 0 0;
+  background:var(--mc, var(--sage)); opacity:0; transition:.26s;
 }
-.module-card::after {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg, rgba(90,122,98,.04), transparent);
-  opacity:0; transition:.28s;
-}
-.module-card:hover::before, .module-card:hover::after { opacity:1; }
-.module-card:hover {
-  transform:translateY(-5px);
-  border-color: rgba(90,122,98,.22);
-  box-shadow: 0 14px 44px rgba(44,44,44,.1);
-}
-.mc-icon {
-  width:58px; height:58px; border-radius:16px;
-  background:var(--cream-warm, #F5EFE4); border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center;
-  font-size:26px; transition:all .28s; position:relative; z-index:1;
-}
-.module-card:hover .mc-icon { transform:scale(1.1); box-shadow:0 4px 14px rgba(44,44,44,.1); }
-.mc-title {
-  font-family:'Playfair Display', serif;
-  font-size:13px; font-weight:700; color:var(--forest);
-  position:relative; z-index:1; letter-spacing:-.1px;
-}
-.mc-desc { font-size:11px; color:var(--muted); line-height:1.55; position:relative; z-index:1; }
-.mc-arr { font-size:14px; color:rgba(90,122,98,.2); transition:.28s; position:relative; z-index:1; }
+.module-card:hover::before { opacity:1; }
+.module-card:hover { transform:translateY(-5px); }
+.mc-icon { width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-size:24px; transition:all .26s; position:relative; z-index:1; }
+.module-card:hover .mc-icon { transform:scale(1.1); }
+.mc-title { font-size:13px; font-weight:700; position:relative; z-index:1; }
+.mc-desc { font-size:10.5px; line-height:1.5; position:relative; z-index:1; }
+.mc-arr { font-size:13px; color:rgba(90,122,98,.25); transition:.26s; position:relative; z-index:1; }
 .module-card:hover .mc-arr { color:var(--mc, var(--sage)); transform:translateX(3px); }
 
-/* ── SCHEDULE PREVIEW ── */
-.schedule-card {
-  background:white; border:1px solid var(--border);
-  border-radius:20px; padding:24px 28px; box-shadow:var(--shadow-sm);
-}
-.sch-head {
-  display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;
-}
-.sch-title {
-  font-family:'Playfair Display', serif;
-  font-size:16px; font-weight:700; color:var(--forest);
-}
-.sch-empty { text-align:center; padding:28px 20px; color:var(--muted); font-size:13px; }
-.sch-empty-ico { font-size:32px; margin-bottom:10px; }
-.sch-empty-sub { font-size:12px; color:var(--muted-light); margin-top:5px; }
-.sch-item {
-  display:flex; align-items:center; gap:14px;
-  padding:12px 0; border-bottom:1px solid var(--border);
-}
+/* ── SESSION LOG ── */
+.schedule-card { padding:22px 26px; }
+.sch-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.sch-title { font-size:15px; font-weight:700; }
+.sch-empty { text-align:center; padding:26px 20px; color:var(--muted); font-size:13px; }
+.sch-empty-ico { font-size:30px; margin-bottom:9px; }
+.sch-empty-sub { font-size:11.5px; color:var(--muted-light); margin-top:5px; }
+.sch-item { display:flex; align-items:center; gap:14px; padding:11px 0; border-bottom:1px solid var(--border); }
 .sch-item:last-child { border-bottom:none; }
-.sch-time {
-  font-family:'DM Mono', monospace; font-size:12px; font-weight:500;
-  color:var(--sage); min-width:60px;
-}
-.sch-dot {
-  width:8px; height:8px; border-radius:50%;
-  background:var(--sage-pale); flex-shrink:0;
-}
-.sch-name { font-size:14px; font-weight:600; color:var(--charcoal); }
-.sch-type { font-size:12px; color:var(--muted); margin-top:1px; }
+.sch-time { font-size:12px; font-weight:500; color:var(--sage); min-width:58px; }
+.sch-name { font-size:13.5px; font-weight:600; color:var(--charcoal); }
+.sch-type { font-size:11.5px; color:var(--muted); margin-top:1px; }
 
 @media(max-width:420px) {
-  .module-card { padding:18px 12px 14px; border-radius:14px; gap:7px; }
-  .mc-icon { width:48px; height:48px; font-size:22px; }
+  .module-card { padding:18px 10px 13px; border-radius:14px; gap:6px; }
+  .mc-icon { width:44px; height:44px; font-size:20px; }
   .mc-title { font-size:11px; }
   .mc-desc { display:none; }
   .doc-main { padding:20px 14px 70px; }
-  .dh-top { padding:28px 16px 28px; }
+  .dh-top { padding:26px 16px 24px; }
 }
 </style>
 </head>
-<body>
+<body class="fl-app">
+
+<div class="fl-sig">WE ARE PEOPLE DEALING WITH <b>FUNCTION</b></div>
 
 <header class="site-header">
   <div class="logo"><img class="logo-img" src="icons/logo.png" alt="Physio Motion" onerror="this.style.display='none'"> Physio Motion Analyzer</div>
@@ -226,19 +136,19 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 </header>
 
 <div class="doc-hero">
-  <div class="dh-top">
+  <div class="dh-top fl-console">
     <div class="dh-inner">
       <div class="dh-profile">
         <div class="dh-av">👨‍⚕️</div>
         <div class="dh-info">
           <h2>Dr. <span id="drName">—</span></h2>
-          <p>Physiotherapist Portal — manage patients, assessments &amp; resources</p>
-          <div class="dh-badge">✦ Doctor Account</div>
+          <p>Physiotherapist portal — manage patients, assessments &amp; resources</p>
+          <div class="dh-badge">✦ Doctor account</div>
         </div>
       </div>
       <div class="dh-stats">
-        <div class="dhs"><span class="dhs-n" id="wsSessions">—</span><span class="dhs-l">Sessions</span></div>
-        <div class="dhs"><span class="dhs-n" id="wsPlans">—</span><span class="dhs-l">Plans</span></div>
+        <div class="dhs"><span class="dhs-n mono" id="wsSessions">—</span><span class="dhs-l">Sessions</span></div>
+        <div class="dhs"><span class="dhs-n mono" id="wsPlans">—</span><span class="dhs-l">Plans</span></div>
       </div>
     </div>
   </div>
@@ -246,15 +156,15 @@ body { display:flex; flex-direction:column; min-height:100vh; }
   <div class="qs-strip">
     <div class="qs-inner">
       <div class="qsc" style="--qc:var(--sage);">
-        <span class="qsc-n" id="qsRom">0</span>
+        <span class="qsc-n mono" id="qsRom">0</span>
         <span class="qsc-l">ROM Sessions</span>
       </div>
       <div class="qsc" style="--qc:var(--gold);">
-        <span class="qsc-n" id="qsEx">0</span>
+        <span class="qsc-n mono" id="qsEx">0</span>
         <span class="qsc-l">Exercise Plans</span>
       </div>
       <div class="qsc" style="--qc:#3D8B5B;">
-        <span class="qsc-n" id="qsNutr">0</span>
+        <span class="qsc-n mono" id="qsNutr">0</span>
         <span class="qsc-l">Nutrition Plans</span>
       </div>
     </div>
@@ -267,6 +177,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
   <div class="modules-grid">
 
     <div class="module-card" style="--mc:#5A7A62" onclick="window.location.href='patient-files.html'">
+      <span class="tile-code">D01</span>
       <div class="mc-icon">🗂️</div>
       <div class="mc-title">Patient Files</div>
       <div class="mc-desc">Organized records — history, notes &amp; linked plans</div>
@@ -274,6 +185,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:var(--sage)" onclick="window.location.href='plans.html'">
+      <span class="tile-code">D02</span>
       <div class="mc-icon">📁</div>
       <div class="mc-title">Plans</div>
       <div class="mc-desc">ROM data, exercise plans, progress &amp; nutrition</div>
@@ -281,6 +193,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:#2980B9" onclick="window.location.href='assessments.html'">
+      <span class="tile-code">D03</span>
       <div class="mc-icon">🔬</div>
       <div class="mc-title">Assessments</div>
       <div class="mc-desc">ROM analysis &amp; manual muscle testing</div>
@@ -288,6 +201,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:var(--gold)" onclick="window.location.href='therapeutic-exercises.html'">
+      <span class="tile-code">D04</span>
       <div class="mc-icon">🏋️</div>
       <div class="mc-title">Exercises</div>
       <div class="mc-desc">Browse &amp; assign therapeutic exercise plans</div>
@@ -295,6 +209,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:#3D8B5B" onclick="window.location.href='lifestyle.html'">
+      <span class="tile-code">D05</span>
       <div class="mc-icon">🥗</div>
       <div class="mc-title">Lifestyle</div>
       <div class="mc-desc">Create personalised nutrition &amp; calorie plans</div>
@@ -302,6 +217,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:#9B59B6" onclick="window.location.href='guidelines.html'">
+      <span class="tile-code">D06</span>
       <div class="mc-icon">📚</div>
       <div class="mc-title">Guidelines</div>
       <div class="mc-desc">AI clinical guidelines &amp; medical library</div>
@@ -309,6 +225,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:#1a6b8a" onclick="window.location.href='patient-helper.html'">
+      <span class="tile-code">D07</span>
       <div class="mc-icon">🩹</div>
       <div class="mc-title">Patient Helper</div>
       <div class="mc-desc">Review patient pain reports &amp; reply with guidance</div>
@@ -316,6 +233,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
     </div>
 
     <div class="module-card" style="--mc:#C84A4A" onclick="window.location.href='doctor-schedule.html'">
+      <span class="tile-code">D08</span>
       <div class="mc-icon">📅</div>
       <div class="mc-title">Schedule</div>
       <div class="mc-desc">Manage appointments &amp; patient calendar</div>

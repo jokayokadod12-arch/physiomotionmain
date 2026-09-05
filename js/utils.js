@@ -123,16 +123,24 @@ function _db() {
   return null;
 }
 
-async function fbGetUser(email) {
+// Like fbGetUser, but also tells the caller WHY it returned null:
+// ok=true  + data=null  → Firestore reached successfully, doc genuinely doesn't exist (real deletion)
+// ok=false + data=null  → network/timeout error, we couldn't confirm either way
+async function fbGetUserStatus(email) {
   const db = _db();
-  if (!db) return null;
+  if (!db) return { ok: false, data: null };
   try {
     const snap = await Promise.race([
       db.collection('users').doc(email).get(),
       new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
     ]);
-    return snap.exists ? snap.data() : null;
-  } catch(e) { console.warn('fbGetUser error:', e.message); return null; }
+    return { ok: true, data: snap.exists ? snap.data() : null };
+  } catch(e) { console.warn('fbGetUser error:', e.message); return { ok: false, data: null }; }
+}
+
+async function fbGetUser(email) {
+  const { data } = await fbGetUserStatus(email);
+  return data;
 }
 
 async function fbSaveUser(userData) {
@@ -200,14 +208,23 @@ function saveSessions(email, sessions) {
 // ── Cloud-first async functions ───────────────────────────
 async function asyncGetUser(email) {
   if (window.FIREBASE_ENABLED) {
-    const u = await fbGetUser(email);
-    if (u) {
+    const { ok, data } = await fbGetUserStatus(email);
+    if (ok) {
       const users = getAllUsers();
       const idx = users.findIndex(x => x.email === email);
-      if (idx !== -1) users[idx] = u; else users.push(u);
-      saveUsers(users);
-      return u;
+      if (data) {
+        if (idx !== -1) users[idx] = data; else users.push(data);
+        saveUsers(users);
+        return data;
+      }
+      // Firestore confirmed: this account was actually deleted.
+      // Purge it from the local cache too, so a stale browser copy
+      // can't be used to log in anymore.
+      if (idx !== -1) { users.splice(idx, 1); saveUsers(users); }
+      return null;
     }
+    // ok === false → couldn't reach Firestore (offline/timeout), only
+    // then do we fall back to whatever we last cached locally.
   }
   return getAllUsers().find(u => u.email === email) || null;
 }
@@ -257,14 +274,23 @@ function requireAuth(requiredRole = null) {
   }
   // Silently refresh user data from Firestore in background
   if (window.FIREBASE_ENABLED) {
-    fbGetUser(user.email).then(fresh => {
-      if (fresh) {
-        updateCurrentUser(fresh);
+    fbGetUserStatus(user.email).then(({ ok, data }) => {
+      if (!ok) return; // network/timeout — don't act on unconfirmed info
+      if (data) {
+        updateCurrentUser(data);
         // If a Super Admin suspended this account mid-session, sign them out immediately
-        if (fresh.accountStatus === 'suspended') {
+        if (data.accountStatus === 'suspended') {
           localStorage.removeItem('currentUser');
           window.location.href = 'login.html';
         }
+      } else {
+        // Account was deleted from Firestore while the session was active
+        // (or was only ever cached locally, never really created in the cloud).
+        // Sign out immediately and purge the stale local copy.
+        localStorage.removeItem('currentUser');
+        const users = getAllUsers().filter(u => u.email !== user.email);
+        saveUsers(users);
+        window.location.href = 'login.html';
       }
     }).catch(() => {});
   }
